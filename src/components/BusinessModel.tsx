@@ -47,15 +47,15 @@ const BusinessModel = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-3xl font-bold text-gray-900">0€</div>
+              <div className="text-3xl font-bold text-gray-900">Asset-Light</div>
               <p className="text-gray-600">
-                Costi fissi per le aziende. Il modello è completamente transazionale 
-                e scala con i volumi.
+                Modello completamente digitale senza costi fissi per le aziende. 
+                Margini crescenti con i volumi.
               </p>
               <ul className="text-sm text-gray-600 space-y-2">
-                <li>• Nessun costo di acquisizione clienti</li>
-                <li>• Margini crescenti con i volumi</li>
                 <li>• Network effect bilaterale</li>
+                <li>• Costi marginali decrescenti</li>
+                <li>• Scalabilità geografica rapida</li>
               </ul>
             </CardContent>
           </Card>
@@ -68,15 +68,15 @@ const BusinessModel = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-3xl font-bold text-gray-900">2x</div>
+              <div className="text-3xl font-bold text-gray-900">Go-to-Market</div>
               <p className="text-gray-600">
-                Crescita prevista anno su anno attraverso referral organici 
-                e network effect.
+                Strategia di crescita focalizzata su qualità del servizio 
+                e network effect organico.
               </p>
               <ul className="text-sm text-gray-600 space-y-2">
-                <li>• Referral da aziende soddisfatte</li>
-                <li>• Network di recruiter qualificati</li>
-                <li>• Espansione geografica graduale</li>
+                <li>• Partner recruiter selezionati</li>
+                <li>• PMI tech e digital first</li>
+                <li>• Espansione per referral</li>
               </ul>
             </CardContent>
           </Card>

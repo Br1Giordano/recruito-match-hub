@@ -34,16 +34,16 @@ const Hero = () => {
 
             <div className="flex items-center space-x-8 pt-8">
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">0€</div>
-                <div className="text-sm text-gray-600">Costi fissi</div>
+                <div className="text-2xl font-bold text-gray-900">Solo successo</div>
+                <div className="text-sm text-gray-600">Paghi solo a risultato</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">-70%</div>
                 <div className="text-sm text-gray-600">Tempi di ricerca</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">15%</div>
-                <div className="text-sm text-gray-600">Success fee</div>
+                <div className="text-2xl font-bold text-gray-900">24h</div>
+                <div className="text-sm text-gray-600">Prime proposte</div>
               </div>
             </div>
           </div>

@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Users2, TrendingUp, Target } from "lucide-react";
@@ -59,19 +60,25 @@ const Market = () => {
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-recruito-blue rounded-full mt-2"></div>
                 <p className="text-gray-600">
-                  <strong>Mercato ampio:</strong> Il recruiting è ricorrente e strutturalmente inefficiente
+                  <strong>Mercato ampio e ricorrente:</strong> Il recruiting è strutturalmente inefficiente in Italia, 
+                  con un valore totale di €2.5 miliardi annui. Le aziende assumono continuamente, 
+                  creando domanda costante per soluzioni efficaci.
                 </p>
               </div>
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-recruito-teal rounded-full mt-2"></div>
                 <p className="text-gray-600">
-                  <strong>Poco digitalizzato:</strong> Nessuna piattaforma ha standardizzato l'incontro
+                  <strong>Settore poco digitalizzato:</strong> Nessuna piattaforma ha standardizzato 
+                  l'incontro tra PMI e recruiter freelance. Il mercato è frammentato tra agenzie 
+                  tradizionali costose e portali generici inefficienti.
                 </p>
               </div>
               <div className="flex items-start space-x-3">
                 <div className="w-2 h-2 bg-recruito-green rounded-full mt-2"></div>
                 <p className="text-gray-600">
-                  <strong>Scalabile:</strong> Modello asset-light con margini progressivi
+                  <strong>Modello altamente scalabile:</strong> Asset-light con margini progressivi 
+                  e network effect bilaterale. Anche una penetrazione minima del mercato 
+                  garantisce sostenibilità e crescita rapida.
                 </p>
               </div>
             </CardContent>

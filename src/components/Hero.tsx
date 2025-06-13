@@ -38,12 +38,12 @@ const Hero = () => {
                 <div className="text-sm text-gray-600">Paghi solo a risultato</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">-70%</div>
-                <div className="text-sm text-gray-600">Tempi di ricerca</div>
+                <div className="text-2xl font-bold text-gray-900">Qualità</div>
+                <div className="text-sm text-gray-600">Recruiter verificati</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">24h</div>
-                <div className="text-sm text-gray-600">Prime proposte</div>
+                <div className="text-2xl font-bold text-gray-900">Efficienza</div>
+                <div className="text-sm text-gray-600">Processo digitale</div>
               </div>
             </div>
           </div>

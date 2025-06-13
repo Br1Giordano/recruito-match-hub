@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Building2, Users2, TrendingUp, Target } from "lucide-react";
@@ -21,7 +20,7 @@ const Market = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-3">
                 <Building2 className="h-8 w-8 text-recruito-blue" />
-                <span>Chi abbiamo bisogno del prodotto?</span>
+                <span>Chi ha bisogno del prodotto?</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">

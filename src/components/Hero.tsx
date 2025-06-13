@@ -9,41 +9,41 @@ const Hero = () => {
       <div className="absolute inset-0 gradient-recruito opacity-5"></div>
       
       <div className="container mx-auto px-4 py-20">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8 animate-fade-in">
-            <div className="space-y-4">
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-10 animate-fade-in">
+            <div className="space-y-6">
+              <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 leading-tight">
                 Il recruiting che 
                 <span className="text-gradient block">funziona davvero</span>
               </h1>
-              <p className="text-xl text-gray-600 leading-relaxed">
+              <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed">
                 Connetti la tua PMI con i migliori recruiter freelance d'Italia. 
                 Assumi profili qualificati in tempi rapidi, pagando solo a risultato.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-8 py-4">
+            <div className="flex flex-col sm:flex-row gap-6">
+              <Button size="lg" className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5">
                 Inizia ora come Azienda
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="text-lg px-8 py-4">
+              <Button size="lg" variant="outline" className="text-lg px-10 py-5">
                 Diventa Recruiter Partner
               </Button>
             </div>
 
-            <div className="flex items-center space-x-8 pt-8">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">Solo successo</div>
-                <div className="text-sm text-gray-600">Paghi solo a risultato</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-12">
+              <div className="text-center space-y-2">
+                <div className="text-3xl font-bold text-gray-900">Solo successo</div>
+                <div className="text-base text-gray-600">Paghi solo a risultato ottenuto</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">Qualità</div>
-                <div className="text-sm text-gray-600">Recruiter verificati</div>
+              <div className="text-center space-y-2">
+                <div className="text-3xl font-bold text-gray-900">Qualità garantita</div>
+                <div className="text-base text-gray-600">Recruiter selezionati e verificati</div>
               </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-gray-900">Efficienza</div>
-                <div className="text-sm text-gray-600">Processo digitale</div>
+              <div className="text-center space-y-2">
+                <div className="text-3xl font-bold text-gray-900">Processo digitale</div>
+                <div className="text-base text-gray-600">Piattaforma moderna ed efficiente</div>
               </div>
             </div>
           </div>

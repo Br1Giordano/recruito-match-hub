@@ -9,7 +9,7 @@ const Header = () => {
           <img 
             src="/lovable-uploads/622bfff9-400d-453f-888f-082777d77474.png" 
             alt="Recruito Logo" 
-            className="h-12 w-auto"
+            className="h-16 w-auto"
           />
         </div>
         

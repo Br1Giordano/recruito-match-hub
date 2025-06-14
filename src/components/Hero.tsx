@@ -1,7 +1,6 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
@@ -24,16 +23,12 @@ const Hero = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6">
-              <Button asChild size="lg" className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5">
-                <Link to="/registrazione-azienda">
-                  Inizia ora come Azienda
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+              <Button size="lg" className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5">
+                Inizia ora come Azienda
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button asChild size="lg" variant="outline" className="text-lg px-10 py-5">
-                <Link to="/registrazione-recruiter">
-                  Diventa Recruiter Partner
-                </Link>
+              <Button size="lg" variant="outline" className="text-lg px-10 py-5">
+                Diventa Recruiter Partner
               </Button>
             </div>
 

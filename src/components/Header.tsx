@@ -7,9 +7,9 @@ const Header = () => {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <img 
-            src="/lovable-uploads/622bfff9-400d-453f-888f-082777d77474.png" 
+            src="/lovable-uploads/2b14001c-d6fa-47cf-84de-a64fba53c4fb.png" 
             alt="Recruito Logo" 
-            className="h-20 w-auto"
+            className="h-12 w-auto"
           />
         </div>
         

@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DollarSign, TrendingUp, Users, ArrowRight } from "lucide-react";
@@ -28,12 +27,13 @@ const BusinessModel = () => {
               <div className="text-3xl font-bold text-gray-900">15%</div>
               <p className="text-gray-600">
                 della RAL annuale, trattenuta dalla success fee pagata dalle aziende 
-                solo a assunzione completata.
+                solo a assunzione completata. Il 70% va direttamente al recruiter.
               </p>
               <div className="bg-green-50 p-4 rounded-lg">
                 <p className="text-sm text-green-800">
-                  <strong>Esempio:</strong> Su una RAL di €50.000, l'azienda paga €7.500, 
-                  noi tratteniamo €1.125
+                  <strong>Esempio:</strong> Su una RAL di €50.000, l'azienda paga €7.500<br/>
+                  • Recruiter riceve: €5.250 (70%)<br/>
+                  • Recruito trattiene: €2.250 (30%)
                 </p>
               </div>
             </CardContent>

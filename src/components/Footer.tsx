@@ -1,17 +1,10 @@
-
 import { Separator } from "@/components/ui/separator";
-
 const Footer = () => {
-  return (
-    <footer className="bg-gray-900 text-white py-16">
+  return <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8 mb-12">
           <div className="space-y-4">
-            <img 
-              src="/lovable-uploads/622bfff9-400d-453f-888f-082777d77474.png" 
-              alt="Recruito Logo" 
-              className="h-8 w-auto filter brightness-0 invert"
-            />
+            <img alt="Recruito Logo" className="h-8 w-auto filter brightness-0 invert" src="/lovable-uploads/2bdf0373-8288-4fbf-bbe0-d287e1ea91eb.jpg" />
             <p className="text-gray-400">
               La piattaforma che connette PMI italiane con i migliori recruiter freelance.
             </p>
@@ -40,8 +33,8 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Contatti</h4>
             <ul className="space-y-2 text-gray-400">
-              <li>info@recruito.it</li>
-              <li>+39 02 1234 5678</li>
+              <li>contact.recruito@gmail.com</li>
+              <li>+39 3440554181</li>
               <li>Milano, Italia</li>
             </ul>
           </div>
@@ -66,8 +59,6 @@ const Footer = () => {
           </div>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;

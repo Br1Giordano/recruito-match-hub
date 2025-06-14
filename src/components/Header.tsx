@@ -9,11 +9,14 @@ const Header = () => {
           <img 
             src="/lovable-uploads/622bfff9-400d-453f-888f-082777d77474.png" 
             alt="Recruito Logo" 
-            className="h-16 w-auto"
+            className="h-20 w-auto"
           />
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
+          <a href="#come-funziona" className="text-gray-600 hover:text-gray-900 transition-colors">
+            Come Funziona
+          </a>
           <a href="#problema" className="text-gray-600 hover:text-gray-900 transition-colors">
             Problema
           </a>

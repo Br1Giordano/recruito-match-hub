@@ -17,7 +17,7 @@ const Hero = () => {
                 <span className="text-gradient block">funziona davvero</span>
               </h1>
               <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed">
-                Connetti la tua PMI con i migliori recruiter freelance d'Italia. 
+                Connetti la tua azienda con i migliori recruiter freelance d'Italia. 
                 Assumi profili qualificati in tempi rapidi, pagando solo a risultato.
               </p>
             </div>

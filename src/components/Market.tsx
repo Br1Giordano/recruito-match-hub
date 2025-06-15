@@ -26,7 +26,7 @@ const Market = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">PMI in crescita</h4>
+                <h4 className="font-semibold text-gray-900 mb-2">Aziende in crescita</h4>
                 <p className="text-gray-600">
                   Aziende nei settori tech, digital, ingegneria e commerciale che necessitano 
                   di profili qualificati senza i costi delle agenzie tradizionali.
@@ -69,7 +69,7 @@ const Market = () => {
                 <div className="w-2 h-2 bg-recruito-teal rounded-full mt-2"></div>
                 <p className="text-gray-600">
                   <strong>Settore poco digitalizzato:</strong> Nessuna piattaforma ha standardizzato 
-                  l'incontro tra PMI e recruiter freelance. Il mercato è frammentato tra agenzie 
+                  l'incontro tra aziende e recruiter freelance. Il mercato è frammentato tra agenzie 
                   tradizionali costose e portali generici inefficienti.
                 </p>
               </div>
@@ -88,7 +88,7 @@ const Market = () => {
         <div className="bg-gradient-to-r from-blue-50 to-green-50 rounded-3xl p-8 mb-16">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-4">
-              La nostra differenziazione
+              I nostri vantaggi competitivi
             </h3>
             <p className="text-gray-600">
               Prima piattaforma italiana che connette aziende con recruiter freelance qualificati

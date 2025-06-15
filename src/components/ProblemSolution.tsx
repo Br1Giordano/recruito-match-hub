@@ -12,7 +12,7 @@ const ProblemSolution = () => {
             Il problema che risolviamo
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Le PMI italiane sono bloccate da processi di recruiting costosi, lenti e inefficaci
+            Le aziende italiane sono bloccate da processi di recruiting costosi, lenti e inefficaci
           </p>
         </div>
 
@@ -34,7 +34,7 @@ const ProblemSolution = () => {
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Costi Elevati</h3>
               <p className="text-gray-600">
                 Le agenzie tradizionali hanno fee del 20-25% con costi fissi 
-                che le PMI non possono sostenere.
+                che molte aziende non possono sostenere.
               </p>
             </CardContent>
           </Card>
@@ -57,7 +57,7 @@ const ProblemSolution = () => {
             La nostra <span className="text-gradient">soluzione</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Una piattaforma che connette PMI e recruiter freelance qualificati per un recruiting efficace e trasparente
+            Una piattaforma che connette aziende e recruiter freelance qualificati per un recruiting efficace e trasparente
           </p>
         </div>
 

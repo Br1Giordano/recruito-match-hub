@@ -66,7 +66,7 @@ const Hero = () => {
                 <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
                   <Target className="h-12 w-12 text-recruito-teal mb-4" />
                   <h3 className="font-semibold text-gray-900 mb-2">Solo a Successo</h3>
-                  <p className="text-gray-600 text-sm">Paghi solo quando assumiamo il candidato giusto</p>
+                  <p className="text-gray-600 text-sm">Paghi solo quando trovi e assumi il candidato giusto</p>
                 </div>
               </div>
             </div>

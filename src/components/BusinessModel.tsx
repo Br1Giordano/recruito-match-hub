@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DollarSign, TrendingUp, Users, ArrowRight } from "lucide-react";
+import { DollarSign, TrendingUp, Users, ArrowRight, ArrowDown } from "lucide-react";
 
 const BusinessModel = () => {
   return (
@@ -13,6 +13,42 @@ const BusinessModel = () => {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Un modello sostenibile che cresce con il successo dei nostri clienti
           </p>
+        </div>
+
+        {/* Revenue Example Section */}
+        <div className="bg-white rounded-3xl p-8 shadow-lg mb-16">
+          <h3 className="text-3xl font-bold text-gray-900 text-center mb-8">
+            Esempio con RAL €40k
+          </h3>
+          
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between p-6 bg-gray-50 rounded-xl mb-6">
+              <span className="text-lg font-semibold text-gray-900">RAL Candidato</span>
+              <span className="text-2xl font-bold text-gray-900">€40.000</span>
+            </div>
+
+            <div className="flex justify-center mb-6">
+              <ArrowDown className="h-8 w-8 text-gray-400" />
+            </div>
+
+            <div className="bg-blue-50 p-6 rounded-xl mb-6">
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-semibold text-gray-900">Success Fee (15%)</span>
+                <span className="text-2xl font-bold text-blue-600">€6.000</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-green-50 p-6 rounded-xl text-center">
+                <div className="text-sm text-gray-600 mb-2">Al Recruiter (70%)</div>
+                <div className="text-2xl font-bold text-green-600">€4.200</div>
+              </div>
+              <div className="bg-teal-50 p-6 rounded-xl text-center">
+                <div className="text-sm text-gray-600 mb-2">A Recruito (30%)</div>
+                <div className="text-2xl font-bold text-teal-600">€1.800</div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8 mb-16">

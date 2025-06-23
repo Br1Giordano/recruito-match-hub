@@ -188,7 +188,7 @@ const HowItWorks = () => {
                   <DollarSign className="h-6 w-6 text-red-500 mt-1" />
                   <div>
                     <h5 className="font-semibold text-gray-900">Costi elevati</h5>
-                    <p className="text-gray-600 text-sm">Fee del 20-25% + costi fissi e anticipi</p>
+                    <p className="text-gray-600 text-sm">Fee del 18-20% + costi fissi e anticipi</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 p-4 bg-red-50 rounded-xl">

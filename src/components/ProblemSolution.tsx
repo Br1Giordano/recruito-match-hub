@@ -33,7 +33,7 @@ const ProblemSolution = () => {
               <DollarSign className="h-16 w-16 text-red-500 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-4">Costi Elevati</h3>
               <p className="text-gray-600">
-                Le agenzie tradizionali hanno fee del 20-25% con costi fissi 
+                Le agenzie tradizionali hanno fee del 18-20% con costi fissi 
                 che molte aziende non possono sostenere.
               </p>
             </CardContent>

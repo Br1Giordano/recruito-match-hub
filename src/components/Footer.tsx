@@ -1,4 +1,7 @@
+
 import { Separator } from "@/components/ui/separator";
+import { Link } from "react-router-dom";
+
 const Footer = () => {
   return <footer className="bg-gray-900 text-white py-16">
       <div className="container mx-auto px-4">
@@ -16,7 +19,7 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Per le Aziende</h4>
             <ul className="space-y-2 text-gray-400">
-              <li><a href="#" className="hover:text-white transition-colors">Come funziona</a></li>
+              <li><a href="#come-funziona" className="hover:text-white transition-colors">Come funziona</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Prezzi</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Caso di successo</a></li>
               <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
@@ -48,18 +51,19 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">© 2025 Recruito. Tutti i diritti riservati.</p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+            <Link to="/privacy-policy" className="text-gray-400 hover:text-white transition-colors text-sm">
               Privacy Policy
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+            </Link>
+            <Link to="/terms-of-service" className="text-gray-400 hover:text-white transition-colors text-sm">
               Termini di Servizio
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white transition-colors text-sm">
+            </Link>
+            <Link to="/cookie-policy" className="text-gray-400 hover:text-white transition-colors text-sm">
               Cookie Policy
-            </a>
+            </Link>
           </div>
         </div>
       </div>
     </footer>;
 };
+
 export default Footer;

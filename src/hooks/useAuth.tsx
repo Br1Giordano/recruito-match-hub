@@ -41,7 +41,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      setUserProfile(data);
+      // Type guard to ensure user_type is valid
+      if (data && (data.user_type === 'recruiter' || data.user_type === 'company')) {
+        setUserProfile(data as UserProfile);
+      }
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
     }

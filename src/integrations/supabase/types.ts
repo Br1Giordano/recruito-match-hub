@@ -42,6 +42,198 @@ export type Database = {
         }
         Relationships: []
       }
+      job_offers: {
+        Row: {
+          benefits: string | null
+          company_id: string
+          created_at: string
+          description: string | null
+          employment_type: string | null
+          id: string
+          location: string | null
+          requirements: string | null
+          salary_max: number | null
+          salary_min: number | null
+          status: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          benefits?: string | null
+          company_id: string
+          created_at?: string
+          description?: string | null
+          employment_type?: string | null
+          id?: string
+          location?: string | null
+          requirements?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          benefits?: string | null
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          employment_type?: string | null
+          id?: string
+          location?: string | null
+          requirements?: string | null
+          salary_max?: number | null
+          salary_min?: number | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_offers_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposal_responses: {
+        Row: {
+          company_id: string
+          created_at: string
+          feedback_notes: string | null
+          id: string
+          interview_date: string | null
+          proposal_id: string
+          response_message: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          feedback_notes?: string | null
+          id?: string
+          interview_date?: string | null
+          proposal_id: string
+          response_message?: string | null
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          feedback_notes?: string | null
+          id?: string
+          interview_date?: string | null
+          proposal_id?: string
+          response_message?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposal_responses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposal_responses_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      proposals: {
+        Row: {
+          availability_weeks: number | null
+          candidate_cv_url: string | null
+          candidate_email: string
+          candidate_linkedin: string | null
+          candidate_name: string
+          candidate_phone: string | null
+          company_id: string
+          created_at: string
+          current_salary: number | null
+          expected_salary: number | null
+          id: string
+          job_offer_id: string | null
+          proposal_description: string | null
+          recruiter_fee_percentage: number | null
+          recruiter_id: string
+          status: string | null
+          updated_at: string
+          years_experience: number | null
+        }
+        Insert: {
+          availability_weeks?: number | null
+          candidate_cv_url?: string | null
+          candidate_email: string
+          candidate_linkedin?: string | null
+          candidate_name: string
+          candidate_phone?: string | null
+          company_id: string
+          created_at?: string
+          current_salary?: number | null
+          expected_salary?: number | null
+          id?: string
+          job_offer_id?: string | null
+          proposal_description?: string | null
+          recruiter_fee_percentage?: number | null
+          recruiter_id: string
+          status?: string | null
+          updated_at?: string
+          years_experience?: number | null
+        }
+        Update: {
+          availability_weeks?: number | null
+          candidate_cv_url?: string | null
+          candidate_email?: string
+          candidate_linkedin?: string | null
+          candidate_name?: string
+          candidate_phone?: string | null
+          company_id?: string
+          created_at?: string
+          current_salary?: number | null
+          expected_salary?: number | null
+          id?: string
+          job_offer_id?: string | null
+          proposal_description?: string | null
+          recruiter_fee_percentage?: number | null
+          recruiter_id?: string
+          status?: string | null
+          updated_at?: string
+          years_experience?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "proposals_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "company_registrations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_job_offer_id_fkey"
+            columns: ["job_offer_id"]
+            isOneToOne: false
+            referencedRelation: "job_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "proposals_recruiter_id_fkey"
+            columns: ["recruiter_id"]
+            isOneToOne: false
+            referencedRelation: "recruiter_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recruiter_registrations: {
         Row: {
           azienda: string | null

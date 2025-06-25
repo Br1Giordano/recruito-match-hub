@@ -98,6 +98,30 @@ export type Database = {
           },
         ]
       }
+      login_attempts: {
+        Row: {
+          attempt_time: string | null
+          id: string
+          ip_address: unknown | null
+          success: boolean | null
+          user_id: string | null
+        }
+        Insert: {
+          attempt_time?: string | null
+          id?: string
+          ip_address?: unknown | null
+          success?: boolean | null
+          user_id?: string | null
+        }
+        Update: {
+          attempt_time?: string | null
+          id?: string
+          ip_address?: unknown | null
+          success?: boolean | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       proposal_responses: {
         Row: {
           company_id: string
@@ -308,6 +332,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_login_attempts: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       link_user_to_registration: {
         Args: { p_registration_id: string; p_user_type: string }
         Returns: boolean

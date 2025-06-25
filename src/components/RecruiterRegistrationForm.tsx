@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogClose } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 const RecruiterRegistrationForm = () => {
@@ -22,21 +23,47 @@ const RecruiterRegistrationForm = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user, linkToRegistration } = useAuth();
+
+  const validateInput = (value: string, maxLength: number = 255) => {
+    return value.trim().substring(0, maxLength);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      console.log("Invio dati recruiter:", formData);
+      // Validate and sanitize inputs
+      const sanitizedData = {
+        nome: validateInput(formData.nome, 100),
+        cognome: validateInput(formData.cognome, 100),
+        email: validateInput(formData.email, 255),
+        telefono: validateInput(formData.telefono, 20),
+        azienda: validateInput(formData.azienda, 255),
+        esperienza: validateInput(formData.esperienza, 100),
+        settori: validateInput(formData.settori, 500),
+        messaggio: validateInput(formData.messaggio, 1000)
+      };
+
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(sanitizedData.email)) {
+        toast({
+          title: "Email non valida",
+          description: "Inserisci un indirizzo email valido.",
+          variant: "destructive",
+        });
+        return;
+      }
       
       const { data, error } = await supabase
         .from('recruiter_registrations')
-        .insert([formData])
-        .select();
+        .insert([sanitizedData])
+        .select()
+        .single();
 
       if (error) {
-        console.error('Errore durante la registrazione:', error);
         toast({
           title: "Errore durante la registrazione",
           description: "Si è verificato un errore. Riprova più tardi.",
@@ -45,12 +72,26 @@ const RecruiterRegistrationForm = () => {
         return;
       }
 
-      console.log('Registrazione completata:', data);
-      
-      toast({
-        title: "Registrazione inviata!",
-        description: "Ti contatteremo presto per completare la tua registrazione.",
-      });
+      // If user is authenticated, link this registration to their profile
+      if (user && data) {
+        const linked = await linkToRegistration(data.id, 'recruiter');
+        if (linked) {
+          toast({
+            title: "Registrazione completata!",
+            description: "Il tuo profilo è stato collegato con successo.",
+          });
+        } else {
+          toast({
+            title: "Registrazione inviata!",
+            description: "Ti contatteremo presto per completare la tua registrazione.",
+          });
+        }
+      } else {
+        toast({
+          title: "Registrazione inviata!",
+          description: "Ti contatteremo presto per completare la tua registrazione.",
+        });
+      }
 
       // Reset form
       setFormData({
@@ -64,7 +105,6 @@ const RecruiterRegistrationForm = () => {
         messaggio: ""
       });
     } catch (error) {
-      console.error('Errore imprevisto:', error);
       toast({
         title: "Errore durante la registrazione",
         description: "Si è verificato un errore imprevisto. Riprova più tardi.",
@@ -76,10 +116,11 @@ const RecruiterRegistrationForm = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -95,6 +136,7 @@ const RecruiterRegistrationForm = () => {
             required
             placeholder="Il tuo nome"
             disabled={isSubmitting}
+            maxLength={100}
           />
         </div>
         <div>
@@ -107,6 +149,7 @@ const RecruiterRegistrationForm = () => {
             required
             placeholder="Il tuo cognome"
             disabled={isSubmitting}
+            maxLength={100}
           />
         </div>
       </div>
@@ -122,6 +165,7 @@ const RecruiterRegistrationForm = () => {
           required
           placeholder="la-tua-email@esempio.com"
           disabled={isSubmitting}
+          maxLength={255}
         />
       </div>
 
@@ -135,6 +179,7 @@ const RecruiterRegistrationForm = () => {
           onChange={handleChange}
           placeholder="+39 123 456 7890"
           disabled={isSubmitting}
+          maxLength={20}
         />
       </div>
 
@@ -147,6 +192,7 @@ const RecruiterRegistrationForm = () => {
           onChange={handleChange}
           placeholder="Nome della tua azienda o agenzia"
           disabled={isSubmitting}
+          maxLength={255}
         />
       </div>
 
@@ -159,6 +205,7 @@ const RecruiterRegistrationForm = () => {
           onChange={handleChange}
           placeholder="es. 5 anni"
           disabled={isSubmitting}
+          maxLength={100}
         />
       </div>
 
@@ -171,6 +218,7 @@ const RecruiterRegistrationForm = () => {
           onChange={handleChange}
           placeholder="es. IT, Marketing, Sales..."
           disabled={isSubmitting}
+          maxLength={500}
         />
       </div>
 
@@ -184,6 +232,7 @@ const RecruiterRegistrationForm = () => {
           placeholder="Raccontaci qualcosa di più su di te..."
           rows={3}
           disabled={isSubmitting}
+          maxLength={1000}
         />
       </div>
 

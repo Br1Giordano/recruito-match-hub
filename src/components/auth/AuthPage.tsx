@@ -5,10 +5,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ArrowLeft, User, Building2, Eye, EyeOff } from "lucide-react";
+import AuthErrorHandler from "./AuthErrorHandler";
 
 interface AuthPageProps {
   onBack?: () => void;
@@ -25,17 +25,12 @@ export default function AuthPage({ onBack }: AuthPageProps) {
     setError(null);
 
     const { error } = await supabase.auth.signInWithPassword({
-      email,
+      email: email.trim(),
       password,
     });
 
     if (error) {
       setError(error.message);
-      toast({
-        title: "Errore di accesso",
-        description: error.message,
-        variant: "destructive",
-      });
     } else {
       toast({
         title: "Accesso effettuato",
@@ -50,10 +45,24 @@ export default function AuthPage({ onBack }: AuthPageProps) {
     setIsLoading(true);
     setError(null);
 
+    // Basic validation
+    if (password.length < 6) {
+      setError("La password deve essere di almeno 6 caratteri");
+      setIsLoading(false);
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError("Inserisci un indirizzo email valido");
+      setIsLoading(false);
+      return;
+    }
+
     const redirectUrl = `${window.location.origin}/`;
 
     const { data, error } = await supabase.auth.signUp({
-      email,
+      email: email.trim(),
       password,
       options: {
         emailRedirectTo: redirectUrl,
@@ -65,11 +74,6 @@ export default function AuthPage({ onBack }: AuthPageProps) {
 
     if (error) {
       setError(error.message);
-      toast({
-        title: "Errore di registrazione",
-        description: error.message,
-        variant: "destructive",
-      });
     } else if (data.user && !data.session) {
       toast({
         title: "Conferma email richiesta",
@@ -121,11 +125,7 @@ export default function AuthPage({ onBack }: AuthPageProps) {
                 <TabsTrigger value="signup">Registrati</TabsTrigger>
               </TabsList>
 
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+              <AuthErrorHandler error={error} />
 
               <TabsContent value="signin">
                 <SignInForm onSubmit={handleSignIn} isLoading={isLoading} showPassword={showPassword} setShowPassword={setShowPassword} />
@@ -153,7 +153,9 @@ function SignInForm({ onSubmit, isLoading, showPassword, setShowPassword }: {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(email, password);
+    if (email.trim() && password) {
+      onSubmit(email, password);
+    }
   };
 
   return (
@@ -167,6 +169,8 @@ function SignInForm({ onSubmit, isLoading, showPassword, setShowPassword }: {
           onChange={(e) => setEmail(e.target.value)}
           required
           placeholder="nome@esempio.com"
+          maxLength={255}
+          autoComplete="email"
         />
       </div>
       <div className="space-y-2">
@@ -179,6 +183,7 @@ function SignInForm({ onSubmit, isLoading, showPassword, setShowPassword }: {
             onChange={(e) => setPassword(e.target.value)}
             required
             placeholder="La tua password"
+            autoComplete="current-password"
           />
           <Button
             type="button"
@@ -210,7 +215,9 @@ function SignUpForm({ onSubmit, isLoading, showPassword, setShowPassword }: {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(email, password, userType);
+    if (email.trim() && password) {
+      onSubmit(email, password, userType);
+    }
   };
 
   return (
@@ -247,6 +254,8 @@ function SignUpForm({ onSubmit, isLoading, showPassword, setShowPassword }: {
           onChange={(e) => setEmail(e.target.value)}
           required
           placeholder="nome@esempio.com"
+          maxLength={255}
+          autoComplete="email"
         />
       </div>
       <div className="space-y-2">
@@ -260,6 +269,7 @@ function SignUpForm({ onSubmit, isLoading, showPassword, setShowPassword }: {
             required
             placeholder="Crea una password sicura"
             minLength={6}
+            autoComplete="new-password"
           />
           <Button
             type="button"

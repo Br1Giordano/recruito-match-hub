@@ -308,7 +308,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      link_user_to_registration: {
+        Args: { p_registration_id: string; p_user_type: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

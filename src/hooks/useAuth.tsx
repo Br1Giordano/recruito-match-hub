@@ -18,6 +18,7 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  linkToRegistration: (registrationId: string, userType: 'recruiter' | 'company') => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -41,7 +42,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      // Type guard to ensure user_type is valid
       if (data && (data.user_type === 'recruiter' || data.user_type === 'company')) {
         setUserProfile(data as UserProfile);
       }
@@ -50,19 +50,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const linkToRegistration = async (registrationId: string, userType: 'recruiter' | 'company') => {
+    try {
+      const { data, error } = await supabase.rpc('link_user_to_registration', {
+        p_registration_id: registrationId,
+        p_user_type: userType
+      });
+
+      if (error) {
+        console.error('Error linking registration:', error);
+        return false;
+      }
+
+      // Refresh user profile after linking
+      if (user) {
+        await fetchUserProfile(user.id);
+      }
+
+      return data || false;
+    } catch (error) {
+      console.error('Error in linkToRegistration:', error);
+      return false;
+    }
+  };
+
   useEffect(() => {
-    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
-        // Fetch user profile when user logs in
         if (session?.user) {
-          setTimeout(() => {
-            fetchUserProfile(session.user.id);
-          }, 0);
+          fetchUserProfile(session.user.id);
         } else {
           setUserProfile(null);
         }
@@ -71,15 +90,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        setTimeout(() => {
-          fetchUserProfile(session.user.id);
-        }, 0);
+        fetchUserProfile(session.user.id);
       }
       
       setLoading(false);
@@ -96,7 +112,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, userProfile, loading, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      userProfile, 
+      loading, 
+      signOut, 
+      linkToRegistration 
+    }}>
       {children}
     </AuthContext.Provider>
   );

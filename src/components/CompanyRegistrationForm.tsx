@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogClose } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 const CompanyRegistrationForm = () => {
@@ -19,21 +20,44 @@ const CompanyRegistrationForm = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user, linkToRegistration } = useAuth();
+
+  const validateInput = (value: string, maxLength: number = 255) => {
+    return value.trim().substring(0, maxLength);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      console.log("Invio dati azienda:", formData);
+      // Validate and sanitize inputs
+      const sanitizedData = {
+        nome_azienda: validateInput(formData.nome_azienda, 255),
+        settore: validateInput(formData.settore, 255),
+        email: validateInput(formData.email, 255),
+        telefono: validateInput(formData.telefono, 20),
+        messaggio: validateInput(formData.messaggio, 1000)
+      };
+
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(sanitizedData.email)) {
+        toast({
+          title: "Email non valida",
+          description: "Inserisci un indirizzo email valido.",
+          variant: "destructive",
+        });
+        return;
+      }
       
       const { data, error } = await supabase
         .from('company_registrations')
-        .insert([formData])
-        .select();
+        .insert([sanitizedData])
+        .select()
+        .single();
 
       if (error) {
-        console.error('Errore durante la registrazione:', error);
         toast({
           title: "Errore durante la registrazione",
           description: "Si è verificato un errore. Riprova più tardi.",
@@ -42,12 +66,26 @@ const CompanyRegistrationForm = () => {
         return;
       }
 
-      console.log('Registrazione completata:', data);
-      
-      toast({
-        title: "Registrazione inviata!",
-        description: "Ti contatteremo presto per discutere come Recruito può aiutare la tua azienda.",
-      });
+      // If user is authenticated, link this registration to their profile
+      if (user && data) {
+        const linked = await linkToRegistration(data.id, 'company');
+        if (linked) {
+          toast({
+            title: "Registrazione completata!",
+            description: "Il tuo profilo aziendale è stato collegato con successo.",
+          });
+        } else {
+          toast({
+            title: "Registrazione inviata!",
+            description: "Ti contatteremo presto per discutere come Recruito può aiutare la tua azienda.",
+          });
+        }
+      } else {
+        toast({
+          title: "Registrazione inviata!",
+          description: "Ti contatteremo presto per discutere come Recruito può aiutare la tua azienda.",
+        });
+      }
 
       // Reset form
       setFormData({
@@ -58,7 +96,6 @@ const CompanyRegistrationForm = () => {
         messaggio: ""
       });
     } catch (error) {
-      console.error('Errore imprevisto:', error);
       toast({
         title: "Errore durante la registrazione",
         description: "Si è verificato un errore imprevisto. Riprova più tardi.",
@@ -70,10 +107,11 @@ const CompanyRegistrationForm = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -88,6 +126,7 @@ const CompanyRegistrationForm = () => {
           required
           placeholder="Il nome della tua azienda"
           disabled={isSubmitting}
+          maxLength={255}
         />
       </div>
 
@@ -100,6 +139,7 @@ const CompanyRegistrationForm = () => {
           onChange={handleChange}
           placeholder="es. Tecnologia, Marketing, Finance..."
           disabled={isSubmitting}
+          maxLength={255}
         />
       </div>
 
@@ -114,6 +154,7 @@ const CompanyRegistrationForm = () => {
           required
           placeholder="contatti@tuaazienda.com"
           disabled={isSubmitting}
+          maxLength={255}
         />
       </div>
 
@@ -127,6 +168,7 @@ const CompanyRegistrationForm = () => {
           onChange={handleChange}
           placeholder="+39 123 456 7890"
           disabled={isSubmitting}
+          maxLength={20}
         />
       </div>
 
@@ -140,6 +182,7 @@ const CompanyRegistrationForm = () => {
           placeholder="Quante persone cercate? Che tipo di profili? Budget indicativo?"
           rows={3}
           disabled={isSubmitting}
+          maxLength={1000}
         />
       </div>
 

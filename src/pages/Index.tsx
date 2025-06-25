@@ -9,9 +9,18 @@ import BusinessModel from "@/components/BusinessModel";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DashboardNavigation from "@/components/DashboardNavigation";
+import AuthPage from "@/components/auth/AuthPage";
+import { useAuth } from "@/hooks/useAuth";
+import { LogIn } from "lucide-react";
 
 const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const { user } = useAuth();
+
+  if (showAuth) {
+    return <AuthPage onBack={() => setShowAuth(false)} />;
+  }
 
   if (showDashboard) {
     return <DashboardNavigation onBack={() => setShowDashboard(false)} />;
@@ -41,13 +50,29 @@ const Index = () => {
               </p>
               
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift">
-                <Button 
-                  onClick={() => setShowDashboard(true)}
-                  size="lg"
-                  className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                >
-                  Accedi alla Demo Interattiva
-                </Button>
+                {user ? (
+                  <Button 
+                    onClick={() => setShowDashboard(true)}
+                    size="lg"
+                    className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  >
+                    Accedi alla Demo Interattiva
+                  </Button>
+                ) : (
+                  <div className="space-y-4">
+                    <Button 
+                      onClick={() => setShowAuth(true)}
+                      size="lg"
+                      className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                    >
+                      <LogIn className="h-5 w-5 mr-2" />
+                      Accedi / Registrati
+                    </Button>
+                    <p className="text-sm text-muted-foreground">
+                      Devi essere autenticato per accedere alla demo
+                    </p>
+                  </div>
+                )}
                 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                   <div className="flex items-start gap-3">

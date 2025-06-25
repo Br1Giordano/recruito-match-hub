@@ -276,6 +276,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_profiles: {
+        Row: {
+          auth_user_id: string | null
+          created_at: string
+          id: string
+          registration_id: string
+          updated_at: string
+          user_type: string
+        }
+        Insert: {
+          auth_user_id?: string | null
+          created_at?: string
+          id?: string
+          registration_id: string
+          updated_at?: string
+          user_type: string
+        }
+        Update: {
+          auth_user_id?: string | null
+          created_at?: string
+          id?: string
+          registration_id?: string
+          updated_at?: string
+          user_type?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

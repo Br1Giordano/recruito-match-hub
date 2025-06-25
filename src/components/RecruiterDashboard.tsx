@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Search, Eye, FileText, Calendar, Euro, User, Building2 } from "lucide-react";
 
 interface Proposal {
@@ -38,25 +38,44 @@ export default function RecruiterDashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { userProfile, user } = useAuth();
 
   const fetchProposals = async () => {
-    setIsLoading(true);
-
-    // Get current recruiter ID (in a real app, this would come from auth)
-    const { data: recruiterData, error: recruiterError } = await supabase
-      .from("recruiter_registrations")
-      .select("id")
-      .limit(1)
-      .single();
-
-    if (recruiterError || !recruiterData) {
+    if (!user) {
       toast({
         title: "Errore",
-        description: "Devi essere autenticato come recruiter",
+        description: "Devi essere autenticato per visualizzare le proposte",
         variant: "destructive",
       });
       setIsLoading(false);
       return;
+    }
+
+    setIsLoading(true);
+
+    // Get current recruiter registration linked to the authenticated user
+    let recruiterId = null;
+    
+    if (userProfile && userProfile.user_type === 'recruiter') {
+      recruiterId = userProfile.registration_id;
+    } else {
+      // Fallback: try to find recruiter by auth user ID
+      const { data: recruiterData, error: recruiterError } = await supabase
+        .from("recruiter_registrations")
+        .select("id")
+        .limit(1)
+        .maybeSingle();
+
+      if (recruiterError || !recruiterData) {
+        toast({
+          title: "Errore",
+          description: "Nessun profilo recruiter trovato per questo utente",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+      recruiterId = recruiterData.id;
     }
 
     const { data, error } = await supabase
@@ -66,10 +85,11 @@ export default function RecruiterDashboard() {
         company_registrations!inner(nome_azienda),
         job_offers(title)
       `)
-      .eq("recruiter_id", recruiterData.id)
+      .eq("recruiter_id", recruiterId)
       .order("created_at", { ascending: false });
 
     if (error) {
+      console.error("Error fetching proposals:", error);
       toast({
         title: "Errore",
         description: "Impossibile caricare le proposte",
@@ -85,7 +105,7 @@ export default function RecruiterDashboard() {
 
   useEffect(() => {
     fetchProposals();
-  }, []);
+  }, [user, userProfile]);
 
   useEffect(() => {
     let filtered = proposals;
@@ -144,6 +164,14 @@ export default function RecruiterDashboard() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-lg">Caricamento proposte...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg">Devi essere autenticato per visualizzare le proposte</div>
       </div>
     );
   }

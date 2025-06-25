@@ -28,7 +28,6 @@ const PrivacyPolicy = () => {
                 Il titolare del trattamento dei dati è:<br />
                 Recruito<br />
                 Email: contact.recruito@gmail.com<br />
-                Telefono: +39 3440554181<br />
                 Sede: Milano, Italia
               </p>
             </section>
@@ -123,8 +122,7 @@ const PrivacyPolicy = () => {
               <h2 className="text-2xl font-semibold mb-4">11. Contatti</h2>
               <p className="mb-4">
                 Per qualsiasi domanda riguardo questa Privacy Policy, contattate:<br />
-                Email: contact.recruito@gmail.com<br />
-                Telefono: +39 3440554181
+                Email: contact.recruito@gmail.com
               </p>
             </section>
           </div>

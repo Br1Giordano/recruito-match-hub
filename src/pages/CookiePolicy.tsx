@@ -96,10 +96,10 @@ const CookiePolicy = () => {
               <h3 className="text-xl font-semibold mb-3">6.1 Impostazioni del Browser</h3>
               <p className="mb-4">Istruzioni per i browser più comuni:</p>
               <ul className="list-disc pl-6 mb-4">
-                <li><strong>Chrome:</strong> Menu > Impostazioni > Avanzate > Privacy e sicurezza > Impostazioni sito > Cookie</li>
-                <li><strong>Firefox:</strong> Menu > Opzioni > Privacy e sicurezza > Cookie e dati dei siti web</li>
-                <li><strong>Safari:</strong> Preferenze > Privacy > Gestisci dati siti web</li>
-                <li><strong>Edge:</strong> Menu > Impostazioni > Privacy, ricerca e servizi > Cookie</li>
+                <li><strong>Chrome:</strong> Menu → Impostazioni → Avanzate → Privacy e sicurezza → Impostazioni sito → Cookie</li>
+                <li><strong>Firefox:</strong> Menu → Opzioni → Privacy e sicurezza → Cookie e dati dei siti web</li>
+                <li><strong>Safari:</strong> Preferenze → Privacy → Gestisci dati siti web</li>
+                <li><strong>Edge:</strong> Menu → Impostazioni → Privacy, ricerca e servizi → Cookie</li>
               </ul>
             </section>
 
@@ -125,7 +125,6 @@ const CookiePolicy = () => {
               <p className="mb-4">
                 Se avete domande sui cookie o su questa policy, contattate:<br />
                 Email: contact.recruito@gmail.com<br />
-                Telefono: +39 3440554181<br />
                 Indirizzo: Milano, Italia
               </p>
             </section>

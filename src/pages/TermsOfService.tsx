@@ -132,7 +132,6 @@ const TermsOfService = () => {
               <p className="mb-4">
                 Per questioni legali o sui termini di servizio:<br />
                 Email: contact.recruito@gmail.com<br />
-                Telefono: +39 3440554181<br />
                 Indirizzo: Milano, Italia
               </p>
             </section>

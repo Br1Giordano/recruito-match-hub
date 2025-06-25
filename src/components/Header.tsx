@@ -1,9 +1,5 @@
 
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Link, useLocation } from "react-router-dom";
-import RecruiterRegistrationForm from "./RecruiterRegistrationForm";
-import CompanyRegistrationForm from "./CompanyRegistrationForm";
 import MobileMenu from "./MobileMenu";
 
 const Header = () => {
@@ -74,36 +70,8 @@ const Header = () => {
           </button>
         </nav>
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center">
           <MobileMenu />
-          
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="hidden sm:inline-flex">
-                Sono un Recruiter
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Registrati come Recruiter</DialogTitle>
-              </DialogHeader>
-              <RecruiterRegistrationForm />
-            </DialogContent>
-          </Dialog>
-          
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button className="gradient-recruito text-white border-0 hover:opacity-90">
-                Sono un'Azienda
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Registrati come Azienda</DialogTitle>
-              </DialogHeader>
-              <CompanyRegistrationForm />
-            </DialogContent>
-          </Dialog>
         </div>
       </div>
     </header>

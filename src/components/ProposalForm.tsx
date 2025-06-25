@@ -76,7 +76,7 @@ export default function ProposalForm() {
   const fetchJobOffers = async (companyId: string) => {
     const { data, error } = await supabase
       .from("job_offers")
-      .select("id, title")
+      .select("id, title, company_id")
       .eq("company_id", companyId)
       .eq("status", "active")
       .order("title");
@@ -121,14 +121,24 @@ export default function ProposalForm() {
     }
 
     const proposalData = {
-      ...data,
       recruiter_id: recruiterData.id,
+      company_id: data.company_id,
       job_offer_id: data.job_offer_id || null,
+      candidate_name: data.candidate_name,
+      candidate_email: data.candidate_email,
+      candidate_phone: data.candidate_phone || null,
+      candidate_linkedin: data.candidate_linkedin || null,
+      proposal_description: data.proposal_description,
+      years_experience: data.years_experience,
+      current_salary: data.current_salary || null,
+      expected_salary: data.expected_salary || null,
+      availability_weeks: data.availability_weeks,
+      recruiter_fee_percentage: data.recruiter_fee_percentage,
     };
 
     const { error } = await supabase
       .from("proposals")
-      .insert([proposalData]);
+      .insert(proposalData);
 
     if (error) {
       toast({

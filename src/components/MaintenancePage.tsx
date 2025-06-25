@@ -1,9 +1,6 @@
-
 import { Wrench, Clock, Mail } from "lucide-react";
-
 const MaintenancePage = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 flex items-center justify-center p-4">
+  return <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full text-center">
         <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-12 shadow-xl border border-white/20">
           {/* Icon */}
@@ -26,7 +23,7 @@ const MaintenancePage = () => {
 
             <div className="flex items-center justify-center gap-2 text-recruito-blue">
               <Clock className="h-5 w-5" />
-              <span className="font-medium">Tempo stimato: 30 minuti</span>
+              <span className="font-medium">Tempo stimato: 30 mnuti</span>
             </div>
           </div>
 
@@ -37,10 +34,7 @@ const MaintenancePage = () => {
             </p>
             <div className="flex items-center justify-center gap-2 text-recruito-teal">
               <Mail className="h-5 w-5" />
-              <a 
-                href="mailto:contact.recruito@gmail.com" 
-                className="font-medium hover:underline"
-              >
+              <a href="mailto:contact.recruito@gmail.com" className="font-medium hover:underline">
                 contact.recruito@gmail.com
               </a>
             </div>
@@ -52,8 +46,6 @@ const MaintenancePage = () => {
           </div>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default MaintenancePage;

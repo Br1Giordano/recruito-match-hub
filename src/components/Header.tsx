@@ -1,7 +1,7 @@
-
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import RecruiterRegistrationForm from "./RecruiterRegistrationForm";
+import CompanyRegistrationForm from "./CompanyRegistrationForm";
 
 const Header = () => {
   return (
@@ -47,9 +47,20 @@ const Header = () => {
               <RecruiterRegistrationForm />
             </DialogContent>
           </Dialog>
-          <Button className="gradient-recruito text-white border-0 hover:opacity-90">
-            Sono un'Azienda
-          </Button>
+          
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="gradient-recruito text-white border-0 hover:opacity-90">
+                Sono un'Azienda
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Registrati come Azienda</DialogTitle>
+              </DialogHeader>
+              <CompanyRegistrationForm />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </header>

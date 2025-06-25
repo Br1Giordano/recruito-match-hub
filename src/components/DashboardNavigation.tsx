@@ -7,50 +7,86 @@ import ProposalForm from "./ProposalForm";
 import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
-import { User, Building2, FileText, Briefcase, MessageSquare, Plus } from "lucide-react";
+import { User, Building2, FileText, Briefcase, MessageSquare, Plus, ArrowLeft, Home } from "lucide-react";
 
-export default function DashboardNavigation() {
+interface DashboardNavigationProps {
+  onBack?: () => void;
+}
+
+export default function DashboardNavigation({ onBack }: DashboardNavigationProps) {
   const [userType, setUserType] = useState<"recruiter" | "company" | null>(null);
 
   if (!userType) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle>Seleziona Tipo Utente</CardTitle>
-            <p className="text-muted-foreground">
-              Scegli il tuo ruolo per accedere al dashboard appropriato
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Button
-              onClick={() => setUserType("recruiter")}
-              className="w-full justify-start h-16"
-              variant="outline"
-            >
-              <User className="h-6 w-6 mr-3" />
-              <div className="text-left">
-                <div className="font-semibold">Recruiter</div>
-                <div className="text-sm text-muted-foreground">
-                  Invia proposte e gestisci candidature
+      <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5">
+        {/* Navigation Header */}
+        <div className="border-b bg-white/80 backdrop-blur-sm shadow-sm">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {onBack && (
+                  <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    Torna al Sito
+                  </Button>
+                )}
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-gradient-to-r from-recruito-blue to-recruito-teal rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">R</span>
+                  </div>
+                  <h1 className="text-xl font-semibold">Demo Sistema Proposte</h1>
                 </div>
               </div>
-            </Button>
-            <Button
-              onClick={() => setUserType("company")}
-              className="w-full justify-start h-16"
-              variant="outline"
-            >
-              <Building2 className="h-6 w-6 mr-3" />
-              <div className="text-left">
-                <div className="font-semibold">Azienda</div>
-                <div className="text-sm text-muted-foreground">
-                  Gestisci offerte e ricevi proposte
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center p-4 min-h-[calc(100vh-80px)]">
+          <Card className="w-full max-w-2xl shadow-xl border-0 bg-white/90 backdrop-blur-sm">
+            <CardHeader className="text-center pb-8">
+              <CardTitle className="text-3xl font-bold text-gradient mb-4">Seleziona Tipo Utente</CardTitle>
+              <p className="text-muted-foreground text-lg">
+                Scegli il tuo ruolo per accedere al dashboard appropriato e testare tutte le funzionalità
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6 px-8 pb-8">
+              <Button
+                onClick={() => setUserType("recruiter")}
+                className="w-full justify-start h-20 bg-white border-2 border-recruito-blue/20 hover:border-recruito-blue hover:bg-recruito-blue/5 text-gray-800 hover:text-recruito-blue transition-all duration-300"
+                variant="outline"
+              >
+                <div className="flex items-center w-full">
+                  <div className="w-12 h-12 bg-recruito-blue/10 rounded-xl flex items-center justify-center mr-4">
+                    <User className="h-6 w-6 text-recruito-blue" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <div className="font-semibold text-lg">Recruiter</div>
+                    <div className="text-sm text-muted-foreground">
+                      Invia proposte candidati e gestisci le tue candidature
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </Button>
-          </CardContent>
-        </Card>
+              </Button>
+              <Button
+                onClick={() => setUserType("company")}
+                className="w-full justify-start h-20 bg-white border-2 border-recruito-teal/20 hover:border-recruito-teal hover:bg-recruito-teal/5 text-gray-800 hover:text-recruito-teal transition-all duration-300"
+                variant="outline"
+              >
+                <div className="flex items-center w-full">
+                  <div className="w-12 h-12 bg-recruito-teal/10 rounded-xl flex items-center justify-center mr-4">
+                    <Building2 className="h-6 w-6 text-recruito-teal" />
+                  </div>
+                  <div className="text-left flex-1">
+                    <div className="font-semibold text-lg">Azienda</div>
+                    <div className="text-sm text-muted-foreground">
+                      Gestisci offerte di lavoro e ricevi proposte dai recruiter
+                    </div>
+                  </div>
+                </div>
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -58,16 +94,27 @@ export default function DashboardNavigation() {
   if (userType === "recruiter") {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="border-b bg-white">
+        <div className="border-b bg-white shadow-sm">
           <div className="container mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <User className="h-6 w-6" />
-                <h1 className="text-xl font-semibold">Dashboard Recruiter</h1>
+              <div className="flex items-center gap-4">
+                {onBack && (
+                  <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+                    <Home className="h-4 w-4" />
+                    Home
+                  </Button>
+                )}
+                <Button variant="ghost" onClick={() => setUserType(null)} className="flex items-center gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Cambia Ruolo
+                </Button>
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 bg-recruito-blue rounded-lg flex items-center justify-center">
+                    <User className="h-4 w-4 text-white" />
+                  </div>
+                  <h1 className="text-xl font-semibold">Dashboard Recruiter</h1>
+                </div>
               </div>
-              <Button variant="outline" onClick={() => setUserType(null)}>
-                Cambia Ruolo
-              </Button>
             </div>
           </div>
         </div>
@@ -100,16 +147,27 @@ export default function DashboardNavigation() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="border-b bg-white">
+      <div className="border-b bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Building2 className="h-6 w-6" />
-              <h1 className="text-xl font-semibold">Dashboard Azienda</h1>
+            <div className="flex items-center gap-4">
+              {onBack && (
+                <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+                  <Home className="h-4 w-4" />
+                  Home
+                </Button>
+              )}
+              <Button variant="ghost" onClick={() => setUserType(null)} className="flex items-center gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Cambia Ruolo
+              </Button>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-recruito-teal rounded-lg flex items-center justify-center">
+                  <Building2 className="h-4 w-4 text-white" />
+                </div>
+                <h1 className="text-xl font-semibold">Dashboard Azienda</h1>
+              </div>
             </div>
-            <Button variant="outline" onClick={() => setUserType(null)}>
-              Cambia Ruolo
-            </Button>
           </div>
         </div>
       </div>

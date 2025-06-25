@@ -16,7 +16,7 @@ const queryClient = new QueryClient();
 // 🚨 MODALITÀ MANUTENZIONE 🚨
 // Cambia questo valore a 'true' per attivare la modalità manutenzione
 // Cambia questo valore a 'false' per disattivare la modalità manutenzione
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 
 const App = () => {
   // Se la modalità manutenzione è attiva, mostra solo la pagina di manutenzione

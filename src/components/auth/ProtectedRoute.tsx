@@ -24,4 +24,3 @@ export default function ProtectedRoute({ children, onBack }: ProtectedRouteProps
 
   return <>{children}</>;
 }
-</ProtectedRoute>

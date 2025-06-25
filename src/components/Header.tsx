@@ -1,5 +1,7 @@
 
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import RecruiterRegistrationForm from "./RecruiterRegistrationForm";
 
 const Header = () => {
   return (
@@ -32,9 +34,19 @@ const Header = () => {
         </nav>
 
         <div className="flex items-center space-x-4">
-          <Button variant="outline" className="hidden sm:inline-flex">
-            Sono un Recruiter
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="hidden sm:inline-flex">
+                Sono un Recruiter
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>Registrati come Recruiter</DialogTitle>
+              </DialogHeader>
+              <RecruiterRegistrationForm />
+            </DialogContent>
+          </Dialog>
           <Button className="gradient-recruito text-white border-0 hover:opacity-90">
             Sono un'Azienda
           </Button>

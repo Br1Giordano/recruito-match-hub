@@ -9,7 +9,81 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      company_registrations: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          messaggio: string | null
+          nome_azienda: string
+          settore: string | null
+          status: string | null
+          telefono: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          messaggio?: string | null
+          nome_azienda: string
+          settore?: string | null
+          status?: string | null
+          telefono?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          messaggio?: string | null
+          nome_azienda?: string
+          settore?: string | null
+          status?: string | null
+          telefono?: string | null
+        }
+        Relationships: []
+      }
+      recruiter_registrations: {
+        Row: {
+          azienda: string | null
+          cognome: string
+          created_at: string
+          email: string
+          esperienza: string | null
+          id: string
+          messaggio: string | null
+          nome: string
+          settori: string | null
+          status: string | null
+          telefono: string | null
+        }
+        Insert: {
+          azienda?: string | null
+          cognome: string
+          created_at?: string
+          email: string
+          esperienza?: string | null
+          id?: string
+          messaggio?: string | null
+          nome: string
+          settori?: string | null
+          status?: string | null
+          telefono?: string | null
+        }
+        Update: {
+          azienda?: string | null
+          cognome?: string
+          created_at?: string
+          email?: string
+          esperienza?: string | null
+          id?: string
+          messaggio?: string | null
+          nome?: string
+          settori?: string | null
+          status?: string | null
+          telefono?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

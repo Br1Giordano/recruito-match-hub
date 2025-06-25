@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { DialogClose } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const RecruiterRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -19,30 +20,59 @@ const RecruiterRegistrationForm = () => {
     messaggio: ""
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
     
-    // Simulazione invio form
-    console.log("Dati recruiter:", formData);
-    
-    toast({
-      title: "Registrazione inviata!",
-      description: "Ti contatteremo presto per completare la tua registrazione.",
-    });
+    try {
+      console.log("Invio dati recruiter:", formData);
+      
+      const { data, error } = await supabase
+        .from('recruiter_registrations')
+        .insert([formData])
+        .select();
 
-    // Reset form
-    setFormData({
-      nome: "",
-      cognome: "",
-      email: "",
-      telefono: "",
-      azienda: "",
-      esperienza: "",
-      settori: "",
-      messaggio: ""
-    });
+      if (error) {
+        console.error('Errore durante la registrazione:', error);
+        toast({
+          title: "Errore durante la registrazione",
+          description: "Si è verificato un errore. Riprova più tardi.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log('Registrazione completata:', data);
+      
+      toast({
+        title: "Registrazione inviata!",
+        description: "Ti contatteremo presto per completare la tua registrazione.",
+      });
+
+      // Reset form
+      setFormData({
+        nome: "",
+        cognome: "",
+        email: "",
+        telefono: "",
+        azienda: "",
+        esperienza: "",
+        settori: "",
+        messaggio: ""
+      });
+    } catch (error) {
+      console.error('Errore imprevisto:', error);
+      toast({
+        title: "Errore durante la registrazione",
+        description: "Si è verificato un errore imprevisto. Riprova più tardi.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -64,6 +94,7 @@ const RecruiterRegistrationForm = () => {
             onChange={handleChange}
             required
             placeholder="Il tuo nome"
+            disabled={isSubmitting}
           />
         </div>
         <div>
@@ -75,6 +106,7 @@ const RecruiterRegistrationForm = () => {
             onChange={handleChange}
             required
             placeholder="Il tuo cognome"
+            disabled={isSubmitting}
           />
         </div>
       </div>
@@ -89,6 +121,7 @@ const RecruiterRegistrationForm = () => {
           onChange={handleChange}
           required
           placeholder="la-tua-email@esempio.com"
+          disabled={isSubmitting}
         />
       </div>
 
@@ -101,6 +134,7 @@ const RecruiterRegistrationForm = () => {
           value={formData.telefono}
           onChange={handleChange}
           placeholder="+39 123 456 7890"
+          disabled={isSubmitting}
         />
       </div>
 
@@ -112,6 +146,7 @@ const RecruiterRegistrationForm = () => {
           value={formData.azienda}
           onChange={handleChange}
           placeholder="Nome della tua azienda o agenzia"
+          disabled={isSubmitting}
         />
       </div>
 
@@ -123,6 +158,7 @@ const RecruiterRegistrationForm = () => {
           value={formData.esperienza}
           onChange={handleChange}
           placeholder="es. 5 anni"
+          disabled={isSubmitting}
         />
       </div>
 
@@ -134,6 +170,7 @@ const RecruiterRegistrationForm = () => {
           value={formData.settori}
           onChange={handleChange}
           placeholder="es. IT, Marketing, Sales..."
+          disabled={isSubmitting}
         />
       </div>
 
@@ -146,17 +183,22 @@ const RecruiterRegistrationForm = () => {
           onChange={handleChange}
           placeholder="Raccontaci qualcosa di più su di te..."
           rows={3}
+          disabled={isSubmitting}
         />
       </div>
 
       <div className="flex gap-3 pt-4">
         <DialogClose asChild>
-          <Button type="button" variant="outline" className="flex-1">
+          <Button type="button" variant="outline" className="flex-1" disabled={isSubmitting}>
             Annulla
           </Button>
         </DialogClose>
-        <Button type="submit" className="flex-1 gradient-recruito text-white border-0 hover:opacity-90">
-          Invia Registrazione
+        <Button 
+          type="submit" 
+          className="flex-1 gradient-recruito text-white border-0 hover:opacity-90"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? "Invio in corso..." : "Invia Registrazione"}
         </Button>
       </div>
     </form>

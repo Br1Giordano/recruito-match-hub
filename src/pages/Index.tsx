@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
@@ -12,22 +11,19 @@ import DashboardNavigation from "@/components/DashboardNavigation";
 import AuthPage from "@/components/auth/AuthPage";
 import { useAuth } from "@/hooks/useAuth";
 import { LogIn } from "lucide-react";
-
 const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
-  const { user } = useAuth();
-
+  const {
+    user
+  } = useAuth();
   if (showAuth) {
     return <AuthPage onBack={() => setShowAuth(false)} />;
   }
-
   if (showDashboard) {
     return <DashboardNavigation onBack={() => setShowDashboard(false)} />;
   }
-
-  return (
-    <div className="min-h-screen">
+  return <div className="min-h-screen">
       <Header />
       <main>
         <Hero />
@@ -41,38 +37,24 @@ const Index = () => {
           
           <div className="container mx-auto px-4 text-center relative z-10">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-4xl font-bold mb-6 text-gradient">
-                🚀 Prova il Sistema Demo
-              </h2>
+              <h2 className="text-4xl font-bold mb-6 text-gradient">🚀 Prova la Demo</h2>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                 Esplora in anteprima il sistema completo di gestione proposte e candidature. 
                 Testa tutte le funzionalità per recruiter e aziende in un ambiente completamente funzionale.
               </p>
               
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift">
-                {user ? (
-                  <Button 
-                    onClick={() => setShowDashboard(true)}
-                    size="lg"
-                    className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                  >
+                {user ? <Button onClick={() => setShowDashboard(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Accedi alla Demo Interattiva
-                  </Button>
-                ) : (
-                  <div className="space-y-4">
-                    <Button 
-                      onClick={() => setShowAuth(true)}
-                      size="lg"
-                      className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                    >
+                  </Button> : <div className="space-y-4">
+                    <Button onClick={() => setShowAuth(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       <LogIn className="h-5 w-5 mr-2" />
                       Accedi / Registrati
                     </Button>
                     <p className="text-sm text-muted-foreground">
                       Devi essere autenticato per accedere alla demo
                     </p>
-                  </div>
-                )}
+                  </div>}
                 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                   <div className="flex items-start gap-3">
@@ -101,8 +83,6 @@ const Index = () => {
         <BusinessModel />
       </main>
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default Index;

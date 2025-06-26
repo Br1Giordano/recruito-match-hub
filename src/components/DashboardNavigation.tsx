@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -18,7 +17,7 @@ interface DashboardNavigationProps {
 }
 
 export default function DashboardNavigation({ onBack }: DashboardNavigationProps) {
-  const { userProfile, signOut, loading, createUserProfile } = useAuth();
+  const { user, userProfile, signOut, loading, createUserProfile } = useAuth();
   const [selectedUserType, setSelectedUserType] = useState<"recruiter" | "company" | null>(null);
   const { toast } = useToast();
 
@@ -27,20 +26,18 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
     if (onBack) onBack();
   };
 
-  // Determina automaticamente il tipo di utente dal profilo esistente
+  // Auto-set user type from existing profile
   useEffect(() => {
-    if (userProfile && userProfile.user_type && !selectedUserType) {
-      console.log('Auto-setting user type from profile:', userProfile.user_type);
+    if (userProfile && userProfile.user_type) {
+      console.log('Setting user type from profile:', userProfile.user_type);
       setSelectedUserType(userProfile.user_type);
     }
-  }, [userProfile, selectedUserType]);
+  }, [userProfile]);
 
   const handleUserTypeSelection = async (type: "recruiter" | "company") => {
     console.log('User selected type:', type);
     
-    // Se l'utente non ha un profilo, crea uno
-    if (!userProfile) {
-      console.log('Creating new user profile...');
+    try {
       const success = await createUserProfile(type);
       if (!success) {
         toast({
@@ -50,12 +47,23 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
         });
         return;
       }
+      
+      setSelectedUserType(type);
+      toast({
+        title: "Successo",
+        description: "Profilo utente creato con successo",
+      });
+    } catch (error) {
+      console.error('Error creating profile:', error);
+      toast({
+        title: "Errore",
+        description: "Errore durante la creazione del profilo",
+        variant: "destructive",
+      });
     }
-    
-    setSelectedUserType(type);
   };
 
-  // Show loading while determining user type
+  // Show loading while auth is loading
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -67,8 +75,8 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
   return (
     <ProtectedRoute onBack={onBack}>
       <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5">
-        {/* Se non c'è un tipo utente selezionato, mostra la selezione */}
-        {!selectedUserType ? (
+        {/* If user is authenticated but has no profile or selected type, show selection */}
+        {user && (!userProfile || !selectedUserType) ? (
           <UserTypeSelection 
             onSelectType={handleUserTypeSelection} 
             onBack={onBack} 
@@ -77,8 +85,15 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
           />
         ) : selectedUserType === "recruiter" ? (
           <RecruiterDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
-        ) : (
+        ) : selectedUserType === "company" ? (
           <CompanyDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
+        ) : (
+          <UserTypeSelection 
+            onSelectType={handleUserTypeSelection} 
+            onBack={onBack} 
+            onSignOut={handleSignOut}
+            currentProfile={userProfile}
+          />
         )}
       </div>
     </ProtectedRoute>

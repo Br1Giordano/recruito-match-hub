@@ -41,6 +41,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('Error fetching user profile:', error);
+        setUserProfile(null);
         return;
       }
 
@@ -48,16 +49,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data && (data.user_type === 'recruiter' || data.user_type === 'company')) {
         setUserProfile(data as UserProfile);
       } else {
-        console.log('No user profile found or invalid user type');
+        console.log('No user profile found');
         setUserProfile(null);
       }
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
+      setUserProfile(null);
     }
   };
 
   const createUserProfile = async (userType: 'recruiter' | 'company') => {
-    if (!user) return false;
+    if (!user) {
+      console.log('No user found, cannot create profile');
+      return false;
+    }
     
     try {
       console.log('Creating user profile for:', user.id, 'as', userType);
@@ -81,7 +86,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       console.log('User profile created:', data);
-      // Cast the data to UserProfile type to ensure type safety
       setUserProfile(data as UserProfile);
       return true;
     } catch (error) {
@@ -115,6 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.id);
@@ -131,26 +136,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      console.log('Initial session:', session?.user?.id);
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        await fetchUserProfile(session.user.id);
+    // Get initial session
+    const getInitialSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log('Initial session:', session?.user?.id);
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          await fetchUserProfile(session.user.id);
+        }
+      } catch (error) {
+        console.error('Error getting initial session:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      setLoading(false);
-    });
+    };
+
+    getInitialSession();
 
     return () => subscription.unsubscribe();
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
-    setSession(null);
-    setUserProfile(null);
+    try {
+      await supabase.auth.signOut();
+      setUser(null);
+      setSession(null);
+      setUserProfile(null);
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
   };
 
   return (

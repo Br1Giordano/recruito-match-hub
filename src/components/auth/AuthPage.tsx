@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,14 +30,15 @@ export default function AuthPage({ onBack }: AuthPageProps) {
 
     if (error) {
       setError(error.message);
+      setIsLoading(false);
     } else {
       toast({
         title: "Accesso effettuato",
         description: "Benvenuto nel sistema!",
       });
+      // Note: Auto-redirect is handled by the Index component via useEffect
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleSignUp = async (email: string, password: string, userType: 'recruiter' | 'company') => {
@@ -74,19 +74,21 @@ export default function AuthPage({ onBack }: AuthPageProps) {
 
     if (error) {
       setError(error.message);
+      setIsLoading(false);
     } else if (data.user && !data.session) {
       toast({
         title: "Conferma email richiesta",
         description: "Controlla la tua email per confermare l'account.",
       });
+      setIsLoading(false);
     } else {
       toast({
         title: "Registrazione completata",
         description: "Account creato con successo!",
       });
+      // Note: Auto-redirect is handled by the Index component via useEffect
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

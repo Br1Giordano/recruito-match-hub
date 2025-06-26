@@ -1,10 +1,18 @@
 
 import { Link, useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import MobileMenu from "./MobileMenu";
 
-const Header = () => {
+interface HeaderProps {
+  onShowAuth?: () => void;
+  onShowDashboard?: () => void;
+}
+
+const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
+  const { user } = useAuth();
 
   const scrollToSection = (sectionId: string) => {
     if (isHomePage) {
@@ -21,6 +29,36 @@ const Header = () => {
     } else {
       // Se non siamo nella homepage, naviga prima alla homepage e poi scrolla
       window.location.href = `/#${sectionId}`;
+    }
+  };
+
+  const handleDemoNavigation = () => {
+    if (isHomePage) {
+      // Cerca l'elemento con data-demo-section
+      const demoElement = document.querySelector('[data-demo-section]');
+      if (demoElement) {
+        demoElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      window.location.href = '/#demo';
+    }
+  };
+
+  const handleCompanyButtonClick = () => {
+    console.log('Company button clicked in header', { user });
+    if (user) {
+      onShowDashboard?.();
+    } else {
+      onShowAuth?.();
+    }
+  };
+
+  const handleRecruiterButtonClick = () => {
+    console.log('Recruiter button clicked in header', { user });
+    if (user) {
+      onShowDashboard?.();
+    } else {
+      onShowAuth?.();
     }
   };
 
@@ -68,6 +106,24 @@ const Header = () => {
           >
             Business
           </button>
+          
+          <div className="flex items-center space-x-4 ml-8">
+            <Button
+              onClick={handleCompanyButtonClick}
+              size="sm"
+              className="gradient-recruito text-white border-0 hover:opacity-90"
+            >
+              Inizia ora come Azienda
+            </Button>
+            <Button
+              onClick={handleRecruiterButtonClick}
+              size="sm"
+              variant="outline"
+              className="hover:bg-gray-50"
+            >
+              Diventa Recruiter Partner
+            </Button>
+          </div>
         </nav>
 
         <div className="flex items-center">

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase } from "lucide-react";
+import JobOfferForm from "./JobOfferForm";
 
 interface JobOffer {
   id: string;
@@ -30,6 +31,7 @@ export default function CompanyOffersDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
+  const [showNewOfferForm, setShowNewOfferForm] = useState(false);
   const { toast } = useToast();
 
   const fetchJobOffers = async () => {
@@ -95,6 +97,11 @@ export default function CompanyOffersDashboard() {
     setFilteredOffers(filtered);
   }, [searchTerm, statusFilter, jobOffers]);
 
+  const handleNewOfferSuccess = () => {
+    setShowNewOfferForm(false);
+    fetchJobOffers(); // Refresh the list
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "active":
@@ -136,6 +143,15 @@ export default function CompanyOffersDashboard() {
     }
   };
 
+  if (showNewOfferForm) {
+    return (
+      <JobOfferForm 
+        onBack={() => setShowNewOfferForm(false)}
+        onSuccess={handleNewOfferSuccess}
+      />
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -153,7 +169,7 @@ export default function CompanyOffersDashboard() {
             Gestisci le tue offerte di lavoro pubblicate
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setShowNewOfferForm(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Nuova Offerta
         </Button>
@@ -202,6 +218,15 @@ export default function CompanyOffersDashboard() {
                     ? "Non hai ancora pubblicato offerte di lavoro"
                     : "Nessuna offerta corrisponde ai filtri selezionati"}
                 </p>
+                {jobOffers.length === 0 && (
+                  <Button 
+                    onClick={() => setShowNewOfferForm(true)}
+                    className="mt-4"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Crea la tua prima offerta
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Search, User, Mail, Phone, Linkedin, Euro, Calendar, MessageSquare, Check, X, Clock } from "lucide-react";
 
 interface Proposal {
@@ -44,26 +44,26 @@ export default function CompanyProposalsDashboard() {
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseMessage, setResponseMessage] = useState("");
   const { toast } = useToast();
+  const { user, userProfile } = useAuth();
 
   const fetchProposals = async () => {
     setIsLoading(true);
 
-    // Get current company ID (in a real app, this would come from auth)
-    const { data: companyData, error: companyError } = await supabase
-      .from("company_registrations")
-      .select("id")
-      .limit(1)
-      .single();
-
-    if (companyError || !companyData) {
-      toast({
-        title: "Errore",
-        description: "Devi essere autenticato come azienda",
-        variant: "destructive",
-      });
+    // Check if user is authenticated
+    if (!user) {
+      console.log('User not authenticated');
       setIsLoading(false);
       return;
     }
+
+    // Check if user has a company profile
+    if (!userProfile || userProfile.user_type !== 'company') {
+      console.log('User profile not found or not a company:', userProfile);
+      setIsLoading(false);
+      return;
+    }
+
+    console.log('Fetching proposals for company:', userProfile.registration_id);
 
     const { data, error } = await supabase
       .from("proposals")
@@ -72,16 +72,18 @@ export default function CompanyProposalsDashboard() {
         recruiter_registrations!inner(nome, cognome, email, telefono),
         job_offers(title)
       `)
-      .eq("company_id", companyData.id)
+      .eq("company_id", userProfile.registration_id)
       .order("created_at", { ascending: false });
 
     if (error) {
+      console.error('Error fetching proposals:', error);
       toast({
         title: "Errore",
         description: "Impossibile caricare le proposte",
         variant: "destructive",
       });
     } else {
+      console.log('Proposals fetched:', data);
       setProposals(data || []);
       setFilteredProposals(data || []);
     }
@@ -90,8 +92,10 @@ export default function CompanyProposalsDashboard() {
   };
 
   useEffect(() => {
-    fetchProposals();
-  }, []);
+    if (user && userProfile && userProfile.user_type === 'company') {
+      fetchProposals();
+    }
+  }, [user, userProfile]);
 
   useEffect(() => {
     let filtered = proposals;
@@ -135,20 +139,13 @@ export default function CompanyProposalsDashboard() {
   };
 
   const sendResponse = async (proposalId: string, status: string) => {
-    // Get current company ID
-    const { data: companyData } = await supabase
-      .from("company_registrations")
-      .select("id")
-      .limit(1)
-      .single();
-
-    if (!companyData) return;
+    if (!userProfile) return;
 
     const { error } = await supabase
       .from("proposal_responses")
       .insert([{
         proposal_id: proposalId,
-        company_id: companyData.id,
+        company_id: userProfile.registration_id,
         status: status,
         response_message: responseMessage,
       }]);
@@ -208,6 +205,32 @@ export default function CompanyProposalsDashboard() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-lg">Caricamento proposte...</div>
+      </div>
+    );
+  }
+
+  // Check if user is properly authenticated as company
+  if (!user || !userProfile || userProfile.user_type !== 'company') {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Proposte Ricevute</h1>
+          <p className="text-muted-foreground">
+            Revisiona e gestisci le proposte inviate dai recruiter
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center py-8">
+              <MessageSquare className="mx-auto h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-semibold text-red-600">Accesso Negato</h3>
+              <p className="text-muted-foreground">
+                Devi essere autenticato come azienda per visualizzare le proposte.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }

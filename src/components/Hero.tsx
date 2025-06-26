@@ -1,22 +1,35 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
-const Hero = () => {
-  // Funzione unificata per il scroll alla sezione demo
-  const scrollToDemo = () => {
-    console.log('Scroll to demo clicked');
-    const demoSection = document.querySelector('[data-demo-section]');
-    console.log('Demo section found:', demoSection);
-    
-    if (demoSection) {
-      demoSection.scrollIntoView({ behavior: 'smooth' });
+interface HeroProps {
+  onShowAuth?: () => void;
+  onShowDashboard?: () => void;
+}
+
+const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
+  const { user } = useAuth();
+
+  const handleCompanyButtonClick = () => {
+    console.log('Company button clicked', { user });
+    if (user) {
+      // Se l'utente è autenticato, vai alla dashboard
+      onShowDashboard?.();
     } else {
-      // Fallback: scroll to a specific position
-      window.scrollTo({
-        top: window.innerHeight * 0.8,
-        behavior: 'smooth'
-      });
+      // Se non è autenticato, mostra la pagina di login
+      onShowAuth?.();
+    }
+  };
+
+  const handleRecruiterButtonClick = () => {
+    console.log('Recruiter button clicked', { user });
+    if (user) {
+      // Se l'utente è autenticato, vai alla dashboard
+      onShowDashboard?.();
+    } else {
+      // Se non è autenticato, mostra la pagina di login
+      onShowAuth?.();
     }
   };
 
@@ -43,7 +56,7 @@ const Hero = () => {
               <Button 
                 size="lg" 
                 className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5"
-                onClick={scrollToDemo}
+                onClick={handleCompanyButtonClick}
                 type="button"
               >
                 Inizia ora come Azienda
@@ -53,7 +66,7 @@ const Hero = () => {
                 size="lg" 
                 variant="outline" 
                 className="text-lg px-10 py-5"
-                onClick={scrollToDemo}
+                onClick={handleRecruiterButtonClick}
                 type="button"
               >
                 Diventa Recruiter Partner

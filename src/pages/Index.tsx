@@ -29,6 +29,14 @@ const Index = () => {
     setShowDashboard(true);
   };
 
+  const handleShowAuth = () => {
+    setShowAuth(true);
+  };
+
+  const handleShowDashboard = () => {
+    setShowDashboard(true);
+  };
+
   if (showAuth) {
     return <AuthPage onBack={() => setShowAuth(false)} onAuthSuccess={handleAuthSuccess} />;
   }
@@ -40,7 +48,7 @@ const Index = () => {
   return <div className="min-h-screen">
       <Header />
       <main>
-        <Hero />
+        <Hero onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />
         
         {/* Demo Section with improved styling */}
         <div className="py-20 bg-gradient-to-r from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 relative overflow-hidden" data-demo-section>

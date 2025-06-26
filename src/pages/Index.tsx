@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
@@ -10,6 +9,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DashboardNavigation from "@/components/DashboardNavigation";
 import AuthPage from "@/components/auth/AuthPage";
+import LoadingScreen from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { LogIn } from "lucide-react";
 
@@ -32,9 +32,7 @@ const Index = () => {
   }, [loading]);
 
   if (loading && !loadingTimeout) {
-    return <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Caricamento...</div>
-      </div>;
+    return <LoadingScreen />;
   }
 
   const handleAuthSuccess = () => {

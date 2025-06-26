@@ -122,3 +122,9 @@
     background-size: 20px 20px;
   }
 }
+
+/* Custom loading animations */
+@keyframes slide-in {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}

@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
@@ -15,9 +16,22 @@ import { LogIn } from "lucide-react";
 const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
   const { user, loading } = useAuth();
 
-  if (loading) {
+  // Safety timeout per evitare loading infiniti
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (loading) {
+        console.warn('Loading timeout reached, forcing app to show');
+        setLoadingTimeout(true);
+      }
+    }, 10000); // 10 secondi di timeout
+
+    return () => clearTimeout(timer);
+  }, [loading]);
+
+  if (loading && !loadingTimeout) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Caricamento...</div>
       </div>;

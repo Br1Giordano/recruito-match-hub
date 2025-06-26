@@ -23,6 +23,8 @@ interface JobOffer {
   status: string;
   created_at: string;
   updated_at: string;
+  company_name?: string;
+  contact_email?: string;
 }
 
 export default function CompanyOffersDashboard() {
@@ -45,20 +47,20 @@ export default function CompanyOffersDashboard() {
       return;
     }
 
-    // Controlla se l'utente ha un profilo azienda
-    if (!userProfile || userProfile.user_type !== 'company') {
-      console.log('User profile not found or not a company:', userProfile);
-      setIsLoading(false);
-      return;
+    console.log('Fetching job offers for user:', user.email);
+
+    // Query aggiornata per cercare offerte sia tramite company_id che contact_email
+    let query = supabase.from("job_offers").select("*");
+
+    // Se l'utente ha un profilo azienda, cerca anche per company_id
+    if (userProfile && userProfile.user_type === 'company') {
+      query = query.or(`company_id.eq.${userProfile.registration_id},contact_email.eq.${user.email}`);
+    } else {
+      // Altrimenti cerca solo per email
+      query = query.eq("contact_email", user.email);
     }
 
-    console.log('Fetching job offers for company:', userProfile.registration_id);
-
-    const { data, error } = await supabase
-      .from("job_offers")
-      .select("*")
-      .eq("company_id", userProfile.registration_id)
-      .order("created_at", { ascending: false });
+    const { data, error } = await query.order("created_at", { ascending: false });
 
     if (error) {
       console.error('Error fetching job offers:', error);
@@ -77,7 +79,7 @@ export default function CompanyOffersDashboard() {
   };
 
   useEffect(() => {
-    if (userProfile && user) {
+    if (user) {
       fetchJobOffers();
     }
   }, [userProfile, user]);
@@ -164,8 +166,8 @@ export default function CompanyOffersDashboard() {
     );
   }
 
-  // Se l'utente non è autenticato come azienda, mostra messaggio appropriato
-  if (!user || !userProfile || userProfile.user_type !== 'company') {
+  // Se l'utente non è autenticato, mostra messaggio appropriato
+  if (!user) {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -183,7 +185,7 @@ export default function CompanyOffersDashboard() {
               <Briefcase className="mx-auto h-12 w-12 text-muted-foreground" />
               <h3 className="mt-4 text-lg font-semibold text-red-600">Accesso Negato</h3>
               <p className="text-muted-foreground">
-                Devi essere autenticato come azienda per visualizzare le offerte di lavoro.
+                Devi essere autenticato per visualizzare le offerte di lavoro.
               </p>
             </div>
           </CardContent>
@@ -273,6 +275,9 @@ export default function CompanyOffersDashboard() {
                       {offer.title}
                     </CardTitle>
                     <CardDescription className="flex items-center gap-4 mt-1">
+                      {offer.company_name && (
+                        <span>{offer.company_name}</span>
+                      )}
                       {offer.location && (
                         <span className="flex items-center gap-1">
                           <MapPin className="h-4 w-4" />

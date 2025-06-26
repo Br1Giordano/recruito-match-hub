@@ -25,15 +25,18 @@ const Index = () => {
   }
 
   const handleAuthSuccess = () => {
+    console.log('Auth success, redirecting to dashboard');
     setShowAuth(false);
     setShowDashboard(true);
   };
 
   const handleShowAuth = () => {
+    console.log('Showing auth page');
     setShowAuth(true);
   };
 
   const handleShowDashboard = () => {
+    console.log('Showing dashboard');
     setShowDashboard(true);
   };
 

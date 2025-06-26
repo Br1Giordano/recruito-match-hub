@@ -46,7 +46,7 @@ const Hero = () => {
                 onClick={scrollToDemo}
                 type="button"
               >
-                Inizia ora come Azienda
+                Join the Beta
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button 
@@ -56,7 +56,7 @@ const Hero = () => {
                 onClick={scrollToDemo}
                 type="button"
               >
-                Diventa Recruiter Partner
+                Join the Beta
               </Button>
             </div>
 

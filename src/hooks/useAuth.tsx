@@ -81,7 +81,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       console.log('User profile created:', data);
-      setUserProfile(data);
+      // Cast the data to UserProfile type to ensure type safety
+      setUserProfile(data as UserProfile);
       return true;
     } catch (error) {
       console.error('Error in createUserProfile:', error);

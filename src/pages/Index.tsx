@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
@@ -49,7 +48,10 @@ const Index = () => {
         <Hero />
         
         {/* Demo Section with improved styling */}
-        <div className="py-20 bg-gradient-to-r from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 relative overflow-hidden">
+        <div 
+          className="py-20 bg-gradient-to-r from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 relative overflow-hidden"
+          data-demo-section
+        >
           {/* Background decoration */}
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="absolute top-10 left-10 w-32 h-32 bg-recruito-blue/10 rounded-full blur-3xl"></div>

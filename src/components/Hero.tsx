@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap } from "lucide-react";
 
 const Hero = () => {
+  const scrollToDemo = () => {
+    const demoSection = document.querySelector('[data-demo-section]');
+    if (demoSection) {
+      demoSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background gradient */}
@@ -23,11 +30,20 @@ const Hero = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6">
-              <Button size="lg" className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5">
+              <Button 
+                size="lg" 
+                className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5"
+                onClick={scrollToDemo}
+              >
                 Inizia ora come Azienda
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="text-lg px-10 py-5">
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="text-lg px-10 py-5"
+                onClick={scrollToDemo}
+              >
                 Diventa Recruiter Partner
               </Button>
             </div>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
@@ -19,18 +20,19 @@ const Index = () => {
   const [loadingTimeout, setLoadingTimeout] = useState(false);
   const { user, loading } = useAuth();
 
-  // Safety timeout per evitare loading infiniti
+  // Timeout di sicurezza ridotto a 2 secondi per un'esperienza più veloce
   useEffect(() => {
     const timer = setTimeout(() => {
       if (loading) {
-        console.warn('Loading timeout reached, forcing app to show');
+        console.warn('Loading timeout reached after 2s, forcing app to show');
         setLoadingTimeout(true);
       }
-    }, 10000); // 10 secondi di timeout
+    }, 2000); // Ridotto da 10 a 2 secondi
 
     return () => clearTimeout(timer);
   }, [loading]);
 
+  // Mostra il loading screen solo per i primi 2 secondi massimo
   if (loading && !loadingTimeout) {
     return <LoadingScreen />;
   }
@@ -59,7 +61,8 @@ const Index = () => {
     return <DashboardNavigation onBack={() => setShowDashboard(false)} />;
   }
 
-  return <div className="min-h-screen">
+  return (
+    <div className="min-h-screen">
       <Header onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />
       <main>
         <Hero onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />
@@ -80,7 +83,12 @@ const Index = () => {
               </p>
               
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift">
-                {user ? <Button onClick={() => setShowDashboard(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">Accedi ai primi test</Button> : <div className="space-y-4">
+                {user ? (
+                  <Button onClick={() => setShowDashboard(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                    Accedi ai primi test
+                  </Button>
+                ) : (
+                  <div className="space-y-4">
                     <Button onClick={() => setShowAuth(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       <LogIn className="h-5 w-5 mr-2" />
                       Accedi / Registrati
@@ -88,7 +96,8 @@ const Index = () => {
                     <p className="text-sm text-muted-foreground">
                       Devi essere autenticato per accedere alla demo
                     </p>
-                  </div>}
+                  </div>
+                )}
                 
                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
                   <div className="flex items-start gap-3">
@@ -117,7 +126,8 @@ const Index = () => {
         <BusinessModel />
       </main>
       <Footer />
-    </div>;
+    </div>
+  );
 };
 
 export default Index;

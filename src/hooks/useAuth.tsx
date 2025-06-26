@@ -114,97 +114,101 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
+    let initializationComplete = false;
 
-    console.log('Setting up auth state listener');
+    console.log('Setting up optimized auth state listener');
     
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state change:', event, session?.user?.id);
-        
+    // Timeout di sicurezza più aggressivo - 3 secondi invece di 10
+    const emergencyTimeout = setTimeout(() => {
+      if (!initializationComplete && mounted) {
+        console.warn('Emergency timeout: forcing auth initialization');
+        setLoading(false);
+      }
+    }, 3000);
+
+    // Gestione ottimizzata dello stato di autenticazione
+    const handleAuthState = async (event: string, session: Session | null) => {
+      if (!mounted) return;
+      
+      console.log('Auth state change:', event, session?.user?.id);
+      
+      // Aggiorna immediatamente session e user
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      // Se non c'è sessione, termina subito il loading
+      if (!session?.user) {
+        setUserProfile(null);
+        if (!initializationComplete) {
+          initializationComplete = true;
+          clearTimeout(emergencyTimeout);
+          setLoading(false);
+        }
+        return;
+      }
+      
+      // Carica il profilo utente in background, senza bloccare l'UI
+      setTimeout(async () => {
         if (!mounted) return;
         
-        // Update session and user immediately
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        // Handle profile fetching
-        if (session?.user) {
-          try {
-            const profile = await fetchUserProfile(session.user.id);
-            if (mounted) {
-              setUserProfile(profile);
-            }
-          } catch (error) {
-            console.error('Error fetching profile in auth state change:', error);
-            if (mounted) {
-              setUserProfile(null);
-            }
+        try {
+          const profile = await fetchUserProfile(session.user.id);
+          if (mounted) {
+            setUserProfile(profile);
           }
-        } else {
+        } catch (error) {
+          console.error('Error fetching profile:', error);
           if (mounted) {
             setUserProfile(null);
           }
+        } finally {
+          if (mounted && !initializationComplete) {
+            initializationComplete = true;
+            clearTimeout(emergencyTimeout);
+            setLoading(false);
+          }
         }
-        
-        // Always set loading to false after processing auth state
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    );
+      }, 0);
+    };
 
-    // Get initial session
-    const getInitialSession = async () => {
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(handleAuthState);
+
+    // Inizializzazione veloce della sessione
+    const initializeAuth = async () => {
       try {
-        console.log('Getting initial session');
+        console.log('Quick session initialization');
         const { data: { session }, error } = await supabase.auth.getSession();
         
+        // Anche in caso di errore, termina il loading per non bloccare l'app
         if (error) {
-          console.error('Error getting initial session:', error);
+          console.error('Session error:', error);
           if (mounted) {
             setLoading(false);
           }
           return;
         }
         
-        console.log('Initial session:', session?.user?.id);
+        // Gestisci la sessione esistente
+        await handleAuthState('INITIAL_SESSION', session);
         
-        if (!mounted) return;
-        
-        setSession(session);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          try {
-            const profile = await fetchUserProfile(session.user.id);
-            if (mounted) {
-              setUserProfile(profile);
-            }
-          } catch (error) {
-            console.error('Error fetching initial profile:', error);
-            if (mounted) {
-              setUserProfile(null);
-            }
-          }
-        }
       } catch (error) {
-        console.error('Error in getInitialSession:', error);
-      } finally {
+        console.error('Auth initialization error:', error);
         if (mounted) {
           setLoading(false);
         }
       }
     };
 
-    getInitialSession();
+    initializeAuth();
 
     return () => {
       mounted = false;
+      clearTimeout(emergencyTimeout);
       console.log('Cleaning up auth subscription');
       subscription.unsubscribe();
     };
-  }, []); // Empty dependency array to avoid re-running
+  }, []); // Empty dependency array
 
   const signOut = async () => {
     try {

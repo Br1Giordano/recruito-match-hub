@@ -36,14 +36,8 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
   return (
     <ProtectedRoute onBack={onBack}>
       <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5">
-        {/* If user has a profile, use that; otherwise show selection */}
-        {userProfile ? (
-          userProfile.user_type === "recruiter" ? (
-            <RecruiterDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
-          ) : (
-            <CompanyDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
-          )
-        ) : !userType ? (
+        {/* Always show user type selection first, regardless of existing profile */}
+        {!userType ? (
           <UserTypeSelection onSelectType={setUserType} onBack={onBack} onSignOut={handleSignOut} />
         ) : userType === "recruiter" ? (
           <RecruiterDashboardLayout onBack={onBack} onSignOut={handleSignOut} />

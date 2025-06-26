@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap } from "lucide-react";
 
 const Hero = () => {
+  // Funzione unificata per il scroll alla sezione demo
   const scrollToDemo = () => {
     console.log('Scroll to demo clicked');
     const demoSection = document.querySelector('[data-demo-section]');
@@ -13,7 +14,7 @@ const Hero = () => {
     } else {
       // Fallback: scroll to a specific position
       window.scrollTo({
-        top: window.innerHeight,
+        top: window.innerHeight * 0.8,
         behavior: 'smooth'
       });
     }
@@ -41,7 +42,7 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-6">
               <Button 
                 size="lg" 
-                className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5 cursor-pointer"
+                className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5"
                 onClick={scrollToDemo}
                 type="button"
               >
@@ -51,7 +52,7 @@ const Hero = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="text-lg px-10 py-5 cursor-pointer"
+                className="text-lg px-10 py-5"
                 onClick={scrollToDemo}
                 type="button"
               >

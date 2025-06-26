@@ -72,51 +72,13 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
       console.log("Creating job offer with user:", user.email);
       console.log("Company name:", data.company_name);
 
-      // First, create or find a company registration with the provided name
-      const { data: existingCompany, error: searchError } = await supabase
-        .from("company_registrations")
-        .select("id")
-        .eq("nome_azienda", data.company_name)
-        .eq("email", user.email)
-        .single();
-
-      let companyId: string;
-
-      if (existingCompany) {
-        companyId = existingCompany.id;
-        console.log("Using existing company:", companyId);
-      } else {
-        // Create a new company registration
-        const { data: newCompany, error: companyError } = await supabase
-          .from("company_registrations")
-          .insert({
-            nome_azienda: data.company_name,
-            email: user.email,
-            status: "approved"
-          })
-          .select("id")
-          .single();
-
-        if (companyError || !newCompany) {
-          console.error("Error creating company:", companyError);
-          toast({
-            title: "Errore",
-            description: "Impossibile registrare l'azienda",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        companyId = newCompany.id;
-        console.log("Created new company:", companyId);
-      }
-
       // Convert salary strings to numbers if provided
       const salaryMin = data.salary_min ? parseInt(data.salary_min) : null;
       const salaryMax = data.salary_max ? parseInt(data.salary_max) : null;
 
       const jobOfferData = {
-        company_id: companyId,
+        company_name: data.company_name,
+        contact_email: user.email,
         title: data.title,
         description: data.description || null,
         location: data.location || null,

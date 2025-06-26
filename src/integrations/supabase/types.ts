@@ -45,7 +45,9 @@ export type Database = {
       job_offers: {
         Row: {
           benefits: string | null
-          company_id: string
+          company_id: string | null
+          company_name: string | null
+          contact_email: string | null
           created_at: string
           description: string | null
           employment_type: string | null
@@ -60,7 +62,9 @@ export type Database = {
         }
         Insert: {
           benefits?: string | null
-          company_id: string
+          company_id?: string | null
+          company_name?: string | null
+          contact_email?: string | null
           created_at?: string
           description?: string | null
           employment_type?: string | null
@@ -75,7 +79,9 @@ export type Database = {
         }
         Update: {
           benefits?: string | null
-          company_id?: string
+          company_id?: string | null
+          company_name?: string | null
+          contact_email?: string | null
           created_at?: string
           description?: string | null
           employment_type?: string | null

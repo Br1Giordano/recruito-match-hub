@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase } from "lucide-react";
 import JobOfferForm from "./JobOfferForm";
 
@@ -33,18 +33,13 @@ export default function CompanyOffersDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [showNewOfferForm, setShowNewOfferForm] = useState(false);
   const { toast } = useToast();
+  const { userProfile } = useAuth();
 
   const fetchJobOffers = async () => {
     setIsLoading(true);
 
-    // Get current company ID (in a real app, this would come from auth)
-    const { data: companyData, error: companyError } = await supabase
-      .from("company_registrations")
-      .select("id")
-      .limit(1)
-      .single();
-
-    if (companyError || !companyData) {
+    // Check if user is authenticated as a company
+    if (!userProfile || userProfile.user_type !== 'company') {
       toast({
         title: "Errore",
         description: "Devi essere autenticato come azienda",
@@ -57,7 +52,7 @@ export default function CompanyOffersDashboard() {
     const { data, error } = await supabase
       .from("job_offers")
       .select("*")
-      .eq("company_id", companyData.id)
+      .eq("company_id", userProfile.registration_id)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -75,8 +70,10 @@ export default function CompanyOffersDashboard() {
   };
 
   useEffect(() => {
-    fetchJobOffers();
-  }, []);
+    if (userProfile) {
+      fetchJobOffers();
+    }
+  }, [userProfile]);
 
   useEffect(() => {
     let filtered = jobOffers;
@@ -156,6 +153,34 @@ export default function CompanyOffersDashboard() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-lg">Caricamento offerte...</div>
+      </div>
+    );
+  }
+
+  // If user is not authenticated as company, show appropriate message
+  if (!userProfile || userProfile.user_type !== 'company') {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Le Mie Offerte</h1>
+            <p className="text-muted-foreground">
+              Gestisci le tue offerte di lavoro pubblicate
+            </p>
+          </div>
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center py-8">
+              <Briefcase className="mx-auto h-12 w-12 text-muted-foreground" />
+              <h3 className="mt-4 text-lg font-semibold text-red-600">Accesso Negato</h3>
+              <p className="text-muted-foreground">
+                Devi essere autenticato come azienda per visualizzare le offerte di lavoro.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }

@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 import { ArrowLeft, Save } from "lucide-react";
 
 const jobOfferSchema = z.object({
@@ -35,6 +36,7 @@ interface JobOfferFormProps {
 export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { userProfile } = useAuth();
 
   const form = useForm<JobOfferFormData>({
     resolver: zodResolver(jobOfferSchema),
@@ -55,14 +57,8 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
     setIsSubmitting(true);
 
     try {
-      // Get current company ID (in a real app, this would come from auth)
-      const { data: companyData, error: companyError } = await supabase
-        .from("company_registrations")
-        .select("id")
-        .limit(1)
-        .single();
-
-      if (companyError || !companyData) {
+      // Check if user is authenticated and has a company profile
+      if (!userProfile || userProfile.user_type !== 'company') {
         toast({
           title: "Errore",
           description: "Devi essere autenticato come azienda per creare offerte",
@@ -78,7 +74,7 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
       const { error } = await supabase
         .from("job_offers")
         .insert({
-          company_id: companyData.id,
+          company_id: userProfile.registration_id,
           title: data.title,
           description: data.description || null,
           location: data.location || null,
@@ -117,6 +113,33 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
       setIsSubmitting(false);
     }
   };
+
+  // If user is not authenticated as a company, show error message
+  if (!userProfile || userProfile.user_type !== 'company') {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Torna alle Offerte
+          </Button>
+        </div>
+        
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center py-8">
+              <p className="text-lg text-red-600 mb-4">
+                Devi essere autenticato come azienda per creare offerte di lavoro
+              </p>
+              <p className="text-muted-foreground">
+                Assicurati di aver effettuato l'accesso con un account aziendale valido.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

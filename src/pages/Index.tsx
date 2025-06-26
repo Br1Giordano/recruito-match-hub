@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
@@ -11,32 +12,26 @@ import DashboardNavigation from "@/components/DashboardNavigation";
 import AuthPage from "@/components/auth/AuthPage";
 import { useAuth } from "@/hooks/useAuth";
 import { LogIn } from "lucide-react";
+
 const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [showAuth, setShowAuth] = useState(false);
-  const {
-    user,
-    loading
-  } = useAuth();
+  const { user, loading } = useAuth();
 
-  // Auto-redirect to dashboard after successful login
-  useEffect(() => {
-    if (user && !loading) {
-      setShowDashboard(true);
-      setShowAuth(false);
-    }
-  }, [user, loading]);
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Caricamento...</div>
       </div>;
   }
+
   if (showAuth) {
     return <AuthPage onBack={() => setShowAuth(false)} />;
   }
+
   if (showDashboard) {
     return <DashboardNavigation onBack={() => setShowDashboard(false)} />;
   }
+
   return <div className="min-h-screen">
       <Header />
       <main>
@@ -97,4 +92,5 @@ const Index = () => {
       <Footer />
     </div>;
 };
+
 export default Index;

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +9,7 @@ import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
 import { User, Building2, FileText, Briefcase, MessageSquare, Plus, ArrowLeft, Home, LogOut } from "lucide-react";
+import JobOffersBoard from "./JobOffersBoard";
 
 interface DashboardNavigationProps {
   onBack?: () => void;
@@ -171,24 +171,24 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
       </div>
 
       <div className="container mx-auto p-4">
-        <Tabs defaultValue="proposals" className="space-y-6">
+        <Tabs defaultValue="job-board" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="job-board" className="flex items-center gap-2">
+              <Briefcase className="h-4 w-4" />
+              Posizioni Aperte
+            </TabsTrigger>
             <TabsTrigger value="proposals" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Le Mie Candidature
             </TabsTrigger>
-            <TabsTrigger value="new-proposal" className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Invia Proposta
-            </TabsTrigger>
           </TabsList>
+          
+          <TabsContent value="job-board">
+            <JobOffersBoard />
+          </TabsContent>
           
           <TabsContent value="proposals">
             <RecruiterDashboard />
-          </TabsContent>
-          
-          <TabsContent value="new-proposal">
-            <ProposalForm />
           </TabsContent>
         </Tabs>
       </div>

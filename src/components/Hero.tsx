@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap } from "lucide-react";
 
@@ -39,7 +38,7 @@ const Hero = () => {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-6">
+            <div className="flex justify-center sm:justify-start">
               <Button 
                 size="lg" 
                 className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5"
@@ -48,15 +47,6 @@ const Hero = () => {
               >
                 Join the Beta
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="text-lg px-10 py-5"
-                onClick={scrollToDemo}
-                type="button"
-              >
-                Join the Beta
               </Button>
             </div>
 

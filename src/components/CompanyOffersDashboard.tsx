@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,27 +10,13 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase } from "lucide-react";
 import JobOfferForm from "./JobOfferForm";
+import { Database } from "@/integrations/supabase/types";
 
-interface JobOffer {
-  id: string;
-  title: string;
-  description?: string;
-  location?: string;
-  salary_min?: number;
-  salary_max?: number;
-  requirements?: string;
-  benefits?: string;
-  employment_type?: string;
-  status: string;
-  created_at: string;
-  updated_at: string;
-  company_name?: string;
-  contact_email?: string;
-}
+type CompanyJobOffer = Database['public']['Tables']['job_offers']['Row'];
 
 export default function CompanyOffersDashboard() {
-  const [jobOffers, setJobOffers] = useState<JobOffer[]>([]);
-  const [filteredOffers, setFilteredOffers] = useState<JobOffer[]>([]);
+  const [jobOffers, setJobOffers] = useState<CompanyJobOffer[]>([]);
+  const [filteredOffers, setFilteredOffers] = useState<CompanyJobOffer[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
@@ -290,8 +277,8 @@ export default function CompanyOffersDashboard() {
                       </span>
                     </CardDescription>
                   </div>
-                  <Badge className={getStatusColor(offer.status)}>
-                    {getStatusText(offer.status)}
+                  <Badge className={getStatusColor(offer.status || 'active')}>
+                    {getStatusText(offer.status || 'active')}
                   </Badge>
                 </div>
               </CardHeader>

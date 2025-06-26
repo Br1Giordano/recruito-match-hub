@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,7 +12,7 @@ import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase } from "lucide-
 import ProposalFormModal from "./ProposalFormModal";
 import { Database } from "@/integrations/supabase/types";
 
-type JobOffer = Database['public']['Tables']['job_offers']['Row'] & {
+type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
   company_registrations?: {
     nome_azienda: string;
     id: string;
@@ -19,13 +20,13 @@ type JobOffer = Database['public']['Tables']['job_offers']['Row'] & {
 };
 
 export default function JobOffersBoard() {
-  const [jobOffers, setJobOffers] = useState<JobOffer[]>([]);
-  const [filteredOffers, setFilteredOffers] = useState<JobOffer[]>([]);
+  const [jobOffers, setJobOffers] = useState<JobOfferWithCompany[]>([]);
+  const [filteredOffers, setFilteredOffers] = useState<JobOfferWithCompany[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [employmentFilter, setEmploymentFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedOffer, setSelectedOffer] = useState<JobOffer | null>(null);
+  const [selectedOffer, setSelectedOffer] = useState<JobOfferWithCompany | null>(null);
   const [showProposalModal, setShowProposalModal] = useState(false);
   const { toast } = useToast();
   const { userProfile } = useAuth();
@@ -88,12 +89,12 @@ export default function JobOffersBoard() {
     setFilteredOffers(filtered);
   }, [searchTerm, locationFilter, employmentFilter, jobOffers]);
 
-  const getCompanyName = (offer: JobOffer): string => {
+  const getCompanyName = (offer: JobOfferWithCompany): string => {
     // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations
     return offer.company_name || offer.company_registrations?.nome_azienda || "Azienda non specificata";
   };
 
-  const handleSendProposal = (offer: JobOffer) => {
+  const handleSendProposal = (offer: JobOfferWithCompany) => {
     if (!userProfile || userProfile.user_type !== 'recruiter') {
       toast({
         title: "Errore",

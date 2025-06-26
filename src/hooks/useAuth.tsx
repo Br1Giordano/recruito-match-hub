@@ -41,20 +41,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (error) {
         console.error('Error fetching user profile:', error);
-        setUserProfile(null);
-        return;
+        return null;
       }
 
       console.log('User profile data:', data);
-      if (data && (data.user_type === 'recruiter' || data.user_type === 'company')) {
-        setUserProfile(data as UserProfile);
-      } else {
-        console.log('No user profile found');
-        setUserProfile(null);
-      }
+      return data as UserProfile | null;
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
-      setUserProfile(null);
+      return null;
     }
   };
 
@@ -67,7 +61,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Creating user profile for:', user.id, 'as', userType);
       
-      // Create a temporary registration ID - this will be updated when they complete registration
       const tempRegistrationId = crypto.randomUUID();
       
       const { data, error } = await supabase
@@ -108,7 +101,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Refresh user profile after linking
       if (user) {
-        await fetchUserProfile(user.id);
+        const profile = await fetchUserProfile(user.id);
+        setUserProfile(profile);
       }
 
       return data || false;
@@ -119,33 +113,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    console.log('Setting up auth state listener');
+    
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         console.log('Auth state change:', event, session?.user?.id);
+        
+        // Update session and user immediately
         setSession(session);
         setUser(session?.user ?? null);
         
+        // Handle profile fetching separately to avoid blocking
         if (session?.user) {
-          await fetchUserProfile(session.user.id);
+          // Use setTimeout to prevent blocking the auth callback
+          setTimeout(async () => {
+            const profile = await fetchUserProfile(session.user.id);
+            setUserProfile(profile);
+          }, 0);
         } else {
           setUserProfile(null);
         }
         
-        setLoading(false);
+        // Only set loading to false after initial auth check
+        if (event === 'INITIAL_SESSION' || event === 'SIGNED_IN' || event === 'SIGNED_OUT') {
+          setLoading(false);
+        }
       }
     );
 
     // Get initial session
     const getInitialSession = async () => {
       try {
+        console.log('Getting initial session');
         const { data: { session } } = await supabase.auth.getSession();
         console.log('Initial session:', session?.user?.id);
+        
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await fetchUserProfile(session.user.id);
+          const profile = await fetchUserProfile(session.user.id);
+          setUserProfile(profile);
         }
       } catch (error) {
         console.error('Error getting initial session:', error);
@@ -156,8 +165,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     getInitialSession();
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      console.log('Cleaning up auth subscription');
+      subscription.unsubscribe();
+    };
+  }, []); // Empty dependency array to avoid re-running
 
   const signOut = async () => {
     try {

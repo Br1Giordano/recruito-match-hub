@@ -4,11 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
-import ProposalForm from "./ProposalForm";
 import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
-import { User, Building2, FileText, Briefcase, MessageSquare, Plus, ArrowLeft, Home, LogOut } from "lucide-react";
+import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut } from "lucide-react";
 import JobOffersBoard from "./JobOffersBoard";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -18,21 +17,14 @@ interface DashboardNavigationProps {
 
 export default function DashboardNavigation({ onBack }: DashboardNavigationProps) {
   const { user, userProfile, signOut, loading, createUserProfile } = useAuth();
-  const [selectedUserType, setSelectedUserType] = useState<"recruiter" | "company" | null>(null);
   const { toast } = useToast();
+
+  console.log('DashboardNavigation render - user:', !!user, 'userProfile:', userProfile, 'loading:', loading);
 
   const handleSignOut = async () => {
     await signOut();
     if (onBack) onBack();
   };
-
-  // Auto-set user type from existing profile
-  useEffect(() => {
-    if (userProfile && userProfile.user_type) {
-      console.log('Setting user type from profile:', userProfile.user_type);
-      setSelectedUserType(userProfile.user_type);
-    }
-  }, [userProfile]);
 
   const handleUserTypeSelection = async (type: "recruiter" | "company") => {
     console.log('User selected type:', type);
@@ -48,7 +40,6 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
         return;
       }
       
-      setSelectedUserType(type);
       toast({
         title: "Successo",
         description: "Profilo utente creato con successo",
@@ -75,25 +66,17 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
   return (
     <ProtectedRoute onBack={onBack}>
       <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5">
-        {/* If user is authenticated but has no profile or selected type, show selection */}
-        {user && (!userProfile || !selectedUserType) ? (
+        {/* Check if user has a profile */}
+        {!userProfile ? (
           <UserTypeSelection 
             onSelectType={handleUserTypeSelection} 
             onBack={onBack} 
             onSignOut={handleSignOut}
-            currentProfile={userProfile}
           />
-        ) : selectedUserType === "recruiter" ? (
+        ) : userProfile.user_type === "recruiter" ? (
           <RecruiterDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
-        ) : selectedUserType === "company" ? (
-          <CompanyDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
         ) : (
-          <UserTypeSelection 
-            onSelectType={handleUserTypeSelection} 
-            onBack={onBack} 
-            onSignOut={handleSignOut}
-            currentProfile={userProfile}
-          />
+          <CompanyDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
         )}
       </div>
     </ProtectedRoute>
@@ -103,13 +86,11 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
 function UserTypeSelection({ 
   onSelectType, 
   onBack, 
-  onSignOut,
-  currentProfile
+  onSignOut
 }: { 
   onSelectType: (type: "recruiter" | "company") => void;
   onBack?: () => void;
   onSignOut: () => void;
-  currentProfile: any;
 }) {
   return (
     <>
@@ -146,11 +127,6 @@ function UserTypeSelection({
             <CardDescription>
               Scegli il tuo ruolo per accedere al dashboard appropriato e testare tutte le funzionalità
             </CardDescription>
-            {currentProfile && (
-              <div className="mt-2 text-sm text-muted-foreground">
-                Profilo esistente: {currentProfile.user_type === 'recruiter' ? 'Recruiter' : 'Azienda'}
-              </div>
-            )}
           </CardHeader>
           <CardContent className="space-y-6 px-8 pb-8">
             <Button

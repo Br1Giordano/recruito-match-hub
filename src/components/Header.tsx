@@ -113,7 +113,7 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
               size="sm"
               className="gradient-recruito text-white border-0 hover:opacity-90"
             >
-              Inizia ora come Azienda
+              Prova Beta - Azienda
             </Button>
             <Button
               onClick={handleRecruiterButtonClick}
@@ -121,7 +121,7 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
               variant="outline"
               className="hover:bg-gray-50"
             >
-              Diventa Recruiter Partner
+              Demo Recruiter
             </Button>
           </div>
         </nav>

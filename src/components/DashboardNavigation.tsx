@@ -10,18 +10,40 @@ import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
 import { User, Building2, FileText, Briefcase, MessageSquare, Plus, ArrowLeft, Home, LogOut } from "lucide-react";
 import JobOffersBoard from "./JobOffersBoard";
+import { useToast } from "@/components/ui/use-toast";
 
 interface DashboardNavigationProps {
   onBack?: () => void;
 }
 
 export default function DashboardNavigation({ onBack }: DashboardNavigationProps) {
-  const { userProfile, signOut, loading } = useAuth();
+  const { userProfile, signOut, loading, createUserProfile } = useAuth();
   const [userType, setUserType] = useState<"recruiter" | "company" | null>(null);
+  const { toast } = useToast();
 
   const handleSignOut = async () => {
     await signOut();
     if (onBack) onBack();
+  };
+
+  const handleUserTypeSelection = async (type: "recruiter" | "company") => {
+    console.log('User selected type:', type);
+    
+    // If user doesn't have a profile, create one
+    if (!userProfile) {
+      console.log('Creating new user profile...');
+      const success = await createUserProfile(type);
+      if (!success) {
+        toast({
+          title: "Errore",
+          description: "Impossibile creare il profilo utente",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+    
+    setUserType(type);
   };
 
   // Show loading while determining user type
@@ -36,9 +58,14 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
   return (
     <ProtectedRoute onBack={onBack}>
       <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5">
-        {/* Always show user type selection first, regardless of existing profile */}
+        {/* Always show user type selection first */}
         {!userType ? (
-          <UserTypeSelection onSelectType={setUserType} onBack={onBack} onSignOut={handleSignOut} />
+          <UserTypeSelection 
+            onSelectType={handleUserTypeSelection} 
+            onBack={onBack} 
+            onSignOut={handleSignOut}
+            currentProfile={userProfile}
+          />
         ) : userType === "recruiter" ? (
           <RecruiterDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
         ) : (
@@ -52,11 +79,13 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
 function UserTypeSelection({ 
   onSelectType, 
   onBack, 
-  onSignOut 
+  onSignOut,
+  currentProfile
 }: { 
   onSelectType: (type: "recruiter" | "company") => void;
   onBack?: () => void;
   onSignOut: () => void;
+  currentProfile: any;
 }) {
   return (
     <>
@@ -90,9 +119,14 @@ function UserTypeSelection({
         <Card className="w-full max-w-2xl shadow-xl border-0 bg-white/90 backdrop-blur-sm">
           <CardHeader className="text-center pb-8">
             <CardTitle className="text-3xl font-bold text-gradient mb-4">Seleziona Tipo Utente</CardTitle>
-            <p className="text-muted-foreground text-lg">
+            <CardDescription>
               Scegli il tuo ruolo per accedere al dashboard appropriato e testare tutte le funzionalità
-            </p>
+            </CardDescription>
+            {currentProfile && (
+              <div className="mt-2 text-sm text-muted-foreground">
+                Profilo esistente: {currentProfile.user_type === 'recruiter' ? 'Recruiter' : 'Azienda'}
+              </div>
+            )}
           </CardHeader>
           <CardContent className="space-y-6 px-8 pb-8">
             <Button

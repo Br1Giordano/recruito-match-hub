@@ -19,6 +19,7 @@ interface AuthContextType {
   loading: boolean;
   signOut: () => Promise<void>;
   linkToRegistration: (registrationId: string, userType: 'recruiter' | 'company') => Promise<boolean>;
+  createUserProfile: (userType: 'recruiter' | 'company') => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,6 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log('Fetching user profile for:', userId);
       const { data, error } = await supabase
         .from('user_profiles')
         .select('*')
@@ -42,11 +44,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
+      console.log('User profile data:', data);
       if (data && (data.user_type === 'recruiter' || data.user_type === 'company')) {
         setUserProfile(data as UserProfile);
+      } else {
+        console.log('No user profile found or invalid user type');
+        setUserProfile(null);
       }
     } catch (error) {
       console.error('Error in fetchUserProfile:', error);
+    }
+  };
+
+  const createUserProfile = async (userType: 'recruiter' | 'company') => {
+    if (!user) return false;
+    
+    try {
+      console.log('Creating user profile for:', user.id, 'as', userType);
+      
+      // Create a temporary registration ID - this will be updated when they complete registration
+      const tempRegistrationId = crypto.randomUUID();
+      
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .insert([{
+          auth_user_id: user.id,
+          user_type: userType,
+          registration_id: tempRegistrationId
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating user profile:', error);
+        return false;
+      }
+
+      console.log('User profile created:', data);
+      setUserProfile(data);
+      return true;
+    } catch (error) {
+      console.error('Error in createUserProfile:', error);
+      return false;
     }
   };
 
@@ -76,12 +115,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          fetchUserProfile(session.user.id);
+          await fetchUserProfile(session.user.id);
         } else {
           setUserProfile(null);
         }
@@ -90,12 +130,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     );
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      console.log('Initial session:', session?.user?.id);
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserProfile(session.user.id);
+        await fetchUserProfile(session.user.id);
       }
       
       setLoading(false);
@@ -118,7 +159,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       userProfile, 
       loading, 
       signOut, 
-      linkToRegistration 
+      linkToRegistration,
+      createUserProfile
     }}>
       {children}
     </AuthContext.Provider>

@@ -40,7 +40,6 @@ export default function CompanyOffersDashboard() {
 
     // Check if user is authenticated as a company
     if (!userProfile || userProfile.user_type !== 'company') {
-      console.log('User profile:', userProfile);
       toast({
         title: "Errore",
         description: "Devi essere autenticato come azienda",
@@ -50,8 +49,6 @@ export default function CompanyOffersDashboard() {
       return;
     }
 
-    console.log('Fetching job offers for company:', userProfile.registration_id);
-
     const { data, error } = await supabase
       .from("job_offers")
       .select("*")
@@ -59,14 +56,12 @@ export default function CompanyOffersDashboard() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error('Error fetching job offers:', error);
       toast({
         title: "Errore",
         description: "Impossibile caricare le offerte di lavoro",
         variant: "destructive",
       });
     } else {
-      console.log('Job offers fetched:', data);
       setJobOffers(data || []);
       setFilteredOffers(data || []);
     }
@@ -182,9 +177,6 @@ export default function CompanyOffersDashboard() {
               <h3 className="mt-4 text-lg font-semibold text-red-600">Accesso Negato</h3>
               <p className="text-muted-foreground">
                 Devi essere autenticato come azienda per visualizzare le offerte di lavoro.
-              </p>
-              <p className="text-sm text-muted-foreground mt-2">
-                Profilo utente: {userProfile ? `${userProfile.user_type} (${userProfile.registration_id})` : 'Non autenticato'}
               </p>
             </div>
           </CardContent>

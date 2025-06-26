@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap } from "lucide-react";
 
@@ -47,7 +48,7 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
                 onClick={scrollToDemo}
                 type="button"
               >
-                Scopri la Piattaforma
+                Inizia subito la tua ricerca
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
               <Button 

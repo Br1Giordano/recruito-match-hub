@@ -9,9 +9,34 @@ interface HeroProps {
 
 const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
   const scrollToDemo = () => {
-    const demoElement = document.querySelector('[data-demo-section]');
+    console.log('scrollToDemo called - looking for demo section');
+    
+    // Try multiple selectors to find the demo section
+    let demoElement = document.querySelector('[data-demo-section]');
+    
+    if (!demoElement) {
+      console.log('data-demo-section not found, trying #demo');
+      demoElement = document.getElementById('demo');
+    }
+    
+    if (!demoElement) {
+      console.log('#demo not found, trying .demo-section');
+      demoElement = document.querySelector('.demo-section');
+    }
+    
     if (demoElement) {
-      demoElement.scrollIntoView({ behavior: 'smooth' });
+      console.log('Demo section found, scrolling...', demoElement);
+      demoElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      console.error('Demo section not found with any selector');
+      // Fallback: scroll to a reasonable position
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -45,7 +70,10 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
               <Button 
                 size="lg" 
                 className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5"
-                onClick={scrollToDemo}
+                onClick={() => {
+                  console.log('Main CTA button clicked');
+                  scrollToDemo();
+                }}
                 type="button"
               >
                 Inizia subito la tua ricerca

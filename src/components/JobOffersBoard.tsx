@@ -23,10 +23,12 @@ interface JobOffer {
   employment_type?: string;
   status: string;
   created_at: string;
-  company_registrations: {
+  company_name?: string;
+  contact_email?: string;
+  company_registrations?: {
     nome_azienda: string;
     id: string;
-  };
+  } | null;
 }
 
 export default function JobOffersBoard() {
@@ -44,11 +46,12 @@ export default function JobOffersBoard() {
   const fetchJobOffers = async () => {
     setIsLoading(true);
 
+    // Query per ottenere tutte le offerte attive, sia con che senza company_registrations
     const { data, error } = await supabase
       .from("job_offers")
       .select(`
         *,
-        company_registrations!inner(nome_azienda, id)
+        company_registrations(nome_azienda, id)
       `)
       .eq("status", "active")
       .order("created_at", { ascending: false });
@@ -61,6 +64,7 @@ export default function JobOffersBoard() {
         variant: "destructive",
       });
     } else {
+      console.log("Job offers fetched:", data);
       setJobOffers(data || []);
       setFilteredOffers(data || []);
     }
@@ -79,7 +83,7 @@ export default function JobOffersBoard() {
       filtered = filtered.filter(
         (offer) =>
           offer.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          offer.company_registrations.nome_azienda.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          getCompanyName(offer).toLowerCase().includes(searchTerm.toLowerCase()) ||
           offer.description?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -96,6 +100,11 @@ export default function JobOffersBoard() {
 
     setFilteredOffers(filtered);
   }, [searchTerm, locationFilter, employmentFilter, jobOffers]);
+
+  const getCompanyName = (offer: JobOffer): string => {
+    // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations
+    return offer.company_name || offer.company_registrations?.nome_azienda || "Azienda non specificata";
+  };
 
   const handleSendProposal = (offer: JobOffer) => {
     if (!userProfile || userProfile.user_type !== 'recruiter') {
@@ -228,7 +237,7 @@ export default function JobOffersBoard() {
                     <CardDescription className="flex items-center gap-4">
                       <span className="flex items-center gap-1">
                         <Building2 className="h-4 w-4" />
-                        {offer.company_registrations.nome_azienda}
+                        {getCompanyName(offer)}
                       </span>
                       {offer.location && (
                         <span className="flex items-center gap-1">

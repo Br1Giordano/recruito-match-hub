@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -19,7 +19,7 @@ interface DashboardNavigationProps {
 
 export default function DashboardNavigation({ onBack }: DashboardNavigationProps) {
   const { userProfile, signOut, loading, createUserProfile } = useAuth();
-  const [userType, setUserType] = useState<"recruiter" | "company" | null>(null);
+  const [selectedUserType, setSelectedUserType] = useState<"recruiter" | "company" | null>(null);
   const { toast } = useToast();
 
   const handleSignOut = async () => {
@@ -27,10 +27,18 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
     if (onBack) onBack();
   };
 
+  // Determina automaticamente il tipo di utente dal profilo esistente
+  useEffect(() => {
+    if (userProfile && userProfile.user_type && !selectedUserType) {
+      console.log('Auto-setting user type from profile:', userProfile.user_type);
+      setSelectedUserType(userProfile.user_type);
+    }
+  }, [userProfile, selectedUserType]);
+
   const handleUserTypeSelection = async (type: "recruiter" | "company") => {
     console.log('User selected type:', type);
     
-    // If user doesn't have a profile, create one
+    // Se l'utente non ha un profilo, crea uno
     if (!userProfile) {
       console.log('Creating new user profile...');
       const success = await createUserProfile(type);
@@ -44,7 +52,7 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
       }
     }
     
-    setUserType(type);
+    setSelectedUserType(type);
   };
 
   // Show loading while determining user type
@@ -59,15 +67,15 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
   return (
     <ProtectedRoute onBack={onBack}>
       <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5">
-        {/* Always show user type selection first */}
-        {!userType ? (
+        {/* Se non c'è un tipo utente selezionato, mostra la selezione */}
+        {!selectedUserType ? (
           <UserTypeSelection 
             onSelectType={handleUserTypeSelection} 
             onBack={onBack} 
             onSignOut={handleSignOut}
             currentProfile={userProfile}
           />
-        ) : userType === "recruiter" ? (
+        ) : selectedUserType === "recruiter" ? (
           <RecruiterDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
         ) : (
           <CompanyDashboardLayout onBack={onBack} onSignOut={handleSignOut} />

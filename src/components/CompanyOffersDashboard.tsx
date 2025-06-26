@@ -33,26 +33,21 @@ export default function CompanyOffersDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [showNewOfferForm, setShowNewOfferForm] = useState(false);
   const { toast } = useToast();
-  const { userProfile, user } = useAuth();
+  const { userProfile } = useAuth();
 
   const fetchJobOffers = async () => {
     setIsLoading(true);
 
-    // Controlla se l'utente è autenticato
-    if (!user) {
-      console.log('User not authenticated');
-      setIsLoading(false);
-      return;
-    }
-
-    // Controlla se l'utente ha un profilo azienda
+    // Check if user is authenticated as a company
     if (!userProfile || userProfile.user_type !== 'company') {
-      console.log('User profile not found or not a company:', userProfile);
+      toast({
+        title: "Errore",
+        description: "Devi essere autenticato come azienda",
+        variant: "destructive",
+      });
       setIsLoading(false);
       return;
     }
-
-    console.log('Fetching job offers for company:', userProfile.registration_id);
 
     const { data, error } = await supabase
       .from("job_offers")
@@ -61,14 +56,12 @@ export default function CompanyOffersDashboard() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error('Error fetching job offers:', error);
       toast({
         title: "Errore",
         description: "Impossibile caricare le offerte di lavoro",
         variant: "destructive",
       });
     } else {
-      console.log('Job offers fetched:', data);
       setJobOffers(data || []);
       setFilteredOffers(data || []);
     }
@@ -77,10 +70,10 @@ export default function CompanyOffersDashboard() {
   };
 
   useEffect(() => {
-    if (userProfile && user) {
+    if (userProfile) {
       fetchJobOffers();
     }
-  }, [userProfile, user]);
+  }, [userProfile]);
 
   useEffect(() => {
     let filtered = jobOffers;
@@ -164,8 +157,8 @@ export default function CompanyOffersDashboard() {
     );
   }
 
-  // Se l'utente non è autenticato come azienda, mostra messaggio appropriato
-  if (!user || !userProfile || userProfile.user_type !== 'company') {
+  // If user is not authenticated as company, show appropriate message
+  if (!userProfile || userProfile.user_type !== 'company') {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">

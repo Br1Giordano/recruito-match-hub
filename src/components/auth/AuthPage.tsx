@@ -11,10 +11,9 @@ import AuthErrorHandler from "./AuthErrorHandler";
 
 interface AuthPageProps {
   onBack?: () => void;
-  onAuthSuccess?: () => void;
 }
 
-export default function AuthPage({ onBack, onAuthSuccess }: AuthPageProps) {
+export default function AuthPage({ onBack }: AuthPageProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,9 +36,8 @@ export default function AuthPage({ onBack, onAuthSuccess }: AuthPageProps) {
         title: "Accesso effettuato",
         description: "Benvenuto nel sistema!",
       });
+      // Note: Auto-redirect is handled by the Index component via useEffect
       setIsLoading(false);
-      // Redirect to dashboard after successful login
-      if (onAuthSuccess) onAuthSuccess();
     }
   };
 
@@ -88,9 +86,8 @@ export default function AuthPage({ onBack, onAuthSuccess }: AuthPageProps) {
         title: "Registrazione completata",
         description: "Account creato con successo!",
       });
+      // Note: Auto-redirect is handled by the Index component via useEffect
       setIsLoading(false);
-      // Redirect to dashboard after successful signup
-      if (onAuthSuccess) onAuthSuccess();
     }
   };
 

@@ -24,8 +24,13 @@ const Index = () => {
       </div>;
   }
 
+  const handleAuthSuccess = () => {
+    setShowAuth(false);
+    setShowDashboard(true);
+  };
+
   if (showAuth) {
-    return <AuthPage onBack={() => setShowAuth(false)} />;
+    return <AuthPage onBack={() => setShowAuth(false)} onAuthSuccess={handleAuthSuccess} />;
   }
 
   if (showDashboard) {

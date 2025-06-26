@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,26 +9,14 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase } from "lucide-react";
 import ProposalFormModal from "./ProposalFormModal";
+import { Database } from "@/integrations/supabase/types";
 
-interface JobOffer {
-  id: string;
-  title: string;
-  description?: string;
-  location?: string;
-  salary_min?: number;
-  salary_max?: number;
-  requirements?: string;
-  benefits?: string;
-  employment_type?: string;
-  status: string;
-  created_at: string;
-  company_name?: string;
-  contact_email?: string;
+type JobOffer = Database['public']['Tables']['job_offers']['Row'] & {
   company_registrations?: {
     nome_azienda: string;
     id: string;
   } | null;
-}
+};
 
 export default function JobOffersBoard() {
   const [jobOffers, setJobOffers] = useState<JobOffer[]>([]);

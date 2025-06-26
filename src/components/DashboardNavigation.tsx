@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -26,6 +27,9 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
     if (userProfile && userProfile.user_type) {
       console.log('Setting user type from existing profile:', userProfile.user_type);
       setUserType(userProfile.user_type);
+    } else if (userProfile === null) {
+      // Se non c'è un profilo, reset userType
+      setUserType(null);
     }
   }, [userProfile]);
 
@@ -54,11 +58,20 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
     setUserType(type);
   };
 
-  // Show loading while determining user type
+  // Show loading while determining user type or while auth is loading
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Caricamento...</div>
+        <div className="text-lg">Caricamento autenticazione...</div>
+      </div>
+    );
+  }
+
+  // Show loading while we have a profile but userType is not set yet
+  if (userProfile && !userType) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-lg">Caricamento profilo...</div>
       </div>
     );
   }

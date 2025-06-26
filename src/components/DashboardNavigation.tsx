@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +20,14 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
   const { userProfile, signOut, loading, createUserProfile } = useAuth();
   const [userType, setUserType] = useState<"recruiter" | "company" | null>(null);
   const { toast } = useToast();
+
+  // Imposta automaticamente il userType basandosi sul profilo esistente
+  useEffect(() => {
+    if (userProfile && userProfile.user_type) {
+      console.log('Setting user type from existing profile:', userProfile.user_type);
+      setUserType(userProfile.user_type);
+    }
+  }, [userProfile]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -59,8 +66,8 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
   return (
     <ProtectedRoute onBack={onBack}>
       <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5">
-        {/* Always show user type selection first */}
-        {!userType ? (
+        {/* Se non c'è userType e non c'è un profilo esistente, mostra la selezione */}
+        {!userType && !userProfile ? (
           <UserTypeSelection 
             onSelectType={handleUserTypeSelection} 
             onBack={onBack} 

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,9 +12,10 @@ import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, Save, Building2 } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 
 const jobOfferSchema = z.object({
+  company_name: z.string().min(1, "Il nome dell'azienda è obbligatorio"),
   title: z.string().min(1, "Il titolo è obbligatorio"),
   description: z.string().optional(),
   location: z.string().optional(),
@@ -34,15 +36,13 @@ interface JobOfferFormProps {
 
 export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [availableCompanies, setAvailableCompanies] = useState<any[]>([]);
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
-  const [showCompanySelection, setShowCompanySelection] = useState(false);
   const { toast } = useToast();
-  const { userProfile, user, linkToRegistration } = useAuth();
+  const { user } = useAuth();
 
   const form = useForm<JobOfferFormData>({
     resolver: zodResolver(jobOfferSchema),
     defaultValues: {
+      company_name: "",
       title: "",
       description: "",
       location: "",
@@ -54,36 +54,6 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
       status: "active",
     },
   });
-
-  // Fetch available companies for demo purposes
-  const fetchAvailableCompanies = async () => {
-    const { data, error } = await supabase
-      .from("company_registrations")
-      .select("id, nome_azienda, email")
-      .order("created_at", { ascending: false });
-
-    if (!error && data) {
-      setAvailableCompanies(data);
-      console.log("Available companies:", data);
-    }
-  };
-
-  const handleLinkToCompany = async (companyId: string) => {
-    const success = await linkToRegistration(companyId, 'company');
-    if (success) {
-      toast({
-        title: "Successo",
-        description: "Account collegato all'azienda con successo!",
-      });
-      setShowCompanySelection(false);
-    } else {
-      toast({
-        title: "Errore",
-        description: "Impossibile collegare l'account all'azienda",
-        variant: "destructive",
-      });
-    }
-  };
 
   const onSubmit = async (data: JobOfferFormData) => {
     setIsSubmitting(true);
@@ -99,50 +69,54 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
         return;
       }
 
-      console.log("Current user:", user);
-      console.log("User profile:", userProfile);
+      console.log("Creating job offer with user:", user.email);
+      console.log("Company name:", data.company_name);
 
-      // Se non ha un profilo aziendale, mostra le aziende disponibili per collegarsi
-      if (!userProfile || userProfile.user_type !== 'company') {
-        console.log("No company profile found, fetching available companies...");
-        await fetchAvailableCompanies();
-        setShowCompanySelection(true);
-        toast({
-          title: "Collegamento Richiesto",
-          description: "Seleziona l'azienda a cui vuoi collegare il tuo account",
-        });
-        return;
-      }
-
-      console.log("Company ID to use:", userProfile.registration_id);
-
-      // Verify that the company registration exists
-      const { data: companyData, error: companyError } = await supabase
+      // First, create or find a company registration with the provided name
+      const { data: existingCompany, error: searchError } = await supabase
         .from("company_registrations")
-        .select("id, nome_azienda")
-        .eq("id", userProfile.registration_id)
+        .select("id")
+        .eq("nome_azienda", data.company_name)
+        .eq("email", user.email)
         .single();
 
-      if (companyError || !companyData) {
-        console.error("Company not found:", companyError);
-        // Se l'azienda non esiste, mostra le aziende disponibili
-        await fetchAvailableCompanies();
-        setShowCompanySelection(true);
-        toast({
-          title: "Profilo Aziendale Non Trovato",
-          description: "Seleziona l'azienda a cui vuoi collegare il tuo account",
-        });
-        return;
-      }
+      let companyId: string;
 
-      console.log("Company found:", companyData);
+      if (existingCompany) {
+        companyId = existingCompany.id;
+        console.log("Using existing company:", companyId);
+      } else {
+        // Create a new company registration
+        const { data: newCompany, error: companyError } = await supabase
+          .from("company_registrations")
+          .insert({
+            nome_azienda: data.company_name,
+            email: user.email,
+            status: "approved"
+          })
+          .select("id")
+          .single();
+
+        if (companyError || !newCompany) {
+          console.error("Error creating company:", companyError);
+          toast({
+            title: "Errore",
+            description: "Impossibile registrare l'azienda",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        companyId = newCompany.id;
+        console.log("Created new company:", companyId);
+      }
 
       // Convert salary strings to numbers if provided
       const salaryMin = data.salary_min ? parseInt(data.salary_min) : null;
       const salaryMax = data.salary_max ? parseInt(data.salary_max) : null;
 
       const jobOfferData = {
-        company_id: userProfile.registration_id,
+        company_id: companyId,
         title: data.title,
         description: data.description || null,
         location: data.location || null,
@@ -188,60 +162,6 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
     }
   };
 
-  // Se stiamo mostrando la selezione delle aziende
-  if (showCompanySelection) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" onClick={() => setShowCompanySelection(false)} className="flex items-center gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Torna al Form
-          </Button>
-        </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              Collega il tuo Account a un'Azienda
-            </CardTitle>
-            <CardDescription>
-              Seleziona l'azienda a cui appartieni per poter creare offerte di lavoro
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {availableCompanies.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-muted-foreground">
-                    Nessuna azienda registrata trovata. Assicurati che l'azienda si sia registrata sulla piattaforma.
-                  </p>
-                </div>
-              ) : (
-                availableCompanies.map((company) => (
-                  <Card key={company.id} className="cursor-pointer hover:bg-gray-50 border-2 hover:border-blue-200 transition-colors"
-                        onClick={() => handleLinkToCompany(company.id)}>
-                    <CardContent className="pt-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="font-semibold">{company.nome_azienda}</h3>
-                          <p className="text-sm text-muted-foreground">{company.email}</p>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          Collega
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -267,6 +187,23 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="company_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nome dell'Azienda *</FormLabel>
+                    <FormControl>
+                      <Input placeholder="es. Tech Solutions S.r.l." {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Il nome della tua azienda che apparirà nell'offerta di lavoro
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <FormField
                 control={form.control}
                 name="title"

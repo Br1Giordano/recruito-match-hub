@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,17 +21,6 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
   const { userProfile, signOut, loading, createUserProfile } = useAuth();
   const [userType, setUserType] = useState<"recruiter" | "company" | null>(null);
   const { toast } = useToast();
-
-  // Imposta automaticamente il userType basandosi sul profilo esistente
-  useEffect(() => {
-    if (userProfile && userProfile.user_type) {
-      console.log('Setting user type from existing profile:', userProfile.user_type);
-      setUserType(userProfile.user_type);
-    } else if (userProfile === null) {
-      // Se non c'è un profilo, reset userType
-      setUserType(null);
-    }
-  }, [userProfile]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -58,20 +47,11 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
     setUserType(type);
   };
 
-  // Show loading while determining user type or while auth is loading
+  // Show loading while determining user type
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Caricamento autenticazione...</div>
-      </div>
-    );
-  }
-
-  // Show loading while we have a profile but userType is not set yet
-  if (userProfile && !userType) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Caricamento profilo...</div>
+        <div className="text-lg">Caricamento...</div>
       </div>
     );
   }
@@ -79,8 +59,8 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
   return (
     <ProtectedRoute onBack={onBack}>
       <div className="min-h-screen bg-gradient-to-br from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5">
-        {/* Se non c'è userType e non c'è un profilo esistente, mostra la selezione */}
-        {!userType && !userProfile ? (
+        {/* Always show user type selection first */}
+        {!userType ? (
           <UserTypeSelection 
             onSelectType={handleUserTypeSelection} 
             onBack={onBack} 

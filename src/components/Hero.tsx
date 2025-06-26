@@ -4,9 +4,18 @@ import { ArrowRight, Users, Target, Zap } from "lucide-react";
 
 const Hero = () => {
   const scrollToDemo = () => {
+    console.log('Scroll to demo clicked');
     const demoSection = document.querySelector('[data-demo-section]');
+    console.log('Demo section found:', demoSection);
+    
     if (demoSection) {
       demoSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Fallback: scroll to a specific position
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
     }
   };
 
@@ -32,8 +41,9 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-6">
               <Button 
                 size="lg" 
-                className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5"
+                className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5 cursor-pointer"
                 onClick={scrollToDemo}
+                type="button"
               >
                 Inizia ora come Azienda
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -41,8 +51,9 @@ const Hero = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="text-lg px-10 py-5"
+                className="text-lg px-10 py-5 cursor-pointer"
                 onClick={scrollToDemo}
+                type="button"
               >
                 Diventa Recruiter Partner
               </Button>

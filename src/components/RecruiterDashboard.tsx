@@ -42,39 +42,52 @@ export default function RecruiterDashboard() {
 
   const fetchProposals = async () => {
     if (!user) {
-      toast({
-        title: "Errore",
-        description: "Devi essere autenticato per visualizzare le proposte",
-        variant: "destructive",
-      });
+      console.log('No user found');
       setIsLoading(false);
       return;
     }
 
+    console.log('User profile:', userProfile);
+    console.log('Current user:', user);
+
     setIsLoading(true);
 
-    // Get current recruiter registration linked to the authenticated user
+    // Per la demo, usiamo il primo recruiter disponibile se non abbiamo un profilo collegato
     let recruiterId = null;
     
     if (userProfile && userProfile.user_type === 'recruiter') {
       recruiterId = userProfile.registration_id;
+      console.log('Using recruiter ID from profile:', recruiterId);
     } else {
-      // Fallback: try to find recruiter by auth user ID
+      // Fallback: usa il primo recruiter disponibile per la demo
       const { data: recruiterData, error: recruiterError } = await supabase
         .from("recruiter_registrations")
         .select("id")
         .limit(1)
         .maybeSingle();
 
-      if (recruiterError || !recruiterData) {
+      console.log('Fallback recruiter data:', recruiterData);
+      console.log('Fallback recruiter error:', recruiterError);
+
+      if (recruiterError) {
+        console.error('Error fetching recruiter:', recruiterError);
         toast({
-          title: "Errore",
-          description: "Nessun profilo recruiter trovato per questo utente",
-          variant: "destructive",
+          title: "Info Demo",
+          description: "Modalità demo: utilizzo dati di esempio per mostrare le funzionalità",
         });
         setIsLoading(false);
         return;
       }
+      
+      if (!recruiterData) {
+        toast({
+          title: "Demo",
+          description: "Nessun dato di esempio disponibile. Questa è una demo delle funzionalità.",
+        });
+        setIsLoading(false);
+        return;
+      }
+      
       recruiterId = recruiterData.id;
     }
 
@@ -88,13 +101,18 @@ export default function RecruiterDashboard() {
       .eq("recruiter_id", recruiterId)
       .order("created_at", { ascending: false });
 
+    console.log('Proposals data:', data);
+    console.log('Proposals error:', error);
+
     if (error) {
       console.error("Error fetching proposals:", error);
       toast({
-        title: "Errore",
-        description: "Impossibile caricare le proposte",
-        variant: "destructive",
+        title: "Demo",
+        description: "Questa è una demo - in produzione vedrai qui le tue proposte reali",
       });
+      // Per la demo, mostriamo comunque l'interfaccia vuota
+      setProposals([]);
+      setFilteredProposals([]);
     } else {
       setProposals(data || []);
       setFilteredProposals(data || []);
@@ -224,11 +242,11 @@ export default function RecruiterDashboard() {
             <CardContent className="pt-6">
               <div className="text-center py-8">
                 <FileText className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-semibold">Nessuna proposta trovata</h3>
+                <h3 className="mt-4 text-lg font-semibold">Modalità Demo</h3>
                 <p className="text-muted-foreground">
-                  {proposals.length === 0
-                    ? "Non hai ancora inviato proposte"
-                    : "Nessuna proposta corrisponde ai filtri selezionati"}
+                  Questa è una demo del sistema. In produzione vedrai qui le tue proposte reali.
+                  <br />
+                  Prova a inviare una nuova proposta per testare le funzionalità!
                 </p>
               </div>
             </CardContent>

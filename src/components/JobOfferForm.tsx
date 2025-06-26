@@ -67,30 +67,56 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
         return;
       }
 
+      console.log("User profile:", userProfile);
+      console.log("Company ID to use:", userProfile.registration_id);
+
+      // First, verify that the company registration exists
+      const { data: companyData, error: companyError } = await supabase
+        .from("company_registrations")
+        .select("id, nome_azienda")
+        .eq("id", userProfile.registration_id)
+        .single();
+
+      if (companyError || !companyData) {
+        console.error("Company not found:", companyError);
+        toast({
+          title: "Errore",
+          description: "Profilo aziendale non trovato. Contatta il supporto.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      console.log("Company found:", companyData);
+
       // Convert salary strings to numbers if provided
       const salaryMin = data.salary_min ? parseInt(data.salary_min) : null;
       const salaryMax = data.salary_max ? parseInt(data.salary_max) : null;
 
+      const jobOfferData = {
+        company_id: userProfile.registration_id,
+        title: data.title,
+        description: data.description || null,
+        location: data.location || null,
+        salary_min: salaryMin,
+        salary_max: salaryMax,
+        requirements: data.requirements || null,
+        benefits: data.benefits || null,
+        employment_type: data.employment_type,
+        status: data.status,
+      };
+
+      console.log("Job offer data to insert:", jobOfferData);
+
       const { error } = await supabase
         .from("job_offers")
-        .insert({
-          company_id: userProfile.registration_id,
-          title: data.title,
-          description: data.description || null,
-          location: data.location || null,
-          salary_min: salaryMin,
-          salary_max: salaryMax,
-          requirements: data.requirements || null,
-          benefits: data.benefits || null,
-          employment_type: data.employment_type,
-          status: data.status,
-        });
+        .insert(jobOfferData);
 
       if (error) {
         console.error("Error creating job offer:", error);
         toast({
           title: "Errore",
-          description: "Impossibile creare l'offerta di lavoro",
+          description: `Impossibile creare l'offerta di lavoro: ${error.message}`,
           variant: "destructive",
         });
         return;
@@ -103,7 +129,7 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
 
       onSuccess();
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Unexpected error:", error);
       toast({
         title: "Errore",
         description: "Si è verificato un errore imprevisto",

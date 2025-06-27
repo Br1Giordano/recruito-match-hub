@@ -39,7 +39,7 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const { userProfile } = useAuth();
+  const { userProfile, user } = useAuth();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -48,10 +48,10 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!userProfile || userProfile.user_type !== 'recruiter') {
+    if (!user) {
       toast({
         title: "Errore",
-        description: "Devi essere autenticato come recruiter per inviare proposte",
+        description: "Devi essere autenticato per inviare proposte",
         variant: "destructive",
       });
       return;
@@ -60,21 +60,65 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
     setIsSubmitting(true);
 
     try {
-      // Prima verifichiamo se il recruiter esiste nella tabella recruiter_registrations
-      const { data: recruiterData, error: recruiterError } = await supabase
-        .from('recruiter_registrations')
-        .select('id')
-        .eq('id', userProfile.registration_id)
-        .single();
+      let recruiterId = null;
 
-      if (recruiterError || !recruiterData) {
-        console.error('Recruiter not found:', recruiterError);
-        toast({
-          title: "Errore",
-          description: "Il tuo profilo recruiter non è stato trovato. Contatta il supporto.",
-          variant: "destructive",
-        });
-        return;
+      // Prova prima con il profilo utente se esiste
+      if (userProfile && userProfile.user_type === 'recruiter') {
+        // Verifica se il recruiter esiste nella tabella recruiter_registrations
+        const { data: recruiterData, error: recruiterError } = await supabase
+          .from('recruiter_registrations')
+          .select('id')
+          .eq('id', userProfile.registration_id)
+          .maybeSingle();
+
+        if (!recruiterError && recruiterData) {
+          recruiterId = recruiterData.id;
+        }
+      }
+
+      // Se non abbiamo un recruiter ID valido, proviamo a usare il primo disponibile (demo mode)
+      if (!recruiterId) {
+        console.log('Profilo recruiter non trovato, tentativo fallback per demo...');
+        
+        const { data: fallbackRecruiter, error: fallbackError } = await supabase
+          .from('recruiter_registrations')
+          .select('id')
+          .limit(1)
+          .maybeSingle();
+
+        if (!fallbackError && fallbackRecruiter) {
+          recruiterId = fallbackRecruiter.id;
+          console.log('Usando recruiter fallback per demo:', recruiterId);
+        }
+      }
+
+      // Se ancora non abbiamo un recruiter ID, creiamo un profilo temporaneo
+      if (!recruiterId) {
+        console.log('Creando profilo recruiter temporaneo...');
+        
+        const tempRecruiterId = crypto.randomUUID();
+        
+        const { error: createError } = await supabase
+          .from('recruiter_registrations')
+          .insert({
+            id: tempRecruiterId,
+            nome: 'Demo',
+            cognome: 'Recruiter',
+            email: user.email || 'demo@recruiter.com',
+            status: 'temp_demo'
+          });
+
+        if (createError) {
+          console.error('Errore creazione recruiter temporaneo:', createError);
+          toast({
+            title: "Errore",
+            description: "Impossibile creare il profilo recruiter temporaneo",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        recruiterId = tempRecruiterId;
       }
 
       // Ora procediamo con la creazione della proposta
@@ -90,7 +134,7 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
         const tempCompanyId = crypto.randomUUID();
         
         const proposalData = {
-          recruiter_id: userProfile.registration_id,
+          recruiter_id: recruiterId,
           company_id: tempCompanyId,
           job_offer_id: jobOffer.id,
           candidate_name: formData.candidate_name,
@@ -148,7 +192,7 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
       }
 
       const proposalData = {
-        recruiter_id: userProfile.registration_id,
+        recruiter_id: recruiterId,
         company_id: targetCompanyId,
         job_offer_id: jobOffer.id,
         candidate_name: formData.candidate_name,

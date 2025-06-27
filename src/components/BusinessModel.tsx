@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DollarSign, TrendingUp, Users, ArrowRight, ArrowDown, Sparkles } from "lucide-react";
+import { DollarSign, TrendingUp, Users, ArrowRight, ArrowDown, Sparkles, UserPlus } from "lucide-react";
 
 const BusinessModel = () => {
   const scrollToDemo = () => {
@@ -160,7 +160,7 @@ const BusinessModel = () => {
                 Unisciti alle PMI che stanno già assumendo più velocemente e 
                 spendendo meno con Recruito.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col gap-4">
                 {/* Elemento grafico principale che collega alla demo */}
                 <div 
                   onClick={scrollToDemo}
@@ -182,9 +182,23 @@ const BusinessModel = () => {
                   </div>
                 </div>
                 
-                <Button size="lg" variant="outline">
-                  Diventa Partner Recruiter
-                </Button>
+                {/* Elemento grafico per Partner Recruiter */}
+                <div className="bg-gradient-to-br from-recruito-teal/10 to-recruito-green/10 rounded-2xl p-6 shadow-lg border border-recruito-teal/20 hover-lift cursor-pointer group transition-all duration-300">
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 bg-gradient-to-br from-recruito-teal to-recruito-green rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <UserPlus className="h-7 w-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-gray-900 group-hover:text-recruito-teal transition-colors">Diventa Partner Recruiter</h4>
+                      <p className="text-gray-600">Guadagna con le tue competenze</p>
+                    </div>
+                    <ArrowRight className="h-6 w-6 text-recruito-teal group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                    <div className="w-2 h-2 bg-recruito-teal rounded-full animate-pulse"></div>
+                    <span>Opportunità illimitate</span>
+                  </div>
+                </div>
               </div>
             </div>
             <div className="space-y-6">

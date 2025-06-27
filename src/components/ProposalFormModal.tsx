@@ -61,15 +61,85 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
     setIsSubmitting(true);
 
     try {
-      // Determina il company_id dalla job offer
-      let company_id = jobOffer.company_id;
-      
-      // Se non c'è company_id ma c'è company_registrations, usa quello
-      if (!company_id && jobOffer.company_registrations) {
-        company_id = jobOffer.company_registrations.id;
+      // Invece di cercare company_id, cerchiamo l'azienda tramite email
+      let targetCompanyId = null;
+
+      // Se l'offerta ha un company_id, lo usiamo
+      if (jobOffer.company_id) {
+        targetCompanyId = jobOffer.company_id;
+      } 
+      // Altrimenti cerchiamo l'azienda tramite email
+      else if (jobOffer.contact_email) {
+        // Cerchiamo se esiste un profilo azienda collegato all'email
+        const { data: companyProfile, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('registration_id')
+          .eq('user_type', 'company')
+          .single();
+
+        if (profileError) {
+          console.log('No company profile found, using contact email approach');
+        } else {
+          targetCompanyId = companyProfile.registration_id;
+        }
+
+        // Se non troviamo un company_id, creiamo una proposta usando l'email
+        if (!targetCompanyId) {
+          // Creiamo una proposta "virtuale" usando l'email dell'azienda
+          // In questo caso, useremo un UUID temporaneo ma indicheremo l'email di contatto
+          const tempCompanyId = crypto.randomUUID();
+          
+          const proposalData = {
+            recruiter_id: userProfile.registration_id,
+            company_id: tempCompanyId, // UUID temporaneo
+            job_offer_id: jobOffer.id,
+            candidate_name: formData.candidate_name,
+            candidate_email: formData.candidate_email,
+            candidate_phone: formData.candidate_phone || null,
+            candidate_linkedin: formData.candidate_linkedin || null,
+            years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
+            current_salary: formData.current_salary ? parseInt(formData.current_salary) : null,
+            expected_salary: formData.expected_salary ? parseInt(formData.expected_salary) : null,
+            availability_weeks: formData.availability_weeks ? parseInt(formData.availability_weeks) : null,
+            recruiter_fee_percentage: parseInt(formData.recruiter_fee_percentage),
+            proposal_description: formData.proposal_description || null,
+          };
+
+          // Inseriamo la proposta
+          const { error } = await supabase
+            .from("proposals")
+            .insert(proposalData);
+
+          if (error) {
+            console.error("Error creating proposal:", error);
+            toast({
+              title: "Errore",
+              description: "Impossibile inviare la proposta. Riprova più tardi.",
+              variant: "destructive",
+            });
+            return;
+          }
+
+          // Ora creiamo un record nella tabella delle aziende temporaneo per collegare l'email
+          await supabase
+            .from("company_registrations")
+            .insert({
+              id: tempCompanyId,
+              nome_azienda: jobOffer.company_name || "Azienda",
+              email: jobOffer.contact_email,
+              status: 'temp_for_proposal'
+            });
+
+          toast({
+            title: "Successo",
+            description: "Proposta inviata con successo",
+          });
+          onSuccess();
+          return;
+        }
       }
 
-      if (!company_id) {
+      if (!targetCompanyId) {
         toast({
           title: "Errore",
           description: "Impossibile identificare l'azienda per questa offerta",
@@ -80,7 +150,7 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
 
       const proposalData = {
         recruiter_id: userProfile.registration_id,
-        company_id: company_id,
+        company_id: targetCompanyId,
         job_offer_id: jobOffer.id,
         candidate_name: formData.candidate_name,
         candidate_email: formData.candidate_email,
@@ -108,6 +178,10 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
         return;
       }
 
+      toast({
+        title: "Successo",
+        description: "Proposta inviata con successo",
+      });
       onSuccess();
     } catch (error) {
       console.error("Error submitting proposal:", error);

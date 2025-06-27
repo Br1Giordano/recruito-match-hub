@@ -32,6 +32,7 @@ interface Proposal {
   };
   job_offers?: {
     title: string;
+    contact_email?: string;
   };
 }
 
@@ -49,50 +50,88 @@ export default function CompanyProposalsDashboard() {
   const fetchProposals = async () => {
     setIsLoading(true);
 
-    // Check if user is authenticated
     if (!user) {
       console.log('User not authenticated');
       setIsLoading(false);
       return;
     }
 
-    // Check if user has a company profile
-    if (!userProfile || userProfile.user_type !== 'company') {
-      console.log('User profile not found or not a company:', userProfile);
-      setIsLoading(false);
-      return;
-    }
+    console.log('Fetching proposals for user:', user.email);
 
-    console.log('Fetching proposals for company:', userProfile.registration_id);
-
+    // Query modificata per cercare proposte sia per company_id che per email
     const { data, error } = await supabase
       .from("proposals")
       .select(`
         *,
         recruiter_registrations!inner(nome, cognome, email, telefono),
-        job_offers(title)
+        job_offers(title, contact_email)
       `)
-      .eq("company_id", userProfile.registration_id)
+      .or(`company_id.eq.${userProfile?.registration_id},job_offers.contact_email.eq.${user.email}`)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error('Error fetching proposals:', error);
-      toast({
-        title: "Errore",
-        description: "Impossibile caricare le proposte",
-        variant: "destructive",
-      });
-    } else {
-      console.log('Proposals fetched:', data);
-      setProposals(data || []);
-      setFilteredProposals(data || []);
+    // Se la query principale non funziona, proviamo un approccio alternativo
+    if (error || !data) {
+      console.log('Trying alternative approach for fetching proposals');
+      
+      // Cerchiamo prima tutte le job offers dell'utente
+      const { data: userJobOffers, error: jobOffersError } = await supabase
+        .from("job_offers")
+        .select("id")
+        .eq("contact_email", user.email);
+
+      if (jobOffersError) {
+        console.error('Error fetching user job offers:', jobOffersError);
+        setIsLoading(false);
+        return;
+      }
+
+      if (!userJobOffers || userJobOffers.length === 0) {
+        console.log('No job offers found for user');
+        setProposals([]);
+        setFilteredProposals([]);
+        setIsLoading(false);
+        return;
+      }
+
+      const jobOfferIds = userJobOffers.map(offer => offer.id);
+
+      // Ora cerchiamo le proposte per questi job offers
+      const { data: proposalsData, error: proposalsError } = await supabase
+        .from("proposals")
+        .select(`
+          *,
+          recruiter_registrations!inner(nome, cognome, email, telefono),
+          job_offers(title, contact_email)
+        `)
+        .in("job_offer_id", jobOfferIds)
+        .order("created_at", { ascending: false });
+
+      if (proposalsError) {
+        console.error('Error fetching proposals:', proposalsError);
+        toast({
+          title: "Errore",
+          description: "Impossibile caricare le proposte",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('Proposals fetched:', proposalsData);
+      setProposals(proposalsData || []);
+      setFilteredProposals(proposalsData || []);
+      setIsLoading(false);
+      return;
     }
 
+    console.log('Proposals fetched:', data);
+    setProposals(data || []);
+    setFilteredProposals(data || []);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    if (user && userProfile && userProfile.user_type === 'company') {
+    if (user) {
       fetchProposals();
     }
   }, [user, userProfile]);
@@ -139,13 +178,16 @@ export default function CompanyProposalsDashboard() {
   };
 
   const sendResponse = async (proposalId: string, status: string) => {
-    if (!userProfile) return;
+    if (!user) return;
+
+    // Usiamo l'email dell'utente invece del company_id se non abbiamo un profilo azienda
+    const companyIdentifier = userProfile?.registration_id || user.email;
 
     const { error } = await supabase
       .from("proposal_responses")
       .insert([{
         proposal_id: proposalId,
-        company_id: userProfile.registration_id,
+        company_id: companyIdentifier,
         status: status,
         response_message: responseMessage,
       }]);
@@ -209,8 +251,7 @@ export default function CompanyProposalsDashboard() {
     );
   }
 
-  // Check if user is properly authenticated as company
-  if (!user || !userProfile || userProfile.user_type !== 'company') {
+  if (!user) {
     return (
       <div className="space-y-6">
         <div>

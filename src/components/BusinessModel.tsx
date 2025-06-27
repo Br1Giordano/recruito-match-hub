@@ -1,8 +1,40 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { DollarSign, TrendingUp, Users, ArrowRight, ArrowDown } from "lucide-react";
+import { DollarSign, TrendingUp, Users, ArrowRight, ArrowDown, Sparkles } from "lucide-react";
 
 const BusinessModel = () => {
+  const scrollToDemo = () => {
+    console.log('scrollToDemo called from BusinessModel - looking for demo section');
+    
+    // Try multiple selectors to find the demo section
+    let demoElement = document.querySelector('[data-demo-section]');
+    
+    if (!demoElement) {
+      console.log('data-demo-section not found, trying #demo');
+      demoElement = document.getElementById('demo');
+    }
+    
+    if (!demoElement) {
+      console.log('#demo not found, trying .demo-section');
+      demoElement = document.querySelector('.demo-section');
+    }
+    
+    if (demoElement) {
+      console.log('Demo section found, scrolling...', demoElement);
+      demoElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      console.error('Demo section not found with any selector');
+      // Fallback: scroll to a reasonable position
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <section id="business" className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -129,10 +161,27 @@ const BusinessModel = () => {
                 spendendo meno con Recruito.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button size="lg" className="gradient-recruito text-white border-0 hover:opacity-90">
-                  Inizia come Azienda
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
+                {/* Elemento grafico principale che collega alla demo */}
+                <div 
+                  onClick={scrollToDemo}
+                  className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 hover-lift cursor-pointer group transition-all duration-300"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 gradient-recruito rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Sparkles className="h-7 w-7 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-gray-900 group-hover:text-recruito-blue transition-colors">Inizia come Azienda</h4>
+                      <p className="text-gray-600">Prova subito la demo completa</p>
+                    </div>
+                    <ArrowRight className="h-6 w-6 text-recruito-blue group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <span>Demo disponibile ora</span>
+                  </div>
+                </div>
+                
                 <Button size="lg" variant="outline">
                   Diventa Partner Recruiter
                 </Button>

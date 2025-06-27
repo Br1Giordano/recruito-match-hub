@@ -46,6 +46,75 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const ensureRecruiterExists = async () => {
+    if (!user?.email || !userProfile) {
+      throw new Error('Utente non autenticato');
+    }
+
+    console.log('Verificando esistenza recruiter per:', user.email);
+
+    // Prima verifica se esiste già un recruiter con l'ID del profilo
+    let { data: recruiterData, error: recruiterError } = await supabase
+      .from('recruiter_registrations')
+      .select('id, email')
+      .eq('id', userProfile.registration_id)
+      .maybeSingle();
+
+    console.log('Recruiter by registration_id:', recruiterData);
+
+    // Se non trovato, cerca per email
+    if (!recruiterData) {
+      const { data: recruiterByEmail } = await supabase
+        .from('recruiter_registrations')
+        .select('id, email')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      console.log('Recruiter by email:', recruiterByEmail);
+
+      if (recruiterByEmail) {
+        // Aggiorna il profilo utente con l'ID corretto
+        await supabase
+          .from('user_profiles')
+          .update({ registration_id: recruiterByEmail.id })
+          .eq('id', userProfile.id);
+        
+        recruiterData = recruiterByEmail;
+        console.log('Profilo utente aggiornato con registration_id corretto');
+      } else {
+        // Crea un nuovo record recruiter
+        console.log('Creando nuovo record recruiter');
+        
+        const { data: newRecruiter, error: createError } = await supabase
+          .from('recruiter_registrations')
+          .insert({
+            email: user.email,
+            nome: user.user_metadata?.first_name || 'Nome',
+            cognome: user.user_metadata?.last_name || 'Cognome',
+            status: 'active'
+          })
+          .select('id, email')
+          .single();
+
+        if (createError) {
+          console.error('Errore creazione recruiter:', createError);
+          throw new Error('Impossibile creare il profilo recruiter');
+        }
+
+        // Aggiorna il profilo utente con il nuovo ID
+        await supabase
+          .from('user_profiles')
+          .update({ registration_id: newRecruiter.id })
+          .eq('id', userProfile.id);
+
+        recruiterData = newRecruiter;
+        console.log('Nuovo recruiter creato e profilo aggiornato');
+      }
+    }
+
+    return recruiterData;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -58,7 +127,6 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
       return;
     }
 
-    // Verifica che l'utente abbia un profilo recruiter valido
     if (!userProfile || userProfile.user_type !== 'recruiter') {
       toast({
         title: "Errore",
@@ -71,66 +139,10 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
     setIsSubmitting(true);
 
     try {
-      console.log('Debug - User profile:', userProfile);
-      console.log('Debug - User email:', user.email);
-      console.log('Debug - Registration ID:', userProfile.registration_id);
+      // Assicurati che esista un record recruiter
+      const recruiterData = await ensureRecruiterExists();
 
-      // Step 1: Verifica se esiste un recruiter con il registration_id corrente
-      let { data: recruiterData, error: recruiterError } = await supabase
-        .from('recruiter_registrations')
-        .select('id, email')
-        .eq('id', userProfile.registration_id)
-        .maybeSingle();
-
-      console.log('Debug - Recruiter by ID:', recruiterData, recruiterError);
-
-      // Step 2: Se non trovato, cerca per email
-      if (!recruiterData && user.email) {
-        console.log('Cercando recruiter per email:', user.email);
-        
-        const { data: recruiterByEmail, error: emailError } = await supabase
-          .from('recruiter_registrations')
-          .select('id, email')
-          .eq('email', user.email)
-          .maybeSingle();
-
-        console.log('Debug - Recruiter by email:', recruiterByEmail, emailError);
-
-        if (!emailError && recruiterByEmail) {
-          recruiterData = recruiterByEmail;
-          
-          // Aggiorna il user_profile per collegarlo correttamente
-          const { error: updateError } = await supabase
-            .from('user_profiles')
-            .update({ registration_id: recruiterByEmail.id })
-            .eq('id', userProfile.id);
-          
-          if (updateError) {
-            console.error('Errore aggiornamento profilo:', updateError);
-          } else {
-            console.log('Profilo aggiornato con successo');
-          }
-        }
-      }
-
-      // Step 3: Se ancora non trovato, mostra tutti i recruiter per debug
-      if (!recruiterData) {
-        console.log('Nessun recruiter trovato, controllo tutti i recruiter esistenti:');
-        const { data: allRecruiters } = await supabase
-          .from('recruiter_registrations')
-          .select('id, email, nome, cognome, status');
-        
-        console.log('Tutti i recruiter:', allRecruiters);
-        
-        toast({
-          title: "Errore",
-          description: "Il tuo profilo recruiter non è collegato correttamente. Controlla la console per dettagli di debug.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      console.log('Recruiter trovato:', recruiterData);
+      console.log('Recruiter verificato:', recruiterData);
 
       // Ora procediamo con la creazione della proposta
       let targetCompanyId = null;
@@ -143,25 +155,8 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
       else if (jobOffer.contact_email) {
         // Creiamo un UUID temporaneo per l'azienda
         const tempCompanyId = crypto.randomUUID();
+        targetCompanyId = tempCompanyId;
         
-        const proposalData = {
-          recruiter_id: recruiterData.id,
-          company_id: tempCompanyId,
-          job_offer_id: jobOffer.id,
-          candidate_name: formData.candidate_name,
-          candidate_email: formData.candidate_email,
-          candidate_phone: formData.candidate_phone || null,
-          candidate_linkedin: formData.candidate_linkedin || null,
-          years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
-          current_salary: formData.current_salary ? parseInt(formData.current_salary) : null,
-          expected_salary: formData.expected_salary ? parseInt(formData.expected_salary) : null,
-          availability_weeks: formData.availability_weeks ? parseInt(formData.availability_weeks) : null,
-          recruiter_fee_percentage: parseInt(formData.recruiter_fee_percentage),
-          proposal_description: formData.proposal_description || null,
-        };
-
-        console.log('Creando proposta con dati:', proposalData);
-
         // Prima creiamo il record temporaneo dell'azienda
         const { error: companyError } = await supabase
           .from("company_registrations")
@@ -175,28 +170,6 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
         if (companyError) {
           console.error('Errore creazione azienda temporanea:', companyError);
         }
-
-        // Poi inseriamo la proposta
-        const { error } = await supabase
-          .from("proposals")
-          .insert(proposalData);
-
-        if (error) {
-          console.error("Error creating proposal:", error);
-          toast({
-            title: "Errore",
-            description: "Impossibile inviare la proposta. Riprova più tardi.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        toast({
-          title: "Successo",
-          description: "Proposta inviata con successo",
-        });
-        onSuccess();
-        return;
       }
 
       if (!targetCompanyId) {
@@ -224,6 +197,8 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
         proposal_description: formData.proposal_description || null,
       };
 
+      console.log('Creando proposta con dati:', proposalData);
+
       const { error } = await supabase
         .from("proposals")
         .insert(proposalData);
@@ -247,7 +222,7 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
       console.error("Error submitting proposal:", error);
       toast({
         title: "Errore",
-        description: "Si è verificato un errore imprevisto",
+        description: error instanceof Error ? error.message : "Si è verificato un errore imprevisto",
         variant: "destructive",
       });
     } finally {

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap } from "lucide-react";
 
@@ -8,24 +9,35 @@ interface HeroProps {
 
 const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
   const scrollToDemo = () => {
-    // Usa un timeout per assicurarti che il DOM sia completamente caricato
-    setTimeout(() => {
-      const demoElement = document.getElementById('demo');
-      if (demoElement) {
-        console.log('Scrolling to demo section');
-        demoElement.scrollIntoView({ 
-          behavior: 'smooth',
-          block: 'start'
-        });
-      } else {
-        console.error('Demo section not found');
-        // Scroll manuale alla posizione approssimativa
-        window.scrollTo({
-          top: 800, // Posizione approssimativa della sezione demo
-          behavior: 'smooth'
-        });
-      }
-    }, 100);
+    console.log('scrollToDemo called - looking for demo section');
+    
+    // Try multiple selectors to find the demo section
+    let demoElement = document.querySelector('[data-demo-section]');
+    
+    if (!demoElement) {
+      console.log('data-demo-section not found, trying #demo');
+      demoElement = document.getElementById('demo');
+    }
+    
+    if (!demoElement) {
+      console.log('#demo not found, trying .demo-section');
+      demoElement = document.querySelector('.demo-section');
+    }
+    
+    if (demoElement) {
+      console.log('Demo section found, scrolling...', demoElement);
+      demoElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      console.error('Demo section not found with any selector');
+      // Fallback: scroll to a reasonable position
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const scrollToHowItWorks = () => {
@@ -58,7 +70,10 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
               <Button 
                 size="lg" 
                 className="gradient-recruito text-white border-0 hover:opacity-90 text-lg px-10 py-5"
-                onClick={scrollToDemo}
+                onClick={() => {
+                  console.log('Main CTA button clicked');
+                  scrollToDemo();
+                }}
                 type="button"
               >
                 Inizia subito la tua ricerca

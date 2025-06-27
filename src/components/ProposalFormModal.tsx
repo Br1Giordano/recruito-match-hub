@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -61,82 +60,82 @@ export default function ProposalFormModal({ isOpen, onClose, onSuccess, jobOffer
     setIsSubmitting(true);
 
     try {
-      // Invece di cercare company_id, cerchiamo l'azienda tramite email
+      // Prima verifichiamo se il recruiter esiste nella tabella recruiter_registrations
+      const { data: recruiterData, error: recruiterError } = await supabase
+        .from('recruiter_registrations')
+        .select('id')
+        .eq('id', userProfile.registration_id)
+        .single();
+
+      if (recruiterError || !recruiterData) {
+        console.error('Recruiter not found:', recruiterError);
+        toast({
+          title: "Errore",
+          description: "Il tuo profilo recruiter non è stato trovato. Contatta il supporto.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Ora procediamo con la creazione della proposta
       let targetCompanyId = null;
 
       // Se l'offerta ha un company_id, lo usiamo
       if (jobOffer.company_id) {
         targetCompanyId = jobOffer.company_id;
       } 
-      // Altrimenti cerchiamo l'azienda tramite email
+      // Altrimenti creiamo una proposta usando l'email dell'azienda
       else if (jobOffer.contact_email) {
-        // Cerchiamo se esiste un profilo azienda collegato all'email
-        const { data: companyProfile, error: profileError } = await supabase
-          .from('user_profiles')
-          .select('registration_id')
-          .eq('user_type', 'company')
-          .single();
+        // Creiamo un UUID temporaneo per l'azienda
+        const tempCompanyId = crypto.randomUUID();
+        
+        const proposalData = {
+          recruiter_id: userProfile.registration_id,
+          company_id: tempCompanyId,
+          job_offer_id: jobOffer.id,
+          candidate_name: formData.candidate_name,
+          candidate_email: formData.candidate_email,
+          candidate_phone: formData.candidate_phone || null,
+          candidate_linkedin: formData.candidate_linkedin || null,
+          years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
+          current_salary: formData.current_salary ? parseInt(formData.current_salary) : null,
+          expected_salary: formData.expected_salary ? parseInt(formData.expected_salary) : null,
+          availability_weeks: formData.availability_weeks ? parseInt(formData.availability_weeks) : null,
+          recruiter_fee_percentage: parseInt(formData.recruiter_fee_percentage),
+          proposal_description: formData.proposal_description || null,
+        };
 
-        if (profileError) {
-          console.log('No company profile found, using contact email approach');
-        } else {
-          targetCompanyId = companyProfile.registration_id;
-        }
-
-        // Se non troviamo un company_id, creiamo una proposta usando l'email
-        if (!targetCompanyId) {
-          // Creiamo una proposta "virtuale" usando l'email dell'azienda
-          // In questo caso, useremo un UUID temporaneo ma indicheremo l'email di contatto
-          const tempCompanyId = crypto.randomUUID();
-          
-          const proposalData = {
-            recruiter_id: userProfile.registration_id,
-            company_id: tempCompanyId, // UUID temporaneo
-            job_offer_id: jobOffer.id,
-            candidate_name: formData.candidate_name,
-            candidate_email: formData.candidate_email,
-            candidate_phone: formData.candidate_phone || null,
-            candidate_linkedin: formData.candidate_linkedin || null,
-            years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
-            current_salary: formData.current_salary ? parseInt(formData.current_salary) : null,
-            expected_salary: formData.expected_salary ? parseInt(formData.expected_salary) : null,
-            availability_weeks: formData.availability_weeks ? parseInt(formData.availability_weeks) : null,
-            recruiter_fee_percentage: parseInt(formData.recruiter_fee_percentage),
-            proposal_description: formData.proposal_description || null,
-          };
-
-          // Inseriamo la proposta
-          const { error } = await supabase
-            .from("proposals")
-            .insert(proposalData);
-
-          if (error) {
-            console.error("Error creating proposal:", error);
-            toast({
-              title: "Errore",
-              description: "Impossibile inviare la proposta. Riprova più tardi.",
-              variant: "destructive",
-            });
-            return;
-          }
-
-          // Ora creiamo un record nella tabella delle aziende temporaneo per collegare l'email
-          await supabase
-            .from("company_registrations")
-            .insert({
-              id: tempCompanyId,
-              nome_azienda: jobOffer.company_name || "Azienda",
-              email: jobOffer.contact_email,
-              status: 'temp_for_proposal'
-            });
-
-          toast({
-            title: "Successo",
-            description: "Proposta inviata con successo",
+        // Prima creiamo il record temporaneo dell'azienda
+        await supabase
+          .from("company_registrations")
+          .insert({
+            id: tempCompanyId,
+            nome_azienda: jobOffer.company_name || "Azienda",
+            email: jobOffer.contact_email,
+            status: 'temp_for_proposal'
           });
-          onSuccess();
+
+        // Poi inseriamo la proposta
+        const { error } = await supabase
+          .from("proposals")
+          .insert(proposalData);
+
+        if (error) {
+          console.error("Error creating proposal:", error);
+          toast({
+            title: "Errore",
+            description: "Impossibile inviare la proposta. Riprova più tardi.",
+            variant: "destructive",
+          });
           return;
         }
+
+        toast({
+          title: "Successo",
+          description: "Proposta inviata con successo",
+        });
+        onSuccess();
+        return;
       }
 
       if (!targetCompanyId) {

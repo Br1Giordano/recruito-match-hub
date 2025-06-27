@@ -266,24 +266,24 @@ const HowItWorks = () => {
           </div>
 
           <div className="text-center mt-12">
-            <div className="flex justify-center gap-6">
-              <div 
+            <div className="flex justify-center gap-4">
+              <button 
                 onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-recruito-blue to-recruito-teal rounded-xl px-6 py-3 shadow-lg border border-white/20 hover-lift cursor-pointer group transition-all duration-300 text-white hover:opacity-90"
+                className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer"
               >
                 <Building2 className="h-4 w-4" />
-                <span className="font-semibold">Unisciti come azienda</span>
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </div>
+                Unisciti come azienda
+                <ArrowRight className="h-4 w-4" />
+              </button>
               
-              <div 
+              <button 
                 onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-recruito-teal to-recruito-green rounded-xl px-6 py-3 shadow-lg border border-white/20 hover-lift cursor-pointer group transition-all duration-300 text-white hover:opacity-90"
+                className="inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer"
               >
                 <Users className="h-4 w-4" />
-                <span className="font-semibold">Unisciti come recruiter</span>
-                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </div>
+                Unisciti come recruiter
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>

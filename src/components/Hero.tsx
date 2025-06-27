@@ -1,5 +1,3 @@
-
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap, Sparkles, TrendingUp, Building2 } from "lucide-react";
 
@@ -67,24 +65,15 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
               </p>
             </div>
 
-            {/* Pulsanti con stile più acceso */}
-            <div className="flex justify-center gap-4 pt-8">
+            {/* Pulsante singolo Join the Beta */}
+            <div className="flex justify-center pt-8">
               <button 
                 onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-blue-500/20"
+                className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 via-purple-600 to-teal-600 hover:from-blue-700 hover:via-purple-700 hover:to-teal-700 text-white px-12 py-4 rounded-full text-lg font-bold transition-all duration-300 cursor-pointer shadow-xl hover:shadow-2xl transform hover:scale-105 border-2 border-white/20"
               >
-                <Building2 className="h-5 w-5" />
-                Unisciti come azienda
-                <ArrowRight className="h-5 w-5" />
-              </button>
-              
-              <button 
-                onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-teal-500/20"
-              >
-                <Users className="h-5 w-5" />
-                Unisciti come recruiter
-                <ArrowRight className="h-5 w-5" />
+                <Sparkles className="h-6 w-6" />
+                Join the Beta
+                <ArrowRight className="h-6 w-6" />
               </button>
             </div>
 
@@ -134,4 +123,3 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 };
 
 export default Hero;
-

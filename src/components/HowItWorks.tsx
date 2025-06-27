@@ -13,6 +13,38 @@ import {
 } from "lucide-react";
 
 const HowItWorks = () => {
+  const scrollToDemo = () => {
+    console.log('scrollToDemo called from HowItWorks - looking for demo section');
+    
+    // Try multiple selectors to find the demo section
+    let demoElement = document.querySelector('[data-demo-section]');
+    
+    if (!demoElement) {
+      console.log('data-demo-section not found, trying #demo');
+      demoElement = document.getElementById('demo');
+    }
+    
+    if (!demoElement) {
+      console.log('#demo not found, trying .demo-section');
+      demoElement = document.querySelector('.demo-section');
+    }
+    
+    if (demoElement) {
+      console.log('Demo section found, scrolling...', demoElement);
+      demoElement.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    } else {
+      console.error('Demo section not found with any selector');
+      // Fallback: scroll to a reasonable position
+      window.scrollTo({
+        top: window.innerHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <section id="come-funziona" className="py-20 bg-white">
       <div className="container mx-auto px-4">
@@ -234,10 +266,13 @@ const HowItWorks = () => {
           </div>
 
           <div className="text-center mt-12">
-            <Button size="lg" className="gradient-recruito text-white border-0 hover:opacity-90">
-              Inizia subito la tua ricerca
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <div 
+              onClick={scrollToDemo}
+              className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-sm rounded-2xl px-12 py-4 shadow-xl border border-white/20 hover-lift cursor-pointer group transition-all duration-300 gradient-recruito text-white border-0 hover:opacity-90"
+            >
+              <span className="text-lg font-semibold">Inizia subito la tua ricerca</span>
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </div>
           </div>
         </div>
       </div>

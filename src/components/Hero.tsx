@@ -66,11 +66,11 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
               </p>
             </div>
 
-            {/* Pulsanti con stile più acceso */}
+            {/* Pulsanti con colori più chiari del brand */}
             <div className="flex justify-center gap-4 pt-8">
               <button 
                 onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-blue-500/20"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-blue-300/30"
               >
                 <Building2 className="h-5 w-5" />
                 Unisciti come azienda
@@ -79,7 +79,7 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
               
               <button 
                 onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-teal-500/20"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-400 to-emerald-400 hover:from-teal-500 hover:to-emerald-500 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-teal-300/30"
               >
                 <Users className="h-5 w-5" />
                 Unisciti come recruiter

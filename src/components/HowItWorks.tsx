@@ -266,12 +266,24 @@ const HowItWorks = () => {
           </div>
 
           <div className="text-center mt-12">
-            <div 
-              onClick={scrollToDemo}
-              className="inline-flex items-center gap-3 bg-white/90 backdrop-blur-sm rounded-2xl px-12 py-4 shadow-xl border border-white/20 hover-lift cursor-pointer group transition-all duration-300 gradient-recruito text-white border-0 hover:opacity-90"
-            >
-              <span className="text-lg font-semibold">Inizia subito la tua ricerca</span>
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            <div className="flex justify-center gap-6">
+              <div 
+                onClick={scrollToDemo}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-recruito-blue to-recruito-teal rounded-xl px-6 py-3 shadow-lg border border-white/20 hover-lift cursor-pointer group transition-all duration-300 text-white hover:opacity-90"
+              >
+                <Building2 className="h-4 w-4" />
+                <span className="font-semibold">Unisciti come azienda</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+              
+              <div 
+                onClick={scrollToDemo}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-recruito-teal to-recruito-green rounded-xl px-6 py-3 shadow-lg border border-white/20 hover-lift cursor-pointer group transition-all duration-300 text-white hover:opacity-90"
+              >
+                <Users className="h-4 w-4" />
+                <span className="font-semibold">Unisciti come recruiter</span>
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </div>
             </div>
           </div>
         </div>

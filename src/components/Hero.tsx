@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Users, Target, Zap, Sparkles, TrendingUp } from "lucide-react";
+import { ArrowRight, Users, Target, Zap, Sparkles, TrendingUp, Building2 } from "lucide-react";
 
 interface HeroProps {
   onShowAuth?: () => void;
@@ -66,66 +66,25 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
               </p>
             </div>
 
-            {/* Sostituisco i pulsanti con elementi grafici accattivanti */}
-            <div className="space-y-6">
-              {/* Elemento grafico principale */}
-              <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 gradient-recruito rounded-2xl flex items-center justify-center">
-                    <Sparkles className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Inizia subito la tua ricerca</h3>
-                    <p className="text-gray-600">Trova i migliori candidati in pochi giorni</p>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span>Disponibile ora</span>
-                  </div>
-                  <ArrowRight className="h-6 w-6 text-recruito-blue" />
-                </div>
-              </div>
-
-              {/* Sezione Come Funziona */}
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="bg-gradient-to-br from-recruito-blue/10 to-recruito-teal/10 rounded-2xl p-6 hover-lift border border-recruito-blue/20">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-recruito-blue/20 rounded-xl flex items-center justify-center">
-                      <Users className="h-6 w-6 text-recruito-blue" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Come Funziona</h4>
-                      <p className="text-sm text-gray-600">Scopri il processo</p>
-                    </div>
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    <span className="inline-flex items-center gap-1">
-                      <TrendingUp className="h-4 w-4" />
-                      Processo semplificato
-                    </span>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-recruito-teal/10 to-recruito-green/10 rounded-2xl p-6 hover-lift border border-recruito-teal/20">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-recruito-teal/20 rounded-xl flex items-center justify-center">
-                      <Target className="h-6 w-6 text-recruito-teal" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-900">Inizia come Azienda</h4>
-                      <p className="text-sm text-gray-600">Diventa Partner Recruiter</p>
-                    </div>
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    <span className="inline-flex items-center gap-1">
-                      <Sparkles className="h-4 w-4" />
-                      Opportunità illimitate
-                    </span>
-                  </div>
-                </div>
-              </div>
+            {/* Sostituisco i tre elementi grafici con i due pulsanti semplici */}
+            <div className="flex justify-center gap-4 pt-8">
+              <button 
+                onClick={scrollToDemo}
+                className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer"
+              >
+                <Building2 className="h-4 w-4" />
+                Unisciti come azienda
+                <ArrowRight className="h-4 w-4" />
+              </button>
+              
+              <button 
+                onClick={scrollToDemo}
+                className="inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer"
+              >
+                <Users className="h-4 w-4" />
+                Unisciti come recruiter
+                <ArrowRight className="h-4 w-4" />
+              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-12">

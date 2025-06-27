@@ -1,0 +1,162 @@
+
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { DialogFooter } from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
+import { Database } from "@/integrations/supabase/types";
+import { useRecruiterManagement } from "@/hooks/useRecruiterManagement";
+import ProposalFormFields from "./ProposalFormFields";
+
+type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
+  company_registrations?: {
+    nome_azienda: string;
+    id: string;
+  } | null;
+};
+
+interface ProposalFormProps {
+  jobOffer: JobOfferWithCompany;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalFormProps) {
+  const [formData, setFormData] = useState({
+    candidate_name: "",
+    candidate_email: "",
+    candidate_phone: "",
+    candidate_linkedin: "",
+    years_experience: "",
+    current_salary: "",
+    expected_salary: "",
+    availability_weeks: "",
+    recruiter_fee_percentage: "15",
+    proposal_description: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+  const { ensureRecruiterExists, validateUserAccess } = useRecruiterManagement();
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!validateUserAccess()) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Assicurati che esista un record recruiter
+      const recruiterData = await ensureRecruiterExists();
+
+      console.log('Recruiter verificato:', recruiterData);
+
+      // Ora procediamo con la creazione della proposta
+      let targetCompanyId = null;
+
+      // Se l'offerta ha un company_id, lo usiamo
+      if (jobOffer.company_id) {
+        targetCompanyId = jobOffer.company_id;
+      } 
+      // Altrimenti creiamo una proposta usando l'email dell'azienda
+      else if (jobOffer.contact_email) {
+        // Creiamo un UUID temporaneo per l'azienda
+        const tempCompanyId = crypto.randomUUID();
+        targetCompanyId = tempCompanyId;
+        
+        // Prima creiamo il record temporaneo dell'azienda
+        const { error: companyError } = await supabase
+          .from("company_registrations")
+          .insert({
+            id: tempCompanyId,
+            nome_azienda: jobOffer.company_name || "Azienda",
+            email: jobOffer.contact_email,
+            status: 'temp_for_proposal'
+          });
+
+        if (companyError) {
+          console.error('Errore creazione azienda temporanea:', companyError);
+        }
+      }
+
+      if (!targetCompanyId) {
+        toast({
+          title: "Errore",
+          description: "Impossibile identificare l'azienda per questa offerta",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const proposalData = {
+        recruiter_id: recruiterData.id,
+        company_id: targetCompanyId,
+        job_offer_id: jobOffer.id,
+        candidate_name: formData.candidate_name,
+        candidate_email: formData.candidate_email,
+        candidate_phone: formData.candidate_phone || null,
+        candidate_linkedin: formData.candidate_linkedin || null,
+        years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
+        current_salary: formData.current_salary ? parseInt(formData.current_salary) : null,
+        expected_salary: formData.expected_salary ? parseInt(formData.expected_salary) : null,
+        availability_weeks: formData.availability_weeks ? parseInt(formData.availability_weeks) : null,
+        recruiter_fee_percentage: parseInt(formData.recruiter_fee_percentage),
+        proposal_description: formData.proposal_description || null,
+      };
+
+      console.log('Creando proposta con dati:', proposalData);
+
+      const { error } = await supabase
+        .from("proposals")
+        .insert(proposalData);
+
+      if (error) {
+        console.error("Error creating proposal:", error);
+        toast({
+          title: "Errore",
+          description: "Impossibile inviare la proposta. Riprova più tardi.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Successo",
+        description: "Proposta inviata con successo",
+      });
+      onSuccess();
+    } catch (error) {
+      console.error("Error submitting proposal:", error);
+      toast({
+        title: "Errore",
+        description: error instanceof Error ? error.message : "Si è verificato un errore imprevisto",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <ProposalFormFields formData={formData} onInputChange={handleInputChange} />
+      
+      <DialogFooter>
+        <Button type="button" variant="outline" onClick={onClose}>
+          Annulla
+        </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Invia Proposta
+        </Button>
+      </DialogFooter>
+    </form>
+  );
+}

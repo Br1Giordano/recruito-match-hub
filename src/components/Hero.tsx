@@ -1,4 +1,5 @@
 
+
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap, Sparkles, TrendingUp, Building2 } from "lucide-react";
 
@@ -66,24 +67,24 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
               </p>
             </div>
 
-            {/* Sostituisco i tre elementi grafici con i due pulsanti semplici */}
+            {/* Pulsanti con stile più acceso */}
             <div className="flex justify-center gap-4 pt-8">
               <button 
                 onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-blue-500/20"
               >
-                <Building2 className="h-4 w-4" />
+                <Building2 className="h-5 w-5" />
                 Unisciti come azienda
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-5 w-5" />
               </button>
               
               <button 
                 onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-teal-500/20"
               >
-                <Users className="h-4 w-4" />
+                <Users className="h-5 w-5" />
                 Unisciti come recruiter
-                <ArrowRight className="h-4 w-4" />
+                <ArrowRight className="h-5 w-5" />
               </button>
             </div>
 
@@ -133,3 +134,4 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 };
 
 export default Hero;
+

@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
-import { useRecruiterManagement } from "@/hooks/useRecruiterManagement";
+import { useAuth } from "@/hooks/useAuth";
 import ProposalFormFields from "./ProposalFormFields";
 
 type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
@@ -34,10 +34,13 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
     availability_weeks: "",
     recruiter_fee_percentage: "15",
     proposal_description: "",
+    recruiter_name: "",
+    recruiter_email: "",
+    recruiter_phone: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const { ensureRecruiterExists, validateUserAccess } = useRecruiterManagement();
+  const { user } = useAuth();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -46,19 +49,28 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!validateUserAccess()) {
+    if (!user) {
+      toast({
+        title: "Errore",
+        description: "Devi essere autenticato per inviare proposte",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validazione campi obbligatori
+    if (!formData.candidate_name || !formData.candidate_email || !formData.recruiter_name || !formData.recruiter_email) {
+      toast({
+        title: "Errore",
+        description: "Compila tutti i campi obbligatori",
+        variant: "destructive",
+      });
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Assicurati che esista un record recruiter
-      const recruiterData = await ensureRecruiterExists();
-
-      console.log('Recruiter verificato:', recruiterData);
-
-      // Ora procediamo con la creazione della proposta
       let targetCompanyId = null;
 
       // Se l'offerta ha un company_id, lo usiamo
@@ -96,7 +108,6 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
       }
 
       const proposalData = {
-        recruiter_id: recruiterData.id,
         company_id: targetCompanyId,
         job_offer_id: jobOffer.id,
         candidate_name: formData.candidate_name,
@@ -109,6 +120,12 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         availability_weeks: formData.availability_weeks ? parseInt(formData.availability_weeks) : null,
         recruiter_fee_percentage: parseInt(formData.recruiter_fee_percentage),
         proposal_description: formData.proposal_description || null,
+        // I dati del recruiter vengono salvati direttamente nella proposta
+        recruiter_name: formData.recruiter_name,
+        recruiter_email: formData.recruiter_email,
+        recruiter_phone: formData.recruiter_phone || null,
+        // Salviamo l'ID dell'utente autenticato per riferimento
+        submitted_by_user_id: user.id,
       };
 
       console.log('Creando proposta con dati:', proposalData);
@@ -145,7 +162,7 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6">
       <ProposalFormFields formData={formData} onInputChange={handleInputChange} />
       
       <DialogFooter>

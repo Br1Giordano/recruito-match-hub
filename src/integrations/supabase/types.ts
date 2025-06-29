@@ -194,9 +194,13 @@ export type Database = {
           id: string
           job_offer_id: string | null
           proposal_description: string | null
+          recruiter_email: string | null
           recruiter_fee_percentage: number | null
-          recruiter_id: string
+          recruiter_id: string | null
+          recruiter_name: string | null
+          recruiter_phone: string | null
           status: string | null
+          submitted_by_user_id: string | null
           updated_at: string
           years_experience: number | null
         }
@@ -214,9 +218,13 @@ export type Database = {
           id?: string
           job_offer_id?: string | null
           proposal_description?: string | null
+          recruiter_email?: string | null
           recruiter_fee_percentage?: number | null
-          recruiter_id: string
+          recruiter_id?: string | null
+          recruiter_name?: string | null
+          recruiter_phone?: string | null
           status?: string | null
+          submitted_by_user_id?: string | null
           updated_at?: string
           years_experience?: number | null
         }
@@ -234,9 +242,13 @@ export type Database = {
           id?: string
           job_offer_id?: string | null
           proposal_description?: string | null
+          recruiter_email?: string | null
           recruiter_fee_percentage?: number | null
-          recruiter_id?: string
+          recruiter_id?: string | null
+          recruiter_name?: string | null
+          recruiter_phone?: string | null
           status?: string | null
+          submitted_by_user_id?: string | null
           updated_at?: string
           years_experience?: number | null
         }

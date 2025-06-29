@@ -126,6 +126,8 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         recruiter_phone: formData.recruiter_phone || null,
         // Salviamo l'ID dell'utente autenticato per riferimento
         submitted_by_user_id: user.id,
+        // recruiter_id rimane null con il nuovo approccio
+        recruiter_id: null,
       };
 
       console.log('Creando proposta con dati:', proposalData);

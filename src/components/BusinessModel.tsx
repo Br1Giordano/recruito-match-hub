@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DollarSign, TrendingUp, Users, ArrowRight, ArrowDown, Sparkles, UserPlus } from "lucide-react";
@@ -182,8 +183,11 @@ const BusinessModel = () => {
                   </div>
                 </div>
                 
-                {/* Elemento grafico per Partner Recruiter */}
-                <div className="bg-gradient-to-br from-recruito-teal/10 to-recruito-green/10 rounded-2xl p-6 shadow-lg border border-recruito-teal/20 hover-lift cursor-pointer group transition-all duration-300">
+                {/* Elemento grafico per Partner Recruiter collegato alla demo */}
+                <div 
+                  onClick={scrollToDemo}
+                  className="bg-gradient-to-br from-recruito-teal/10 to-recruito-green/10 rounded-2xl p-6 shadow-lg border border-recruito-teal/20 hover-lift cursor-pointer group transition-all duration-300"
+                >
                   <div className="flex items-center gap-4">
                     <div className="w-14 h-14 bg-gradient-to-br from-recruito-teal to-recruito-green rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                       <UserPlus className="h-7 w-7 text-white" />
@@ -196,7 +200,7 @@ const BusinessModel = () => {
                   </div>
                   <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
                     <div className="w-2 h-2 bg-recruito-teal rounded-full animate-pulse"></div>
-                    <span>Opportunità illimitate</span>
+                    <span>Accedi alla beta demo</span>
                   </div>
                 </div>
               </div>

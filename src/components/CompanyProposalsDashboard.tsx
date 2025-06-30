@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
@@ -20,8 +21,8 @@ export default function CompanyProposalsDashboard() {
 
   // Raggruppa le proposte per stato
   const pendingProposals = proposals.filter(p => p.status === "pending");
-  const interestedProposals = proposals.filter(p => p.status === "under_review");
-  const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status));
+  const interestedProposals = proposals.filter(p => p.status === "interested");
+  const otherProposals = proposals.filter(p => !["pending", "interested"].includes(p.status));
 
   useEffect(() => {
     let currentProposals = [];

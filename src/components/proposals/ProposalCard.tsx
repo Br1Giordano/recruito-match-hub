@@ -40,6 +40,8 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
     switch (status) {
       case "pending":
         return "bg-yellow-100 text-yellow-800";
+      case "interested":
+        return "bg-green-100 text-green-800";
       case "under_review":
         return "bg-blue-100 text-blue-800";
       case "approved":
@@ -57,6 +59,8 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
     switch (status) {
       case "pending":
         return "In Attesa";
+      case "interested":
+        return "Interessato";
       case "under_review":
         return "In Revisione";
       case "approved":
@@ -200,7 +204,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setRespondingTo(proposal.id)}
+                onClick={() => onStatusUpdate(proposal.id, "interested")}
                 className="text-green-600 border-green-600 hover:bg-green-50"
               >
                 <Check className="h-4 w-4 mr-2" />

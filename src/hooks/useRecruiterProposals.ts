@@ -34,7 +34,7 @@ export function useRecruiterProposals() {
 
   const fetchProposals = async () => {
     if (!user) {
-      console.log('No user found');
+      console.log('No user found - authentication required');
       setIsLoading(false);
       return;
     }
@@ -44,78 +44,75 @@ export function useRecruiterProposals() {
 
     setIsLoading(true);
 
-    let recruiterId = null;
-    
-    if (userProfile && userProfile.user_type === 'recruiter') {
-      recruiterId = userProfile.registration_id;
-      console.log('Using recruiter ID from profile:', recruiterId);
-    } else {
-      const { data: recruiterData, error: recruiterError } = await supabase
-        .from("recruiter_registrations")
-        .select("id")
-        .limit(1)
-        .maybeSingle();
+    try {
+      // Con le nuove RLS policy, la query ora filtra automaticamente
+      // le proposte del recruiter autenticato
+      const { data, error } = await supabase
+        .from("proposals")
+        .select(`
+          *,
+          company_registrations(nome_azienda),
+          job_offers(title)
+        `)
+        .order("created_at", { ascending: false });
 
-      console.log('Fallback recruiter data:', recruiterData);
-      console.log('Fallback recruiter error:', recruiterError);
+      console.log('Proposals data with RLS security:', data);
+      console.log('Proposals error:', error);
 
-      if (recruiterError) {
-        console.error('Error fetching recruiter:', recruiterError);
-        toast({
-          title: "Info Demo",
-          description: "Modalità demo: utilizzo dati di esempio per mostrare le funzionalità",
-        });
-        setIsLoading(false);
-        return;
+      if (error) {
+        console.error("Error fetching proposals:", error);
+        
+        if (error.message.includes('RLS') || error.message.includes('policy')) {
+          toast({
+            title: "Accesso Limitato",
+            description: "Puoi vedere solo le tue proposte. Assicurati di aver effettuato l'accesso come recruiter.",
+          });
+        } else {
+          toast({
+            title: "Errore",
+            description: "Errore nel caricamento delle proposte",
+            variant: "destructive",
+          });
+        }
+        setProposals([]);
+      } else {
+        // Le RLS policy filtrano automaticamente per il recruiter corrente
+        const transformedData = (data || []).map(proposal => ({
+          ...proposal,
+          company_registrations: Array.isArray(proposal.company_registrations) 
+            ? proposal.company_registrations[0] || null
+            : proposal.company_registrations
+        }));
+        
+        console.log(`Loaded ${transformedData.length} proposals with security filtering`);
+        setProposals(transformedData);
+        
+        if (transformedData.length > 0) {
+          toast({
+            title: "Successo",
+            description: `Caricate ${transformedData.length} tue proposte`,
+          });
+        }
       }
-      
-      if (!recruiterData) {
-        toast({
-          title: "Demo",
-          description: "Nessun dato di esempio disponibile. Questa è una demo delle funzionalità.",
-        });
-        setIsLoading(false);
-        return;
-      }
-      
-      recruiterId = recruiterData.id;
-    }
-
-    const { data, error } = await supabase
-      .from("proposals")
-      .select(`
-        *,
-        company_registrations(nome_azienda),
-        job_offers(title)
-      `)
-      .eq("recruiter_id", recruiterId)
-      .order("created_at", { ascending: false });
-
-    console.log('Proposals data:', data);
-    console.log('Proposals error:', error);
-
-    if (error) {
-      console.error("Error fetching proposals:", error);
+    } catch (error) {
+      console.error('Unexpected error fetching proposals:', error);
       toast({
-        title: "Demo",
-        description: "Questa è una demo - in produzione vedrai qui le tue proposte reali",
+        title: "Errore",
+        description: "Errore imprevisto nel caricamento",
+        variant: "destructive",
       });
       setProposals([]);
-    } else {
-      const transformedData = (data || []).map(proposal => ({
-        ...proposal,
-        company_registrations: Array.isArray(proposal.company_registrations) 
-          ? proposal.company_registrations[0] || null
-          : proposal.company_registrations
-      }));
-      setProposals(transformedData);
     }
 
     setIsLoading(false);
   };
 
   useEffect(() => {
-    fetchProposals();
+    if (user) {
+      fetchProposals();
+    } else {
+      setIsLoading(false);
+    }
   }, [user, userProfile]);
 
   return {

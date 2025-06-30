@@ -27,6 +27,11 @@ interface Proposal {
   };
 }
 
+// Funzione per validare e sanitizzare input
+const sanitizeInput = (input: string): string => {
+  return input.replace(/[<>\"']/g, '');
+};
+
 export function useProposals() {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,16 +40,17 @@ export function useProposals() {
 
   const fetchProposals = async () => {
     if (!user?.email) {
-      console.log('User email not available');
+      console.log('User email not available - authentication required');
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
     
-    console.log('Fetching proposals for user email:', user.email);
+    console.log('Fetching proposals for authenticated user:', user.email);
 
     try {
+      // Query ottimizzata per lavorare con le nuove RLS policy
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
@@ -55,20 +61,28 @@ export function useProposals() {
 
       if (proposalsError) {
         console.error('Error fetching proposals:', proposalsError);
-        toast({
-          title: "Errore",
-          description: `Errore nel caricamento delle proposte: ${proposalsError.message}`,
-          variant: "destructive",
-        });
+        
+        // Gestione specifica errori di sicurezza
+        if (proposalsError.message.includes('RLS') || proposalsError.message.includes('policy')) {
+          toast({
+            title: "Accesso Negato",
+            description: "Non hai i permessi per visualizzare queste proposte.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Errore",
+            description: `Errore nel caricamento delle proposte: ${proposalsError.message}`,
+            variant: "destructive",
+          });
+        }
         return;
       }
 
-      const userProposals = (proposalsData || []).filter(proposal => 
-        proposal.job_offers?.contact_email === user.email
-      );
+      // Le RLS policy ora filtrano automaticamente i dati
+      const userProposals = proposalsData || [];
       
-      console.log('All proposals:', proposalsData?.length);
-      console.log('Filtered user proposals:', userProposals.length);
+      console.log('Loaded proposals with RLS security:', userProposals.length);
       setProposals(userProposals);
       
       if (userProposals.length > 0) {
@@ -91,12 +105,34 @@ export function useProposals() {
   };
 
   const updateProposalStatus = async (proposalId: string, newStatus: string) => {
-    console.log('Updating proposal status:', { proposalId, newStatus, userEmail: user?.email });
+    if (!user?.email) {
+      toast({
+        title: "Errore",
+        description: "Devi essere autenticato per aggiornare le proposte",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Validazione input
+    const sanitizedStatus = sanitizeInput(newStatus);
+    const validStatuses = ['pending', 'under_review', 'approved', 'rejected', 'hired'];
+    
+    if (!validStatuses.includes(sanitizedStatus)) {
+      toast({
+        title: "Errore",
+        description: "Stato non valido",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    console.log('Updating proposal status:', { proposalId, newStatus: sanitizedStatus, userEmail: user.email });
     
     try {
       const { data, error } = await supabase
         .from("proposals")
-        .update({ status: newStatus })
+        .update({ status: sanitizedStatus })
         .eq("id", proposalId)
         .select();
 
@@ -104,14 +140,23 @@ export function useProposals() {
 
       if (error) {
         console.error('Supabase error:', error);
-        toast({
-          title: "Errore",
-          description: `Impossibile aggiornare lo stato della proposta: ${error.message}`,
-          variant: "destructive",
-        });
+        
+        if (error.message.includes('RLS') || error.message.includes('policy')) {
+          toast({
+            title: "Accesso Negato",
+            description: "Non hai i permessi per modificare questa proposta",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Errore",
+            description: `Impossibile aggiornare lo stato della proposta: ${error.message}`,
+            variant: "destructive",
+          });
+        }
         return false;
       } else {
-        console.log('Proposal status updated successfully');
+        console.log('Proposal status updated successfully with security validation');
         toast({
           title: "Successo",
           description: "Stato della proposta aggiornato",
@@ -132,59 +177,130 @@ export function useProposals() {
   };
 
   const sendResponse = async (proposalId: string, status: string, responseMessage: string) => {
-    if (!user) return;
+    if (!user) {
+      toast({
+        title: "Errore",
+        description: "Devi essere autenticato per inviare risposte",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validazione e sanitizzazione input
+    const sanitizedStatus = sanitizeInput(status);
+    const sanitizedMessage = sanitizeInput(responseMessage);
+    
+    if (!sanitizedStatus || !sanitizedMessage.trim()) {
+      toast({
+        title: "Errore",
+        description: "Tutti i campi sono obbligatori",
+        variant: "destructive",
+      });
+      return;
+    }
 
     const companyIdentifier = user.email;
 
-    const { error } = await supabase
-      .from("proposal_responses")
-      .insert([{
-        proposal_id: proposalId,
-        company_id: companyIdentifier,
-        status: status,
-        response_message: responseMessage,
-      }]);
+    try {
+      const { error } = await supabase
+        .from("proposal_responses")
+        .insert([{
+          proposal_id: proposalId,
+          company_id: companyIdentifier,
+          status: sanitizedStatus,
+          response_message: sanitizedMessage,
+        }]);
 
-    if (error) {
+      if (error) {
+        console.error('Error sending response:', error);
+        
+        if (error.message.includes('RLS') || error.message.includes('policy')) {
+          toast({
+            title: "Accesso Negato",
+            description: "Non hai i permessi per rispondere a questa proposta",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Errore",
+            description: "Impossibile inviare la risposta",
+            variant: "destructive",
+          });
+        }
+      } else {
+        console.log('Response sent successfully with security validation');
+        toast({
+          title: "Successo",
+          description: "Risposta inviata al recruiter",
+        });
+        // Aggiorna lo stato della proposta
+        updateProposalStatus(proposalId, sanitizedStatus === "interested" ? "under_review" : "rejected");
+      }
+    } catch (error) {
+      console.error('Unexpected error sending response:', error);
       toast({
         title: "Errore",
-        description: "Impossibile inviare la risposta",
+        description: "Errore imprevisto durante l'invio della risposta",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Successo",
-        description: "Risposta inviata al recruiter",
-      });
-      // Updated to use "under_review" instead of "interested" since that's what the database accepts
-      updateProposalStatus(proposalId, status === "interested" ? "under_review" : "rejected");
     }
   };
 
   const deleteProposal = async (proposalId: string) => {
-    const { error } = await supabase
-      .from("proposals")
-      .delete()
-      .eq("id", proposalId);
-
-    if (error) {
+    if (!user) {
       toast({
         title: "Errore",
-        description: "Impossibile eliminare la proposta",
+        description: "Devi essere autenticato per eliminare proposte",
         variant: "destructive",
       });
-    } else {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("proposals")
+        .delete()
+        .eq("id", proposalId);
+
+      if (error) {
+        console.error('Error deleting proposal:', error);
+        
+        if (error.message.includes('RLS') || error.message.includes('policy')) {
+          toast({
+            title: "Accesso Negato",
+            description: "Non hai i permessi per eliminare questa proposta",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Errore",
+            description: "Impossibile eliminare la proposta",
+            variant: "destructive",
+          });
+        }
+      } else {
+        console.log('Proposal deleted successfully with security validation');
+        toast({
+          title: "Successo",
+          description: "Proposta eliminata con successo",
+        });
+        fetchProposals();
+      }
+    } catch (error) {
+      console.error('Unexpected error deleting proposal:', error);
       toast({
-        title: "Successo",
-        description: "Proposta eliminata con successo",
+        title: "Errore",
+        description: "Errore imprevisto durante l'eliminazione",
+        variant: "destructive",
       });
-      fetchProposals();
     }
   };
 
   useEffect(() => {
     if (user?.email) {
       fetchProposals();
+    } else {
+      setIsLoading(false);
     }
   }, [user?.email]);
 

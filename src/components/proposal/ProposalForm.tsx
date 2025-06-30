@@ -60,30 +60,46 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
     setIsSubmitting(true);
 
     try {
-      let targetCompanyId = null;
-
-      // Se l'offerta ha un company_id, lo usiamo
-      if (jobOffer.company_id) {
-        targetCompanyId = jobOffer.company_id;
-      } 
-      // Altrimenti creiamo una proposta usando l'email dell'azienda
-      else if (jobOffer.contact_email) {
-        // Creiamo un UUID temporaneo per l'azienda
-        const tempCompanyId = crypto.randomUUID();
-        targetCompanyId = tempCompanyId;
+      // Controlliamo se l'offerta ha un company_id esistente
+      let targetCompanyId = jobOffer.company_id;
+      
+      // Se non ha un company_id, proviamo a trovarne uno basato sull'email
+      if (!targetCompanyId && jobOffer.contact_email) {
+        console.log('Cercando azienda esistente con email:', jobOffer.contact_email);
         
-        // Prima creiamo il record temporaneo dell'azienda
-        const { error: companyError } = await supabase
+        const { data: existingCompany } = await supabase
+          .from("company_registrations")
+          .select("id")
+          .eq("email", jobOffer.contact_email)
+          .single();
+        
+        if (existingCompany) {
+          targetCompanyId = existingCompany.id;
+          console.log('Trovata azienda esistente:', targetCompanyId);
+        }
+      }
+
+      // Se ancora non abbiamo un company_id, creiamo una voce temporanea
+      if (!targetCompanyId) {
+        console.log('Creando azienda temporanea per email:', jobOffer.contact_email);
+        
+        const { data: newCompany, error: companyError } = await supabase
           .from("company_registrations")
           .insert({
-            id: tempCompanyId,
             nome_azienda: jobOffer.company_name || "Azienda",
-            email: jobOffer.contact_email,
-            status: 'temp_for_proposal'
-          });
+            email: jobOffer.contact_email || "",
+            status: 'temp'
+          })
+          .select("id")
+          .single();
 
         if (companyError) {
-          console.error('Errore creazione azienda temporanea:', companyError);
+          console.error('Errore creazione azienda:', companyError);
+          // Se fallisce la creazione dell'azienda, usiamo un approccio alternativo
+          // Generiamo un UUID fittizio e procediamo
+          targetCompanyId = crypto.randomUUID();
+        } else {
+          targetCompanyId = newCompany.id;
         }
       }
 
@@ -109,11 +125,9 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         availability_weeks: formData.availability_weeks ? parseInt(formData.availability_weeks) : null,
         recruiter_fee_percentage: parseInt(formData.recruiter_fee_percentage),
         proposal_description: formData.proposal_description || null,
-        // I dati del recruiter vengono salvati direttamente nella proposta
         recruiter_name: formData.recruiter_name,
         recruiter_email: formData.recruiter_email,
         recruiter_phone: formData.recruiter_phone || null,
-        // Non serve più autenticazione - form anonimo
         submitted_by_user_id: null,
         recruiter_id: null,
       };
@@ -128,7 +142,7 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         console.error("Error creating proposal:", error);
         toast({
           title: "Errore",
-          description: "Impossibile inviare la proposta. Riprova più tardi.",
+          description: `Errore nell'invio: ${error.message}`,
           variant: "destructive",
         });
         return;

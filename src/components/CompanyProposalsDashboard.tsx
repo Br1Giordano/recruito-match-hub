@@ -56,7 +56,7 @@ export default function CompanyProposalsDashboard() {
     console.log('Fetching proposals for user email:', user.email);
 
     try {
-      // Ora possiamo fare una query diretta con join senza problemi di RLS
+      // Con RLS disabilitato, possiamo fare una query diretta con join
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
@@ -75,12 +75,13 @@ export default function CompanyProposalsDashboard() {
         return;
       }
 
-      // Filtra le proposte per le job offers dell'utente
+      // Filtra le proposte per le job offers dell'utente a livello applicativo
       const userProposals = (proposalsData || []).filter(proposal => 
         proposal.job_offers?.contact_email === user.email
       );
       
-      console.log('Filtered user proposals:', userProposals);
+      console.log('All proposals:', proposalsData?.length);
+      console.log('Filtered user proposals:', userProposals.length);
       setProposals(userProposals);
       setFilteredProposals(userProposals);
       

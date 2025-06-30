@@ -60,8 +60,8 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
     setIsSubmitting(true);
 
     try {
-      // Ora che abbiamo rimosso il constraint, usiamo semplicemente l'ID dell'offerta o un valore di fallback
-      const targetCompanyId = jobOffer.company_id || jobOffer.id;
+      // Con RLS disabilitato, usiamo semplicemente l'email di contatto dalla job offer
+      const targetCompanyId = jobOffer.contact_email || jobOffer.company_name || 'unknown';
 
       const proposalData = {
         company_id: targetCompanyId,

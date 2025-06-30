@@ -46,8 +46,8 @@ export default function CompanyProposalsDashboard() {
   const { user } = useAuth();
 
   const fetchProposals = async () => {
-    if (!user) {
-      console.log('User not authenticated');
+    if (!user?.email) {
+      console.log('User email not available');
       setIsLoading(false);
       return;
     }
@@ -58,42 +58,59 @@ export default function CompanyProposalsDashboard() {
     console.log('Fetching proposals for user email:', user.email);
 
     try {
-      // Query diretta per le proposte con join alle job offers
+      // Prima otteniamo le job offers dell'utente
+      const { data: jobOffers, error: jobOffersError } = await supabase
+        .from("job_offers")
+        .select("id, title, contact_email")
+        .eq("contact_email", user.email);
+
+      if (jobOffersError) {
+        console.error('Error fetching job offers:', jobOffersError);
+        setError(`Errore nel caricamento delle offerte: ${jobOffersError.message}`);
+        return;
+      }
+
+      console.log('Job offers found:', jobOffers);
+
+      if (!jobOffers || jobOffers.length === 0) {
+        console.log('No job offers found for this user');
+        setProposals([]);
+        setFilteredProposals([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Otteniamo le proposte per le job offers dell'utente
+      const jobOfferIds = jobOffers.map(offer => offer.id);
+      
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
-        .select(`
-          *,
-          job_offers(title, contact_email)
-        `)
+        .select("*")
+        .in("job_offer_id", jobOfferIds)
         .order("created_at", { ascending: false });
-
-      console.log('Proposals data:', proposalsData);
-      console.log('Proposals error:', proposalsError);
 
       if (proposalsError) {
         console.error('Error fetching proposals:', proposalsError);
         setError(`Errore nel caricamento delle proposte: ${proposalsError.message}`);
+        return;
+      }
+
+      console.log('Proposals found:', proposalsData);
+
+      // Aggiungiamo le informazioni delle job offers alle proposte
+      const proposalsWithJobOffers = (proposalsData || []).map(proposal => ({
+        ...proposal,
+        job_offers: jobOffers.find(offer => offer.id === proposal.job_offer_id)
+      }));
+
+      setProposals(proposalsWithJobOffers);
+      setFilteredProposals(proposalsWithJobOffers);
+      
+      if (proposalsWithJobOffers.length > 0) {
         toast({
-          title: "Errore",
-          description: "Impossibile caricare le proposte: " + proposalsError.message,
-          variant: "destructive",
+          title: "Successo",
+          description: `Trovate ${proposalsWithJobOffers.length} proposte`,
         });
-      } else {
-        // Filtra le proposte per le job offers dell'utente
-        const userProposals = (proposalsData || []).filter(proposal => 
-          proposal.job_offers?.contact_email === user.email
-        );
-        
-        console.log('Filtered user proposals:', userProposals);
-        setProposals(userProposals);
-        setFilteredProposals(userProposals);
-        
-        if (userProposals.length > 0) {
-          toast({
-            title: "Successo",
-            description: `Trovate ${userProposals.length} proposte`,
-          });
-        }
       }
     } catch (error) {
       console.error('Unexpected error:', error);
@@ -110,10 +127,10 @@ export default function CompanyProposalsDashboard() {
   };
 
   useEffect(() => {
-    if (user) {
+    if (user?.email) {
       fetchProposals();
     }
-  }, [user]);
+  }, [user?.email]);
 
   useEffect(() => {
     let filtered = proposals;

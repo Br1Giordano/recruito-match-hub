@@ -1,13 +1,16 @@
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Euro, Calendar, User, Building2 } from "lucide-react";
+import { Euro, Calendar, User, Building2 } from "lucide-react";
+import ProposalDetailsDialog from "./ProposalDetailsDialog";
 
 interface RecruiterProposalCardProps {
   proposal: {
     id: string;
     candidate_name: string;
+    candidate_email: string;
+    candidate_phone?: string;
+    candidate_linkedin?: string;
     proposal_description: string;
     years_experience?: number;
     expected_salary?: number;
@@ -119,10 +122,7 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
             <div className="text-sm text-muted-foreground">
               Inviata il {new Date(proposal.created_at).toLocaleDateString('it-IT')}
             </div>
-            <Button variant="outline" size="sm">
-              <Eye className="h-4 w-4 mr-2" />
-              Dettagli
-            </Button>
+            <ProposalDetailsDialog proposal={proposal} />
           </div>
         </div>
       </CardContent>

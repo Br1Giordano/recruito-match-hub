@@ -21,7 +21,7 @@ export default function RecruiterDashboard() {
       filtered = filtered.filter(
         (proposal) =>
           proposal.candidate_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          proposal.company_registrations?.nome_azienda?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          proposal.job_offers?.company_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           proposal.job_offers?.title?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }

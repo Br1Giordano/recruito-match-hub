@@ -21,10 +21,7 @@ interface Proposal {
   recruiter_name?: string;
   recruiter_email?: string;
   recruiter_phone?: string;
-  job_offers?: {
-    title: string;
-    contact_email?: string;
-  };
+  job_offer_id?: string;
 }
 
 export function useProposals() {
@@ -46,13 +43,10 @@ export function useProposals() {
     console.log('Fetching proposals for user email:', user.email);
 
     try {
-      // Query diretta senza RLS - ora completamente disabilitato
+      // Fetch solo dalla tabella proposals senza join
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
-        .select(`
-          *,
-          job_offers(title, contact_email)
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (proposalsError) {
@@ -66,10 +60,35 @@ export function useProposals() {
         return;
       }
 
-      // Filtriamo le proposte per l'utente corrente basandoci sulla email di contatto dell'offerta di lavoro
-      const userProposals = (proposalsData || []).filter(proposal => 
-        proposal.job_offers?.contact_email === user.email
-      );
+      // Ora fetchamos le job offers per ottenere le email di contatto
+      const { data: jobOffersData, error: jobOffersError } = await supabase
+        .from("job_offers")
+        .select("id, title, contact_email");
+
+      if (jobOffersError) {
+        console.error('Error fetching job offers:', jobOffersError);
+        // Continua comunque con le proposte anche se non riesce a caricare le job offers
+      }
+
+      // Creiamo una mappa delle job offers
+      const jobOffersMap = new Map();
+      if (jobOffersData) {
+        jobOffersData.forEach(offer => {
+          jobOffersMap.set(offer.id, offer);
+        });
+      }
+
+      // Filtriamo le proposte per l'utente corrente
+      const userProposals = (proposalsData || []).filter(proposal => {
+        const jobOffer = jobOffersMap.get(proposal.job_offer_id);
+        return jobOffer?.contact_email === user.email;
+      }).map(proposal => {
+        const jobOffer = jobOffersMap.get(proposal.job_offer_id);
+        return {
+          ...proposal,
+          job_offers: jobOffer ? { title: jobOffer.title, contact_email: jobOffer.contact_email } : null
+        };
+      });
       
       console.log('All proposals:', proposalsData?.length || 0);
       console.log('Filtered user proposals:', userProposals.length);
@@ -155,7 +174,6 @@ export function useProposals() {
         title: "Successo",
         description: "Risposta inviata al recruiter",
       });
-      // Updated to use "under_review" instead of "interested" since that's what the database accepts
       updateProposalStatus(proposalId, status === "interested" ? "under_review" : "rejected");
     }
   };

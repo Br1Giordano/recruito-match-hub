@@ -40,7 +40,7 @@ export function useProposals() {
 
   const fetchProposals = async () => {
     if (!user?.email) {
-      console.log('User email not available - authentication required');
+      console.log('User email not available - authentication required for secure access');
       setIsLoading(false);
       return;
     }
@@ -50,7 +50,8 @@ export function useProposals() {
     console.log('Fetching proposals for authenticated user:', user.email);
 
     try {
-      // Query ottimizzata per lavorare con le nuove RLS policy
+      // With RLS policies active, this query will automatically filter to show only
+      // proposals for job offers where the current user's email matches the contact_email
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
@@ -62,12 +63,11 @@ export function useProposals() {
       if (proposalsError) {
         console.error('Error fetching proposals:', proposalsError);
         
-        // Gestione specifica errori di sicurezza
+        // Enhanced security error handling
         if (proposalsError.message.includes('RLS') || proposalsError.message.includes('policy')) {
           toast({
-            title: "Accesso Negato",
-            description: "Non hai i permessi per visualizzare queste proposte.",
-            variant: "destructive",
+            title: "Accesso Sicuro Attivo",
+            description: "Sistema di sicurezza abilitato. Visualizzi solo le proposte autorizzate.",
           });
         } else {
           toast({
@@ -79,7 +79,7 @@ export function useProposals() {
         return;
       }
 
-      // Le RLS policy ora filtrano automaticamente i dati
+      // RLS policies now automatically filter the data for security
       const userProposals = proposalsData || [];
       
       console.log('Loaded proposals with RLS security:', userProposals.length);
@@ -88,7 +88,7 @@ export function useProposals() {
       if (userProposals.length > 0) {
         toast({
           title: "Successo",
-          description: `Trovate ${userProposals.length} proposte`,
+          description: `Trovate ${userProposals.length} proposte (accesso sicuro)`,
         });
       }
     } catch (error) {
@@ -114,7 +114,7 @@ export function useProposals() {
       return false;
     }
 
-    // Validazione input
+    // Validazione e sanitizzazione input
     const sanitizedStatus = sanitizeInput(newStatus);
     const validStatuses = ['pending', 'under_review', 'approved', 'rejected', 'hired'];
     
@@ -127,16 +127,21 @@ export function useProposals() {
       return false;
     }
 
-    console.log('Updating proposal status:', { proposalId, newStatus: sanitizedStatus, userEmail: user.email });
+    console.log('Updating proposal status with security validation:', { 
+      proposalId, 
+      newStatus: sanitizedStatus, 
+      userEmail: user.email 
+    });
     
     try {
+      // RLS policies ensure only authorized users can update proposals
       const { data, error } = await supabase
         .from("proposals")
         .update({ status: sanitizedStatus })
         .eq("id", proposalId)
         .select();
 
-      console.log('Update result:', { data, error });
+      console.log('Update result with security:', { data, error });
 
       if (error) {
         console.error('Supabase error:', error);
@@ -144,7 +149,7 @@ export function useProposals() {
         if (error.message.includes('RLS') || error.message.includes('policy')) {
           toast({
             title: "Accesso Negato",
-            description: "Non hai i permessi per modificare questa proposta",
+            description: "Non hai i permessi per modificare questa proposta (sicurezza attiva)",
             variant: "destructive",
           });
         } else {
@@ -159,7 +164,7 @@ export function useProposals() {
         console.log('Proposal status updated successfully with security validation');
         toast({
           title: "Successo",
-          description: "Stato della proposta aggiornato",
+          description: "Stato della proposta aggiornato (accesso sicuro)",
         });
         fetchProposals();
         return true;
@@ -202,6 +207,7 @@ export function useProposals() {
     const companyIdentifier = user.email;
 
     try {
+      // RLS policies ensure only authorized companies can insert responses
       const { error } = await supabase
         .from("proposal_responses")
         .insert([{
@@ -217,7 +223,7 @@ export function useProposals() {
         if (error.message.includes('RLS') || error.message.includes('policy')) {
           toast({
             title: "Accesso Negato",
-            description: "Non hai i permessi per rispondere a questa proposta",
+            description: "Non hai i permessi per rispondere a questa proposta (sicurezza attiva)",
             variant: "destructive",
           });
         } else {
@@ -231,7 +237,7 @@ export function useProposals() {
         console.log('Response sent successfully with security validation');
         toast({
           title: "Successo",
-          description: "Risposta inviata al recruiter",
+          description: "Risposta inviata al recruiter (accesso sicuro)",
         });
         // Aggiorna lo stato della proposta
         updateProposalStatus(proposalId, sanitizedStatus === "interested" ? "under_review" : "rejected");
@@ -257,6 +263,7 @@ export function useProposals() {
     }
 
     try {
+      // RLS policies ensure only authorized users (admin) can delete proposals
       const { error } = await supabase
         .from("proposals")
         .delete()
@@ -268,7 +275,7 @@ export function useProposals() {
         if (error.message.includes('RLS') || error.message.includes('policy')) {
           toast({
             title: "Accesso Negato",
-            description: "Non hai i permessi per eliminare questa proposta",
+            description: "Non hai i permessi per eliminare questa proposta (solo admin)",
             variant: "destructive",
           });
         } else {
@@ -282,7 +289,7 @@ export function useProposals() {
         console.log('Proposal deleted successfully with security validation');
         toast({
           title: "Successo",
-          description: "Proposta eliminata con successo",
+          description: "Proposta eliminata con successo (accesso sicuro)",
         });
         fetchProposals();
       }

@@ -34,7 +34,7 @@ export function useRecruiterProposals() {
 
   const fetchProposals = async () => {
     if (!user) {
-      console.log('No user found - authentication required');
+      console.log('No user found - authentication required for secure access');
       setIsLoading(false);
       return;
     }
@@ -45,8 +45,8 @@ export function useRecruiterProposals() {
     setIsLoading(true);
 
     try {
-      // Con le nuove RLS policy, la query ora filtra automaticamente
-      // le proposte del recruiter autenticato
+      // With RLS enabled, we need to fetch proposals where the recruiter_email matches the current user
+      // This works with the new security policies
       const { data, error } = await supabase
         .from("proposals")
         .select(`
@@ -54,6 +54,7 @@ export function useRecruiterProposals() {
           company_registrations(nome_azienda),
           job_offers(title)
         `)
+        .eq('recruiter_email', user.email)
         .order("created_at", { ascending: false });
 
       console.log('Proposals data with RLS security:', data);
@@ -65,7 +66,7 @@ export function useRecruiterProposals() {
         if (error.message.includes('RLS') || error.message.includes('policy')) {
           toast({
             title: "Accesso Limitato",
-            description: "Puoi vedere solo le tue proposte. Assicurati di aver effettuato l'accesso come recruiter.",
+            description: "Puoi vedere solo le tue proposte. Sistema di sicurezza attivo.",
           });
         } else {
           toast({
@@ -76,7 +77,7 @@ export function useRecruiterProposals() {
         }
         setProposals([]);
       } else {
-        // Le RLS policy filtrano automaticamente per il recruiter corrente
+        // RLS policies ensure only authorized data is returned
         const transformedData = (data || []).map(proposal => ({
           ...proposal,
           company_registrations: Array.isArray(proposal.company_registrations) 
@@ -84,13 +85,13 @@ export function useRecruiterProposals() {
             : proposal.company_registrations
         }));
         
-        console.log(`Loaded ${transformedData.length} proposals with security filtering`);
+        console.log(`Loaded ${transformedData.length} proposals with RLS security filtering`);
         setProposals(transformedData);
         
         if (transformedData.length > 0) {
           toast({
             title: "Successo",
-            description: `Caricate ${transformedData.length} tue proposte`,
+            description: `Caricate ${transformedData.length} tue proposte (sicure)`,
           });
         }
       }

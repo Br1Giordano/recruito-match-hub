@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase } from "lucide-react";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2 } from "lucide-react";
 import JobOfferForm from "./JobOfferForm";
 import { Database } from "@/integrations/supabase/types";
 
@@ -23,6 +23,7 @@ export default function CompanyOffersDashboard() {
   const [showNewOfferForm, setShowNewOfferForm] = useState(false);
   const { toast } = useToast();
   const { userProfile, user } = useAuth();
+  const { isAdmin } = useAdminCheck();
 
   const fetchJobOffers = async () => {
     setIsLoading(true);
@@ -39,8 +40,11 @@ export default function CompanyOffersDashboard() {
     // Query aggiornata per cercare offerte sia tramite company_id che contact_email
     let query = supabase.from("job_offers").select("*");
 
-    // Se l'utente ha un profilo azienda, cerca anche per company_id
-    if (userProfile && userProfile.user_type === 'company') {
+    // Se l'utente è admin, mostra tutte le offerte
+    if (isAdmin) {
+      // Admin vede tutte le offerte
+      query = query.order("created_at", { ascending: false });
+    } else if (userProfile && userProfile.user_type === 'company') {
       query = query.or(`company_id.eq.${userProfile.registration_id},contact_email.eq.${user.email}`);
     } else {
       // Altrimenti cerca solo per email
@@ -69,7 +73,7 @@ export default function CompanyOffersDashboard() {
     if (user) {
       fetchJobOffers();
     }
-  }, [userProfile, user]);
+  }, [userProfile, user, isAdmin]);
 
   useEffect(() => {
     let filtered = jobOffers;
@@ -93,6 +97,50 @@ export default function CompanyOffersDashboard() {
   const handleNewOfferSuccess = () => {
     setShowNewOfferForm(false);
     fetchJobOffers(); // Refresh the list
+  };
+
+  const handleDeleteOffer = async (offerId: string, offerTitle: string) => {
+    if (!isAdmin) {
+      toast({
+        title: "Errore",
+        description: "Solo gli amministratori possono eliminare le offerte",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const confirmed = window.confirm(`Sei sicuro di voler eliminare l'offerta "${offerTitle}"? Questa azione non può essere annullata.`);
+    
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('job_offers')
+        .delete()
+        .eq('id', offerId);
+
+      if (error) {
+        console.error('Error deleting job offer:', error);
+        toast({
+          title: "Errore",
+          description: "Impossibile eliminare l'offerta di lavoro",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Successo",
+          description: "Offerta di lavoro eliminata con successo",
+        });
+        fetchJobOffers(); // Refresh the list
+      }
+    } catch (error) {
+      console.error('Error deleting job offer:', error);
+      toast({
+        title: "Errore",
+        description: "Errore durante l'eliminazione dell'offerta",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -185,9 +233,11 @@ export default function CompanyOffersDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Le Mie Offerte</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {isAdmin ? "Tutte le Offerte (Admin)" : "Le Mie Offerte"}
+          </h1>
           <p className="text-muted-foreground">
-            Gestisci le tue offerte di lavoro pubblicate
+            {isAdmin ? "Gestisci tutte le offerte di lavoro (modalità amministratore)" : "Gestisci le tue offerte di lavoro pubblicate"}
           </p>
         </div>
         <Button onClick={() => setShowNewOfferForm(true)}>
@@ -260,10 +310,20 @@ export default function CompanyOffersDashboard() {
                     <CardTitle className="flex items-center gap-2">
                       <Briefcase className="h-5 w-5" />
                       {offer.title}
+                      {isAdmin && (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          Admin View
+                        </Badge>
+                      )}
                     </CardTitle>
                     <CardDescription className="flex items-center gap-4 mt-1">
                       {offer.company_name && (
                         <span>{offer.company_name}</span>
+                      )}
+                      {offer.contact_email && isAdmin && (
+                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                          {offer.contact_email}
+                        </span>
                       )}
                       {offer.location && (
                         <span className="flex items-center gap-1">
@@ -319,10 +379,23 @@ export default function CompanyOffersDashboard() {
                         <span> • Aggiornata il {new Date(offer.updated_at).toLocaleDateString('it-IT')}</span>
                       )}
                     </div>
-                    <Button variant="outline" size="sm">
-                      <Edit className="h-4 w-4 mr-2" />
-                      Modifica
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm">
+                        <Edit className="h-4 w-4 mr-2" />
+                        Modifica
+                      </Button>
+                      {isAdmin && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeleteOffer(offer.id, offer.title)}
+                          className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Elimina
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </CardContent>

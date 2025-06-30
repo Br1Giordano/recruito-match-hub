@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
-import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase } from "lucide-react";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase, Trash2 } from "lucide-react";
 import ProposalFormModal from "./ProposalFormModal";
 import { Database } from "@/integrations/supabase/types";
 
@@ -30,6 +30,7 @@ export default function JobOffersBoard() {
   const [showProposalModal, setShowProposalModal] = useState(false);
   const { toast } = useToast();
   const { userProfile } = useAuth();
+  const { isAdmin } = useAdminCheck();
 
   const fetchJobOffers = async () => {
     setIsLoading(true);
@@ -117,6 +118,50 @@ export default function JobOffersBoard() {
     });
   };
 
+  const handleDeleteOffer = async (offerId: string, offerTitle: string) => {
+    if (!isAdmin) {
+      toast({
+        title: "Errore",
+        description: "Solo gli amministratori possono eliminare le offerte",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const confirmed = window.confirm(`Sei sicuro di voler eliminare l'offerta "${offerTitle}"? Questa azione non può essere annullata.`);
+    
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from('job_offers')
+        .delete()
+        .eq('id', offerId);
+
+      if (error) {
+        console.error('Error deleting job offer:', error);
+        toast({
+          title: "Errore",
+          description: "Impossibile eliminare l'offerta di lavoro",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Successo",
+          description: "Offerta di lavoro eliminata con successo",
+        });
+        fetchJobOffers(); // Refresh the list
+      }
+    } catch (error) {
+      console.error('Error deleting job offer:', error);
+      toast({
+        title: "Errore",
+        description: "Errore durante l'eliminazione dell'offerta",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getEmploymentTypeText = (type?: string) => {
     switch (type) {
       case "full-time":
@@ -146,9 +191,15 @@ export default function JobOffersBoard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Posizioni Aperte</h1>
+        <h1 className="text-3xl font-bold tracking-tight">
+          Posizioni Aperte
+          {isAdmin && <span className="text-lg font-normal text-blue-600 ml-2">(Admin)</span>}
+        </h1>
         <p className="text-muted-foreground">
-          Scopri le opportunità disponibili e invia proposte per i tuoi candidati
+          {isAdmin 
+            ? "Scopri le opportunità disponibili e gestisci tutte le offerte (modalità amministratore)"
+            : "Scopri le opportunità disponibili e invia proposte per i tuoi candidati"
+          }
         </p>
       </div>
 
@@ -221,12 +272,22 @@ export default function JobOffersBoard() {
                     <CardTitle className="flex items-center gap-2 mb-2">
                       <Briefcase className="h-5 w-5" />
                       {offer.title}
+                      {isAdmin && (
+                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                          Admin
+                        </Badge>
+                      )}
                     </CardTitle>
                     <CardDescription className="flex items-center gap-4">
                       <span className="flex items-center gap-1">
                         <Building2 className="h-4 w-4" />
                         {getCompanyName(offer)}
                       </span>
+                      {isAdmin && offer.contact_email && (
+                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                          {offer.contact_email}
+                        </span>
+                      )}
                       {offer.location && (
                         <span className="flex items-center gap-1">
                           <MapPin className="h-4 w-4" />
@@ -278,14 +339,27 @@ export default function JobOffersBoard() {
                     <div className="text-sm text-muted-foreground">
                       Pubblicata il {new Date(offer.created_at).toLocaleDateString('it-IT')}
                     </div>
-                    <Button 
-                      onClick={() => handleSendProposal(offer)}
-                      disabled={!userProfile || userProfile.user_type !== 'recruiter'}
-                      className="bg-recruito-blue hover:bg-recruito-blue/90"
-                    >
-                      <Send className="h-4 w-4 mr-2" />
-                      Invia Candidato
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        onClick={() => handleSendProposal(offer)}
+                        disabled={!userProfile || userProfile.user_type !== 'recruiter'}
+                        className="bg-recruito-blue hover:bg-recruito-blue/90"
+                      >
+                        <Send className="h-4 w-4 mr-2" />
+                        Invia Candidato
+                      </Button>
+                      {isAdmin && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeleteOffer(offer.id, offer.title)}
+                          className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Elimina
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 </div>
               </CardContent>

@@ -35,67 +35,30 @@ export default function JobOffersBoard() {
   const fetchJobOffers = async () => {
     setIsLoading(true);
 
-    console.log('Fetching job offers...');
+    // Query per ottenere tutte le offerte attive, sia con che senza company_registrations
+    const { data, error } = await supabase
+      .from("job_offers")
+      .select(`
+        *,
+        company_registrations(nome_azienda, id)
+      `)
+      .eq("status", "active")
+      .order("created_at", { ascending: false });
 
-    try {
-      // Query semplice per ottenere solo le offerte attive senza join complessi
-      const { data: offersData, error: offersError } = await supabase
-        .from("job_offers")
-        .select("*")
-        .eq("status", "active")
-        .order("created_at", { ascending: false });
-
-      if (offersError) {
-        console.error("Error fetching job offers:", offersError);
-        toast({
-          title: "Errore",
-          description: "Impossibile caricare le offerte di lavoro",
-          variant: "destructive",
-        });
-        setJobOffers([]);
-        setFilteredOffers([]);
-        return;
-      }
-
-      // Ora provo a fare un fetch separato delle company_registrations
-      const { data: companiesData, error: companiesError } = await supabase
-        .from("company_registrations")
-        .select("id, nome_azienda");
-
-      if (companiesError) {
-        console.error("Error fetching companies:", companiesError);
-        // Continua anche senza i dati delle aziende
-      }
-
-      // Crea una mappa delle aziende
-      const companiesMap = new Map();
-      if (companiesData) {
-        companiesData.forEach(company => {
-          companiesMap.set(company.id, company);
-        });
-      }
-
-      // Combina i dati
-      const enrichedOffers = (offersData || []).map(offer => ({
-        ...offer,
-        company_registrations: offer.company_id ? companiesMap.get(offer.company_id) : null
-      }));
-
-      console.log("Job offers fetched:", enrichedOffers);
-      setJobOffers(enrichedOffers);
-      setFilteredOffers(enrichedOffers);
-    } catch (error) {
-      console.error("Unexpected error fetching job offers:", error);
+    if (error) {
+      console.error("Error fetching job offers:", error);
       toast({
         title: "Errore",
-        description: "Errore imprevisto durante il caricamento",
+        description: "Impossibile caricare le offerte di lavoro",
         variant: "destructive",
       });
-      setJobOffers([]);
-      setFilteredOffers([]);
-    } finally {
-      setIsLoading(false);
+    } else {
+      console.log("Job offers fetched:", data);
+      setJobOffers(data || []);
+      setFilteredOffers(data || []);
     }
+
+    setIsLoading(false);
   };
 
   useEffect(() => {

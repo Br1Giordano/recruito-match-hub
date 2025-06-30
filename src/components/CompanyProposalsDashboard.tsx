@@ -41,7 +41,6 @@ export default function CompanyProposalsDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseMessage, setResponseMessage] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -53,72 +52,50 @@ export default function CompanyProposalsDashboard() {
     }
 
     setIsLoading(true);
-    setError(null);
     
     console.log('Fetching proposals for user email:', user.email);
 
     try {
-      // Prima otteniamo le job offers dell'utente
-      const { data: jobOffers, error: jobOffersError } = await supabase
-        .from("job_offers")
-        .select("id, title, contact_email")
-        .eq("contact_email", user.email);
-
-      if (jobOffersError) {
-        console.error('Error fetching job offers:', jobOffersError);
-        setError(`Errore nel caricamento delle offerte: ${jobOffersError.message}`);
-        return;
-      }
-
-      console.log('Job offers found:', jobOffers);
-
-      if (!jobOffers || jobOffers.length === 0) {
-        console.log('No job offers found for this user');
-        setProposals([]);
-        setFilteredProposals([]);
-        setIsLoading(false);
-        return;
-      }
-
-      // Otteniamo le proposte per le job offers dell'utente
-      const jobOfferIds = jobOffers.map(offer => offer.id);
-      
+      // Ora possiamo fare una query diretta con join senza problemi di RLS
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
-        .select("*")
-        .in("job_offer_id", jobOfferIds)
+        .select(`
+          *,
+          job_offers(title, contact_email)
+        `)
         .order("created_at", { ascending: false });
 
       if (proposalsError) {
         console.error('Error fetching proposals:', proposalsError);
-        setError(`Errore nel caricamento delle proposte: ${proposalsError.message}`);
+        toast({
+          title: "Errore",
+          description: `Errore nel caricamento delle proposte: ${proposalsError.message}`,
+          variant: "destructive",
+        });
         return;
       }
 
-      console.log('Proposals found:', proposalsData);
-
-      // Aggiungiamo le informazioni delle job offers alle proposte
-      const proposalsWithJobOffers = (proposalsData || []).map(proposal => ({
-        ...proposal,
-        job_offers: jobOffers.find(offer => offer.id === proposal.job_offer_id)
-      }));
-
-      setProposals(proposalsWithJobOffers);
-      setFilteredProposals(proposalsWithJobOffers);
+      // Filtra le proposte per le job offers dell'utente
+      const userProposals = (proposalsData || []).filter(proposal => 
+        proposal.job_offers?.contact_email === user.email
+      );
       
-      if (proposalsWithJobOffers.length > 0) {
+      console.log('Filtered user proposals:', userProposals);
+      setProposals(userProposals);
+      setFilteredProposals(userProposals);
+      
+      if (userProposals.length > 0) {
         toast({
           title: "Successo",
-          description: `Trovate ${proposalsWithJobOffers.length} proposte`,
+          description: `Trovate ${userProposals.length} proposte`,
         });
       }
     } catch (error) {
       console.error('Unexpected error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto';
-      setError(`Si è verificato un errore imprevisto: ${errorMessage}`);
       toast({
         title: "Errore",
-        description: "Si è verificato un errore imprevisto",
+        description: `Si è verificato un errore imprevisto: ${errorMessage}`,
         variant: "destructive",
       });
     } finally {
@@ -263,30 +240,6 @@ export default function CompanyProposalsDashboard() {
               <p className="text-muted-foreground">
                 Devi essere autenticato come azienda per visualizzare le proposte.
               </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Proposte Ricevute</h1>
-          <p className="text-muted-foreground">
-            Revisiona e gestisci le proposte inviate dai recruiter
-          </p>
-        </div>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center py-8">
-              <MessageSquare className="mx-auto h-12 w-12 text-red-500" />
-              <h3 className="mt-4 text-lg font-semibold text-red-600">Errore di Caricamento</h3>
-              <p className="text-muted-foreground mb-4">{error}</p>
-              <Button onClick={fetchProposals}>Riprova</Button>
             </div>
           </CardContent>
         </Card>

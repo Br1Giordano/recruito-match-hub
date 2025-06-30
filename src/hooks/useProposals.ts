@@ -49,43 +49,17 @@ export function useProposals() {
     console.log('Fetching proposals for company user:', user.email);
 
     try {
-      // Prima verifica se l'utente ha offerte di lavoro
-      const { data: userJobOffers, error: jobOffersError } = await supabase
-        .from("job_offers")
-        .select("id, title, contact_email")
-        .eq("contact_email", user.email);
-
-      if (jobOffersError) {
-        console.error('Error fetching job offers:', jobOffersError);
-        toast({
-          title: "Errore",
-          description: "Errore nel caricamento delle offerte di lavoro",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      console.log('User job offers:', userJobOffers);
-
-      if (!userJobOffers || userJobOffers.length === 0) {
-        console.log('No job offers found for user');
-        setProposals([]);
-        setIsLoading(false);
-        return;
-      }
-
-      // Ora cerca le proposte per queste offerte
-      const jobOfferIds = userJobOffers.map(offer => offer.id);
-      
+      // Direttamente query delle proposte con le nuove RLS policy
+      // Le policy ora filtrano automaticamente usando auth.email()
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
           *,
           job_offers(title, contact_email)
         `)
-        .in("job_offer_id", jobOfferIds)
         .order("created_at", { ascending: false });
+
+      console.log('Direct proposals query result:', { data: proposalsData, error: proposalsError });
 
       if (proposalsError) {
         console.error('Error fetching proposals:', proposalsError);
@@ -97,7 +71,7 @@ export function useProposals() {
         setProposals([]);
       } else {
         const userProposals = proposalsData || [];
-        console.log('Loaded proposals:', userProposals.length);
+        console.log('Loaded proposals with RLS filtering:', userProposals.length);
         setProposals(userProposals);
         
         if (userProposals.length > 0) {
@@ -105,6 +79,8 @@ export function useProposals() {
             title: "Successo",
             description: `Trovate ${userProposals.length} proposte`,
           });
+        } else {
+          console.log('No proposals found - this might be normal if no proposals were sent to your job offers');
         }
       }
     } catch (error) {

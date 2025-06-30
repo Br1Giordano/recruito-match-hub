@@ -33,85 +33,59 @@ export function useRecruiterProposals() {
   const { userProfile, user } = useAuth();
 
   const fetchProposals = async () => {
-    if (!user) {
-      console.log('No user found');
-      setIsLoading(false);
-      return;
-    }
-
-    console.log('User profile:', userProfile);
-    console.log('Current user:', user);
-
     setIsLoading(true);
 
-    let recruiterId = null;
-    
-    if (userProfile && userProfile.user_type === 'recruiter') {
-      recruiterId = userProfile.registration_id;
-      console.log('Using recruiter ID from profile:', recruiterId);
-    } else {
-      const { data: recruiterData, error: recruiterError } = await supabase
-        .from("recruiter_registrations")
-        .select("id")
-        .limit(1)
-        .maybeSingle();
+    console.log('Fetching all proposals for recruiter view');
 
-      console.log('Fallback recruiter data:', recruiterData);
-      console.log('Fallback recruiter error:', recruiterError);
+    try {
+      const { data, error } = await supabase
+        .from("proposals")
+        .select(`
+          *,
+          company_registrations(nome_azienda),
+          job_offers(title)
+        `)
+        .order("created_at", { ascending: false });
 
-      if (recruiterError) {
-        console.error('Error fetching recruiter:', recruiterError);
+      console.log('Proposals data:', data);
+      console.log('Proposals error:', error);
+
+      if (error) {
+        console.error("Error fetching proposals:", error);
         toast({
-          title: "Info Demo",
-          description: "Modalità demo: utilizzo dati di esempio per mostrare le funzionalità",
+          title: "Errore",
+          description: `Errore nel caricamento delle proposte: ${error.message}`,
+          variant: "destructive",
         });
-        setIsLoading(false);
-        return;
+        setProposals([]);
+      } else {
+        const transformedData = (data || []).map(proposal => ({
+          ...proposal,
+          company_registrations: Array.isArray(proposal.company_registrations) 
+            ? proposal.company_registrations[0] || null
+            : proposal.company_registrations
+        }));
+        
+        // Se l'utente è un recruiter autenticato, filtra per le sue proposte
+        let filteredProposals = transformedData;
+        if (user && userProfile?.user_type === 'recruiter') {
+          // Qui potresti filtrare per recruiter_id se necessario
+          // filteredProposals = transformedData.filter(p => p.recruiter_id === userProfile.registration_id);
+        }
+        
+        setProposals(filteredProposals);
       }
-      
-      if (!recruiterData) {
-        toast({
-          title: "Demo",
-          description: "Nessun dato di esempio disponibile. Questa è una demo delle funzionalità.",
-        });
-        setIsLoading(false);
-        return;
-      }
-      
-      recruiterId = recruiterData.id;
-    }
-
-    const { data, error } = await supabase
-      .from("proposals")
-      .select(`
-        *,
-        company_registrations(nome_azienda),
-        job_offers(title)
-      `)
-      .eq("recruiter_id", recruiterId)
-      .order("created_at", { ascending: false });
-
-    console.log('Proposals data:', data);
-    console.log('Proposals error:', error);
-
-    if (error) {
-      console.error("Error fetching proposals:", error);
+    } catch (error) {
+      console.error('Unexpected error:', error);
       toast({
-        title: "Demo",
-        description: "Questa è una demo - in produzione vedrai qui le tue proposte reali",
+        title: "Errore",
+        description: "Errore imprevisto nel caricamento delle proposte",
+        variant: "destructive",
       });
       setProposals([]);
-    } else {
-      const transformedData = (data || []).map(proposal => ({
-        ...proposal,
-        company_registrations: Array.isArray(proposal.company_registrations) 
-          ? proposal.company_registrations[0] || null
-          : proposal.company_registrations
-      }));
-      setProposals(transformedData);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   useEffect(() => {

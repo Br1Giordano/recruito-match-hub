@@ -34,15 +34,9 @@ export function useProposals() {
   const { user } = useAuth();
 
   const fetchProposals = async () => {
-    if (!user?.email) {
-      console.log('User email not available');
-      setIsLoading(false);
-      return;
-    }
-
     setIsLoading(true);
     
-    console.log('Fetching proposals for user email:', user.email);
+    console.log('Fetching all proposals');
 
     try {
       const { data: proposalsData, error: proposalsError } = await supabase
@@ -63,18 +57,23 @@ export function useProposals() {
         return;
       }
 
-      const userProposals = (proposalsData || []).filter(proposal => 
-        proposal.job_offers?.contact_email === user.email
-      );
+      console.log('All proposals fetched:', proposalsData?.length);
       
-      console.log('All proposals:', proposalsData?.length);
-      console.log('Filtered user proposals:', userProposals.length);
-      setProposals(userProposals);
+      // Se l'utente è loggato, filtra per email
+      let filteredProposals = proposalsData || [];
+      if (user?.email) {
+        filteredProposals = proposalsData?.filter(proposal => 
+          proposal.job_offers?.contact_email === user.email
+        ) || [];
+        console.log('Filtered user proposals:', filteredProposals.length);
+      }
       
-      if (userProposals.length > 0) {
+      setProposals(filteredProposals);
+      
+      if (filteredProposals.length > 0) {
         toast({
           title: "Successo",
-          description: `Trovate ${userProposals.length} proposte`,
+          description: `Trovate ${filteredProposals.length} proposte`,
         });
       }
     } catch (error) {
@@ -91,7 +90,7 @@ export function useProposals() {
   };
 
   const updateProposalStatus = async (proposalId: string, newStatus: string) => {
-    console.log('Updating proposal status:', { proposalId, newStatus, userEmail: user?.email });
+    console.log('Updating proposal status:', { proposalId, newStatus });
     
     try {
       const { data, error } = await supabase
@@ -156,7 +155,6 @@ export function useProposals() {
         title: "Successo",
         description: "Risposta inviata al recruiter",
       });
-      // Updated to use "under_review" instead of "interested" since that's what the database accepts
       updateProposalStatus(proposalId, status === "interested" ? "under_review" : "rejected");
     }
   };
@@ -183,9 +181,7 @@ export function useProposals() {
   };
 
   useEffect(() => {
-    if (user?.email) {
-      fetchProposals();
-    }
+    fetchProposals();
   }, [user?.email]);
 
   return {

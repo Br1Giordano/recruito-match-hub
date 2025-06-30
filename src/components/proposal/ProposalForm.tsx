@@ -6,7 +6,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
-import { useAuth } from "@/hooks/useAuth";
 import ProposalFormFields from "./ProposalFormFields";
 
 type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
@@ -40,7 +39,6 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -48,15 +46,6 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!user) {
-      toast({
-        title: "Errore",
-        description: "Devi essere autenticato per inviare proposte",
-        variant: "destructive",
-      });
-      return;
-    }
 
     // Validazione campi obbligatori
     if (!formData.candidate_name || !formData.candidate_email || !formData.recruiter_name || !formData.recruiter_email) {
@@ -124,9 +113,8 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         recruiter_name: formData.recruiter_name,
         recruiter_email: formData.recruiter_email,
         recruiter_phone: formData.recruiter_phone || null,
-        // Salviamo l'ID dell'utente autenticato per riferimento
-        submitted_by_user_id: user.id,
-        // recruiter_id rimane null con il nuovo approccio
+        // Non serve più autenticazione - form anonimo
+        submitted_by_user_id: null,
         recruiter_id: null,
       };
 

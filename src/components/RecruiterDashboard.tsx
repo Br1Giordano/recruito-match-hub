@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -115,8 +114,15 @@ export default function RecruiterDashboard() {
       setProposals([]);
       setFilteredProposals([]);
     } else {
-      setProposals(data || []);
-      setFilteredProposals(data || []);
+      // Trasformiamo i dati per adattarli al tipo atteso
+      const transformedData = (data || []).map(proposal => ({
+        ...proposal,
+        company_registrations: Array.isArray(proposal.company_registrations) 
+          ? proposal.company_registrations[0] || null
+          : proposal.company_registrations
+      }));
+      setProposals(transformedData);
+      setFilteredProposals(transformedData);
     }
 
     setIsLoading(false);

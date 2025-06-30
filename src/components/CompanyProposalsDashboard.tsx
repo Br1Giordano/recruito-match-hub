@@ -24,12 +24,9 @@ interface Proposal {
   recruiter_fee_percentage?: number;
   status: string;
   created_at: string;
-  recruiter_registrations: {
-    nome: string;
-    cognome: string;
-    email: string;
-    telefono?: string;
-  };
+  recruiter_name?: string;
+  recruiter_email?: string;
+  recruiter_phone?: string;
   job_offers?: {
     title: string;
     contact_email?: string;
@@ -56,31 +53,25 @@ export default function CompanyProposalsDashboard() {
       return;
     }
 
-    console.log('Fetching proposals for user:', user.email);
+    console.log('Fetching proposals for user email:', user.email);
 
-    // Query modificata per cercare proposte sia per company_id che per email
-    const { data, error } = await supabase
-      .from("proposals")
-      .select(`
-        *,
-        recruiter_registrations!inner(nome, cognome, email, telefono),
-        job_offers(title, contact_email)
-      `)
-      .or(`company_id.eq.${userProfile?.registration_id},job_offers.contact_email.eq.${user.email}`)
-      .order("created_at", { ascending: false });
-
-    // Se la query principale non funziona, proviamo un approccio alternativo
-    if (error || !data) {
-      console.log('Trying alternative approach for fetching proposals');
-      
-      // Cerchiamo prima tutte le job offers dell'utente
+    try {
+      // Primo: cerchiamo le job offers dell'utente usando l'email
       const { data: userJobOffers, error: jobOffersError } = await supabase
         .from("job_offers")
-        .select("id")
+        .select("id, title, contact_email")
         .eq("contact_email", user.email);
+
+      console.log('User job offers:', userJobOffers);
+      console.log('Job offers error:', jobOffersError);
 
       if (jobOffersError) {
         console.error('Error fetching user job offers:', jobOffersError);
+        toast({
+          title: "Errore",
+          description: "Impossibile recuperare le offerte di lavoro",
+          variant: "destructive",
+        });
         setIsLoading(false);
         return;
       }
@@ -94,40 +85,51 @@ export default function CompanyProposalsDashboard() {
       }
 
       const jobOfferIds = userJobOffers.map(offer => offer.id);
+      console.log('Job offer IDs:', jobOfferIds);
 
-      // Ora cerchiamo le proposte per questi job offers
+      // Secondo: cerchiamo le proposte per questi job offers
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
           *,
-          recruiter_registrations!inner(nome, cognome, email, telefono),
           job_offers(title, contact_email)
         `)
         .in("job_offer_id", jobOfferIds)
         .order("created_at", { ascending: false });
 
+      console.log('Proposals data:', proposalsData);
+      console.log('Proposals error:', proposalsError);
+
       if (proposalsError) {
         console.error('Error fetching proposals:', proposalsError);
         toast({
           title: "Errore",
-          description: "Impossibile caricare le proposte",
+          description: "Impossibile caricare le proposte: " + proposalsError.message,
           variant: "destructive",
         });
-        setIsLoading(false);
-        return;
+        setProposals([]);
+        setFilteredProposals([]);
+      } else {
+        setProposals(proposalsData || []);
+        setFilteredProposals(proposalsData || []);
+        
+        if (proposalsData && proposalsData.length > 0) {
+          toast({
+            title: "Successo",
+            description: `Trovate ${proposalsData.length} proposte`,
+          });
+        }
       }
-
-      console.log('Proposals fetched:', proposalsData);
-      setProposals(proposalsData || []);
-      setFilteredProposals(proposalsData || []);
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore imprevisto",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    console.log('Proposals fetched:', data);
-    setProposals(data || []);
-    setFilteredProposals(data || []);
-    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -143,8 +145,7 @@ export default function CompanyProposalsDashboard() {
       filtered = filtered.filter(
         (proposal) =>
           proposal.candidate_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          proposal.recruiter_registrations.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          proposal.recruiter_registrations.cognome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          proposal.recruiter_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           proposal.job_offers?.title?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -180,7 +181,6 @@ export default function CompanyProposalsDashboard() {
   const sendResponse = async (proposalId: string, status: string) => {
     if (!user) return;
 
-    // Usiamo l'email dell'utente invece del company_id se non abbiamo un profilo azienda
     const companyIdentifier = userProfile?.registration_id || user.email;
 
     const { error } = await supabase
@@ -281,7 +281,7 @@ export default function CompanyProposalsDashboard() {
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Proposte Ricevute</h1>
         <p className="text-muted-foreground">
-          Revisiona e gestisci le proposte inviate dai recruiter
+          Revisiona e gestisci le proposte inviate dai recruiter per le tue offerte di lavoro
         </p>
       </div>
 
@@ -327,7 +327,7 @@ export default function CompanyProposalsDashboard() {
                 <h3 className="mt-4 text-lg font-semibold">Nessuna proposta trovata</h3>
                 <p className="text-muted-foreground">
                   {proposals.length === 0
-                    ? "Non hai ancora ricevuto proposte"
+                    ? "Non hai ancora ricevuto proposte per le tue offerte di lavoro"
                     : "Nessuna proposta corrisponde ai filtri selezionati"}
                 </p>
               </div>
@@ -344,7 +344,9 @@ export default function CompanyProposalsDashboard() {
                       {proposal.candidate_name}
                     </CardTitle>
                     <CardDescription className="mt-1">
-                      Proposto da {proposal.recruiter_registrations.nome} {proposal.recruiter_registrations.cognome}
+                      {proposal.recruiter_name && (
+                        <>Proposto da {proposal.recruiter_name}</>
+                      )}
                       {proposal.job_offers?.title && (
                         <>
                           <span> • </span>
@@ -363,7 +365,7 @@ export default function CompanyProposalsDashboard() {
                   <div>
                     <h4 className="text-sm font-medium mb-2">Descrizione del candidato:</h4>
                     <p className="text-sm text-muted-foreground">
-                      {proposal.proposal_description}
+                      {proposal.proposal_description || "Nessuna descrizione fornita"}
                     </p>
                   </div>
 
@@ -414,24 +416,30 @@ export default function CompanyProposalsDashboard() {
                             Disponibile in: {proposal.availability_weeks} settimane
                           </div>
                         )}
-                        <div>Fee recruiter: {proposal.recruiter_fee_percentage}%</div>
+                        {proposal.recruiter_fee_percentage && (
+                          <div>Fee recruiter: {proposal.recruiter_fee_percentage}%</div>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  <div className="border-t pt-4">
-                    <h4 className="text-sm font-medium mb-2">Contatti Recruiter:</h4>
-                    <div className="flex items-center gap-4 text-sm">
-                      <a href={`mailto:${proposal.recruiter_registrations.email}`} className="text-blue-600 hover:underline">
-                        {proposal.recruiter_registrations.email}
-                      </a>
-                      {proposal.recruiter_registrations.telefono && (
-                        <a href={`tel:${proposal.recruiter_registrations.telefono}`} className="text-blue-600 hover:underline">
-                          {proposal.recruiter_registrations.telefono}
-                        </a>
-                      )}
+                  {(proposal.recruiter_name || proposal.recruiter_email) && (
+                    <div className="border-t pt-4">
+                      <h4 className="text-sm font-medium mb-2">Contatti Recruiter:</h4>
+                      <div className="flex items-center gap-4 text-sm">
+                        {proposal.recruiter_email && (
+                          <a href={`mailto:${proposal.recruiter_email}`} className="text-blue-600 hover:underline">
+                            {proposal.recruiter_email}
+                          </a>
+                        )}
+                        {proposal.recruiter_phone && (
+                          <a href={`tel:${proposal.recruiter_phone}`} className="text-blue-600 hover:underline">
+                            {proposal.recruiter_phone}
+                          </a>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {proposal.status === "pending" && (
                     <div className="flex items-center gap-2 pt-4 border-t">

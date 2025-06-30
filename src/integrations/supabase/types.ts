@@ -164,13 +164,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "proposal_responses_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "company_registrations"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "proposal_responses_proposal_id_fkey"
             columns: ["proposal_id"]
             isOneToOne: false

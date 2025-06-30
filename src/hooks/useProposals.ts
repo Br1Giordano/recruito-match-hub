@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -90,23 +91,43 @@ export function useProposals() {
   };
 
   const updateProposalStatus = async (proposalId: string, newStatus: string) => {
-    const { error } = await supabase
-      .from("proposals")
-      .update({ status: newStatus })
-      .eq("id", proposalId);
+    console.log('Updating proposal status:', { proposalId, newStatus, userEmail: user?.email });
+    
+    try {
+      const { data, error } = await supabase
+        .from("proposals")
+        .update({ status: newStatus })
+        .eq("id", proposalId)
+        .select();
 
-    if (error) {
+      console.log('Update result:', { data, error });
+
+      if (error) {
+        console.error('Supabase error:', error);
+        toast({
+          title: "Errore",
+          description: `Impossibile aggiornare lo stato della proposta: ${error.message}`,
+          variant: "destructive",
+        });
+        return false;
+      } else {
+        console.log('Proposal status updated successfully');
+        toast({
+          title: "Successo",
+          description: "Stato della proposta aggiornato",
+        });
+        fetchProposals();
+        return true;
+      }
+    } catch (error) {
+      console.error('Unexpected error during update:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto';
       toast({
         title: "Errore",
-        description: "Impossibile aggiornare lo stato della proposta",
+        description: `Errore imprevisto: ${errorMessage}`,
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Successo",
-        description: "Stato della proposta aggiornato",
-      });
-      fetchProposals();
+      return false;
     }
   };
 
@@ -135,7 +156,7 @@ export function useProposals() {
         title: "Successo",
         description: "Risposta inviata al recruiter",
       });
-      updateProposalStatus(proposalId, status === "interested" ? "under_review" : "rejected");
+      updateProposalStatus(proposalId, status === "interested" ? "interested" : "rejected");
     }
   };
 

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -26,11 +27,6 @@ interface Proposal {
   };
 }
 
-// Funzione per validare e sanitizzare input
-const sanitizeInput = (input: string): string => {
-  return input.replace(/[<>\"']/g, '');
-};
-
 export function useProposals() {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,18 +35,16 @@ export function useProposals() {
 
   const fetchProposals = async () => {
     if (!user?.email) {
-      console.log('User email not available - authentication required');
+      console.log('User email not available');
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
     
-    console.log('Fetching proposals for company user:', user.email);
+    console.log('Fetching proposals for user email:', user.email);
 
     try {
-      // Direttamente query delle proposte con le nuove RLS policy
-      // Le policy ora filtrano automaticamente usando auth.email()
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
@@ -59,8 +53,6 @@ export function useProposals() {
         `)
         .order("created_at", { ascending: false });
 
-      console.log('Direct proposals query result:', { data: proposalsData, error: proposalsError });
-
       if (proposalsError) {
         console.error('Error fetching proposals:', proposalsError);
         toast({
@@ -68,20 +60,22 @@ export function useProposals() {
           description: `Errore nel caricamento delle proposte: ${proposalsError.message}`,
           variant: "destructive",
         });
-        setProposals([]);
-      } else {
-        const userProposals = proposalsData || [];
-        console.log('Loaded proposals with RLS filtering:', userProposals.length);
-        setProposals(userProposals);
-        
-        if (userProposals.length > 0) {
-          toast({
-            title: "Successo",
-            description: `Trovate ${userProposals.length} proposte`,
-          });
-        } else {
-          console.log('No proposals found - this might be normal if no proposals were sent to your job offers');
-        }
+        return;
+      }
+
+      const userProposals = (proposalsData || []).filter(proposal => 
+        proposal.job_offers?.contact_email === user.email
+      );
+      
+      console.log('All proposals:', proposalsData?.length);
+      console.log('Filtered user proposals:', userProposals.length);
+      setProposals(userProposals);
+      
+      if (userProposals.length > 0) {
+        toast({
+          title: "Successo",
+          description: `Trovate ${userProposals.length} proposte`,
+        });
       }
     } catch (error) {
       console.error('Unexpected error:', error);
@@ -97,34 +91,12 @@ export function useProposals() {
   };
 
   const updateProposalStatus = async (proposalId: string, newStatus: string) => {
-    if (!user?.email) {
-      toast({
-        title: "Errore",
-        description: "Devi essere autenticato per aggiornare le proposte",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    // Validazione input
-    const sanitizedStatus = sanitizeInput(newStatus);
-    const validStatuses = ['pending', 'under_review', 'approved', 'rejected', 'hired'];
-    
-    if (!validStatuses.includes(sanitizedStatus)) {
-      toast({
-        title: "Errore",
-        description: "Stato non valido",
-        variant: "destructive",
-      });
-      return false;
-    }
-
-    console.log('Updating proposal status:', { proposalId, newStatus: sanitizedStatus, userEmail: user.email });
+    console.log('Updating proposal status:', { proposalId, newStatus, userEmail: user?.email });
     
     try {
       const { data, error } = await supabase
         .from("proposals")
-        .update({ status: sanitizedStatus })
+        .update({ status: newStatus })
         .eq("id", proposalId)
         .select();
 
@@ -160,112 +132,59 @@ export function useProposals() {
   };
 
   const sendResponse = async (proposalId: string, status: string, responseMessage: string) => {
-    if (!user) {
-      toast({
-        title: "Errore",
-        description: "Devi essere autenticato per inviare risposte",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Validazione e sanitizzazione input
-    const sanitizedStatus = sanitizeInput(status);
-    const sanitizedMessage = sanitizeInput(responseMessage);
-    
-    if (!sanitizedStatus || !sanitizedMessage.trim()) {
-      toast({
-        title: "Errore",
-        description: "Tutti i campi sono obbligatori",
-        variant: "destructive",
-      });
-      return;
-    }
+    if (!user) return;
 
     const companyIdentifier = user.email;
 
-    try {
-      const { error } = await supabase
-        .from("proposal_responses")
-        .insert([{
-          proposal_id: proposalId,
-          company_id: companyIdentifier,
-          status: sanitizedStatus,
-          response_message: sanitizedMessage,
-        }]);
+    const { error } = await supabase
+      .from("proposal_responses")
+      .insert([{
+        proposal_id: proposalId,
+        company_id: companyIdentifier,
+        status: status,
+        response_message: responseMessage,
+      }]);
 
-      if (error) {
-        console.error('Error sending response:', error);
-        toast({
-          title: "Errore",
-          description: "Impossibile inviare la risposta",
-          variant: "destructive",
-        });
-      } else {
-        console.log('Response sent successfully');
-        toast({
-          title: "Successo",
-          description: "Risposta inviata al recruiter",
-        });
-        // Aggiorna lo stato della proposta
-        updateProposalStatus(proposalId, sanitizedStatus === "interested" ? "under_review" : "rejected");
-      }
-    } catch (error) {
-      console.error('Unexpected error sending response:', error);
+    if (error) {
       toast({
         title: "Errore",
-        description: "Errore imprevisto durante l'invio della risposta",
+        description: "Impossibile inviare la risposta",
         variant: "destructive",
       });
+    } else {
+      toast({
+        title: "Successo",
+        description: "Risposta inviata al recruiter",
+      });
+      // Updated to use "under_review" instead of "interested" since that's what the database accepts
+      updateProposalStatus(proposalId, status === "interested" ? "under_review" : "rejected");
     }
   };
 
   const deleteProposal = async (proposalId: string) => {
-    if (!user) {
+    const { error } = await supabase
+      .from("proposals")
+      .delete()
+      .eq("id", proposalId);
+
+    if (error) {
       toast({
         title: "Errore",
-        description: "Devi essere autenticato per eliminare proposte",
+        description: "Impossibile eliminare la proposta",
         variant: "destructive",
       });
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-        .from("proposals")
-        .delete()
-        .eq("id", proposalId);
-
-      if (error) {
-        console.error('Error deleting proposal:', error);
-        toast({
-          title: "Errore",
-          description: "Impossibile eliminare la proposta",
-          variant: "destructive",
-        });
-      } else {
-        console.log('Proposal deleted successfully');
-        toast({
-          title: "Successo",
-          description: "Proposta eliminata con successo",
-        });
-        fetchProposals();
-      }
-    } catch (error) {
-      console.error('Unexpected error deleting proposal:', error);
+    } else {
       toast({
-        title: "Errore",
-        description: "Errore imprevisto durante l'eliminazione",
-        variant: "destructive",
+        title: "Successo",
+        description: "Proposta eliminata con successo",
       });
+      fetchProposals();
     }
   };
 
   useEffect(() => {
     if (user?.email) {
       fetchProposals();
-    } else {
-      setIsLoading(false);
     }
   }, [user?.email]);
 

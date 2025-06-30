@@ -187,7 +187,7 @@ export type Database = {
           candidate_linkedin: string | null
           candidate_name: string
           candidate_phone: string | null
-          company_id: string
+          company_id: string | null
           created_at: string
           current_salary: number | null
           expected_salary: number | null
@@ -211,7 +211,7 @@ export type Database = {
           candidate_linkedin?: string | null
           candidate_name: string
           candidate_phone?: string | null
-          company_id: string
+          company_id?: string | null
           created_at?: string
           current_salary?: number | null
           expected_salary?: number | null
@@ -235,7 +235,7 @@ export type Database = {
           candidate_linkedin?: string | null
           candidate_name?: string
           candidate_phone?: string | null
-          company_id?: string
+          company_id?: string | null
           created_at?: string
           current_salary?: number | null
           expected_salary?: number | null
@@ -253,13 +253,6 @@ export type Database = {
           years_experience?: number | null
         }
         Relationships: [
-          {
-            foreignKeyName: "proposals_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "company_registrations"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "proposals_job_offer_id_fkey"
             columns: ["job_offer_id"]

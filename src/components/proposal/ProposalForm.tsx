@@ -60,57 +60,8 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
     setIsSubmitting(true);
 
     try {
-      // Controlliamo se l'offerta ha un company_id esistente
-      let targetCompanyId = jobOffer.company_id;
-      
-      // Se non ha un company_id, proviamo a trovarne uno basato sull'email
-      if (!targetCompanyId && jobOffer.contact_email) {
-        console.log('Cercando azienda esistente con email:', jobOffer.contact_email);
-        
-        const { data: existingCompany } = await supabase
-          .from("company_registrations")
-          .select("id")
-          .eq("email", jobOffer.contact_email)
-          .single();
-        
-        if (existingCompany) {
-          targetCompanyId = existingCompany.id;
-          console.log('Trovata azienda esistente:', targetCompanyId);
-        }
-      }
-
-      // Se ancora non abbiamo un company_id, creiamo una voce temporanea
-      if (!targetCompanyId) {
-        console.log('Creando azienda temporanea per email:', jobOffer.contact_email);
-        
-        const { data: newCompany, error: companyError } = await supabase
-          .from("company_registrations")
-          .insert({
-            nome_azienda: jobOffer.company_name || "Azienda",
-            email: jobOffer.contact_email || "",
-            status: 'temp'
-          })
-          .select("id")
-          .single();
-
-        if (companyError) {
-          console.error('Errore creazione azienda:', companyError);
-          // Se fallisce la creazione dell'azienda, usiamo un approccio alternativo
-          // Generiamo un UUID fittizio e procediamo
-          targetCompanyId = crypto.randomUUID();
-        } else {
-          targetCompanyId = newCompany.id;
-        }
-      }
-
-      if (!targetCompanyId) {
-        toast({
-          title: "Errore",
-          description: "Impossibile identificare l'azienda per questa offerta",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Ora che abbiamo rimosso il constraint, usiamo semplicemente l'ID dell'offerta o un valore di fallback
+      const targetCompanyId = jobOffer.company_id || jobOffer.id;
 
       const proposalData = {
         company_id: targetCompanyId,

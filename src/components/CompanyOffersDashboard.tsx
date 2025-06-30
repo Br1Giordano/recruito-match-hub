@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2, Pause } from "lucide-react";
+import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2, Pause, Play } from "lucide-react";
 import JobOfferForm from "./JobOfferForm";
 import { Database } from "@/integrations/supabase/types";
 
@@ -125,6 +126,37 @@ export default function CompanyOffersDashboard() {
       toast({
         title: "Errore",
         description: "Errore durante la disattivazione dell'offerta",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleReactivateOffer = async (offerId: string, offerTitle: string) => {
+    try {
+      const { error } = await supabase
+        .from('job_offers')
+        .update({ status: 'active' })
+        .eq('id', offerId);
+
+      if (error) {
+        console.error('Error reactivating job offer:', error);
+        toast({
+          title: "Errore",
+          description: "Impossibile riattivare l'offerta di lavoro",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Successo",
+          description: `Offerta "${offerTitle}" riattivata con successo`,
+        });
+        fetchJobOffers(); // Refresh the list
+      }
+    } catch (error) {
+      console.error('Error reactivating job offer:', error);
+      toast({
+        title: "Errore",
+        description: "Errore durante la riattivazione dell'offerta",
         variant: "destructive",
       });
     }
@@ -424,6 +456,17 @@ export default function CompanyOffersDashboard() {
                         >
                           <Pause className="h-4 w-4 mr-2" />
                           Disattiva
+                        </Button>
+                      )}
+                      {offer.status === 'paused' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleReactivateOffer(offer.id, offer.title)}
+                          className="border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
+                        >
+                          <Play className="h-4 w-4 mr-2" />
+                          Riattiva
                         </Button>
                       )}
                       {isAdmin && (

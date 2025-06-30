@@ -18,11 +18,10 @@ interface RecruiterProposal {
   recruiter_fee_percentage?: number;
   status: string;
   created_at: string;
-  company_registrations?: {
-    nome_azienda: string;
-  } | null;
+  company_id?: string;
   job_offers?: {
     title: string;
+    company_name?: string;
   };
 }
 
@@ -35,23 +34,23 @@ export function useRecruiterProposals() {
   const fetchProposals = async () => {
     setIsLoading(true);
 
-    console.log('Fetching all proposals for recruiter view');
+    console.log('Fetching proposals for recruiter:', user?.email);
 
     try {
       const { data, error } = await supabase
         .from("proposals")
         .select(`
           *,
-          company_registrations(nome_azienda),
-          job_offers(title)
+          job_offers(title, company_name)
         `)
+        .eq("recruiter_email", user?.email)
         .order("created_at", { ascending: false });
 
-      console.log('Proposals data:', data);
-      console.log('Proposals error:', error);
+      console.log('Recruiter proposals data:', data);
+      console.log('Recruiter proposals error:', error);
 
       if (error) {
-        console.error("Error fetching proposals:", error);
+        console.error("Error fetching recruiter proposals:", error);
         toast({
           title: "Errore",
           description: `Errore nel caricamento delle proposte: ${error.message}`,
@@ -59,21 +58,8 @@ export function useRecruiterProposals() {
         });
         setProposals([]);
       } else {
-        const transformedData = (data || []).map(proposal => ({
-          ...proposal,
-          company_registrations: Array.isArray(proposal.company_registrations) 
-            ? proposal.company_registrations[0] || null
-            : proposal.company_registrations
-        }));
-        
-        // Se l'utente è un recruiter autenticato, filtra per le sue proposte
-        let filteredProposals = transformedData;
-        if (user && userProfile?.user_type === 'recruiter') {
-          // Qui potresti filtrare per recruiter_id se necessario
-          // filteredProposals = transformedData.filter(p => p.recruiter_id === userProfile.registration_id);
-        }
-        
-        setProposals(filteredProposals);
+        setProposals(data || []);
+        console.log(`Trovate ${data?.length || 0} proposte per il recruiter`);
       }
     } catch (error) {
       console.error('Unexpected error:', error);
@@ -89,8 +75,10 @@ export function useRecruiterProposals() {
   };
 
   useEffect(() => {
-    fetchProposals();
-  }, [user, userProfile]);
+    if (user?.email) {
+      fetchProposals();
+    }
+  }, [user?.email]);
 
   return {
     proposals,

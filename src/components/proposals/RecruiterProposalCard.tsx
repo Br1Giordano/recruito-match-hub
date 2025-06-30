@@ -15,11 +15,9 @@ interface RecruiterProposalCardProps {
     recruiter_fee_percentage?: number;
     status: string;
     created_at: string;
-    company_registrations?: {
-      nome_azienda: string;
-    } | null;
     job_offers?: {
       title: string;
+      company_name?: string;
     };
   };
 }
@@ -70,7 +68,7 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
             </CardTitle>
             <CardDescription className="flex items-center gap-2 mt-1">
               <Building2 className="h-4 w-4" />
-              {proposal.company_registrations?.nome_azienda || "Azienda"}
+              {proposal.job_offers?.company_name || "Azienda"}
               {proposal.job_offers?.title && (
                 <>
                   <span>•</span>

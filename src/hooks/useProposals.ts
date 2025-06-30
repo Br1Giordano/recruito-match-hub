@@ -156,7 +156,8 @@ export function useProposals() {
         title: "Successo",
         description: "Risposta inviata al recruiter",
       });
-      updateProposalStatus(proposalId, status === "interested" ? "interested" : "rejected");
+      // Updated to use "under_review" instead of "interested" since that's what the database accepts
+      updateProposalStatus(proposalId, status === "interested" ? "under_review" : "rejected");
     }
   };
 

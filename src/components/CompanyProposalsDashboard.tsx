@@ -19,10 +19,10 @@ export default function CompanyProposalsDashboard() {
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
 
-  // Raggruppa le proposte per stato
+  // Raggruppa le proposte per stato - under_review ora rappresenta "interessato"
   const pendingProposals = proposals.filter(p => p.status === "pending");
-  const interestedProposals = proposals.filter(p => p.status === "interested");
-  const otherProposals = proposals.filter(p => !["pending", "interested"].includes(p.status));
+  const interestedProposals = proposals.filter(p => p.status === "under_review"); // Changed from "interested" to "under_review"
+  const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status)); // Updated to exclude "under_review"
 
   useEffect(() => {
     let currentProposals = [];

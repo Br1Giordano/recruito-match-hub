@@ -40,10 +40,8 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
     switch (status) {
       case "pending":
         return "bg-yellow-100 text-yellow-800";
-      case "interested":
-        return "bg-green-100 text-green-800";
       case "under_review":
-        return "bg-blue-100 text-blue-800";
+        return "bg-green-100 text-green-800"; // Changed to green for "interested" proposals
       case "approved":
         return "bg-green-100 text-green-800";
       case "rejected":
@@ -59,10 +57,8 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
     switch (status) {
       case "pending":
         return "In Attesa";
-      case "interested":
-        return "Interessato";
       case "under_review":
-        return "In Revisione";
+        return "Interessato"; // Changed to show "Interessato" for under_review status
       case "approved":
         return "Approvata";
       case "rejected":
@@ -204,7 +200,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => onStatusUpdate(proposal.id, "interested")}
+                onClick={() => onStatusUpdate(proposal.id, "under_review")}
                 className="text-green-600 border-green-600 hover:bg-green-50"
               >
                 <Check className="h-4 w-4 mr-2" />
@@ -218,15 +214,6 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
               >
                 <X className="h-4 w-4 mr-2" />
                 Non Interessato
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onStatusUpdate(proposal.id, "under_review")}
-                className="text-blue-600 border-blue-600 hover:bg-blue-50"
-              >
-                <Clock className="h-4 w-4 mr-2" />
-                In Revisione
               </Button>
             </div>
           )}

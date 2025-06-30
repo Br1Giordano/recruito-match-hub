@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2 } from "lucide-react";
+import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2, Pause } from "lucide-react";
 import JobOfferForm from "./JobOfferForm";
 import { Database } from "@/integrations/supabase/types";
 
@@ -97,6 +97,37 @@ export default function CompanyOffersDashboard() {
   const handleNewOfferSuccess = () => {
     setShowNewOfferForm(false);
     fetchJobOffers(); // Refresh the list
+  };
+
+  const handleDeactivateOffer = async (offerId: string, offerTitle: string) => {
+    try {
+      const { error } = await supabase
+        .from('job_offers')
+        .update({ status: 'paused' })
+        .eq('id', offerId);
+
+      if (error) {
+        console.error('Error deactivating job offer:', error);
+        toast({
+          title: "Errore",
+          description: "Impossibile disattivare l'offerta di lavoro",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Successo",
+          description: `Offerta "${offerTitle}" disattivata con successo`,
+        });
+        fetchJobOffers(); // Refresh the list
+      }
+    } catch (error) {
+      console.error('Error deactivating job offer:', error);
+      toast({
+        title: "Errore",
+        description: "Errore durante la disattivazione dell'offerta",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleDeleteOffer = async (offerId: string, offerTitle: string) => {
@@ -384,6 +415,17 @@ export default function CompanyOffersDashboard() {
                         <Edit className="h-4 w-4 mr-2" />
                         Modifica
                       </Button>
+                      {offer.status === 'active' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => handleDeactivateOffer(offer.id, offer.title)}
+                          className="border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-300"
+                        >
+                          <Pause className="h-4 w-4 mr-2" />
+                          Disattiva
+                        </Button>
+                      )}
                       {isAdmin && (
                         <Button 
                           variant="outline" 

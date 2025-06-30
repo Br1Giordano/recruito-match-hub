@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -140,6 +139,27 @@ export function useProposals() {
     }
   };
 
+  const deleteProposal = async (proposalId: string) => {
+    const { error } = await supabase
+      .from("proposals")
+      .delete()
+      .eq("id", proposalId);
+
+    if (error) {
+      toast({
+        title: "Errore",
+        description: "Impossibile eliminare la proposta",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Successo",
+        description: "Proposta eliminata con successo",
+      });
+      fetchProposals();
+    }
+  };
+
   useEffect(() => {
     if (user?.email) {
       fetchProposals();
@@ -151,6 +171,7 @@ export function useProposals() {
     isLoading,
     fetchProposals,
     updateProposalStatus,
-    sendResponse
+    sendResponse,
+    deleteProposal
   };
 }

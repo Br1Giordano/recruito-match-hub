@@ -1,23 +1,49 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProposals } from "@/hooks/useProposals";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 import ProposalFilters from "./proposals/ProposalFilters";
 import ProposalCard from "./proposals/ProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
+import ProposalTabs from "./proposals/ProposalTabs";
 
 export default function CompanyProposalsDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [activeTab, setActiveTab] = useState("pending");
   const [filteredProposals, setFilteredProposals] = useState<any[]>([]);
   const { user } = useAuth();
-  const { proposals, isLoading, updateProposalStatus, sendResponse } = useProposals();
+  const { isAdmin } = useAdminCheck();
+  const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
+
+  // Raggruppa le proposte per stato
+  const pendingProposals = proposals.filter(p => p.status === "pending");
+  const interestedProposals = proposals.filter(p => p.status === "under_review");
+  const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status));
 
   useEffect(() => {
-    let filtered = proposals;
+    let currentProposals = [];
+    
+    // Seleziona le proposte in base alla tab attiva
+    switch (activeTab) {
+      case "pending":
+        currentProposals = pendingProposals;
+        break;
+      case "interested":
+        currentProposals = interestedProposals;
+        break;
+      case "other":
+        currentProposals = otherProposals;
+        break;
+      default:
+        currentProposals = proposals;
+    }
 
+    let filtered = currentProposals;
+
+    // Applica i filtri di ricerca
     if (searchTerm) {
       filtered = filtered.filter(
         (proposal) =>
@@ -27,12 +53,22 @@ export default function CompanyProposalsDashboard() {
       );
     }
 
-    if (statusFilter !== "all") {
+    // Applica i filtri di stato solo se non siamo in una tab specifica
+    if (statusFilter !== "all" && activeTab === "pending") {
       filtered = filtered.filter((proposal) => proposal.status === statusFilter);
     }
 
     setFilteredProposals(filtered);
-  }, [searchTerm, statusFilter, proposals]);
+  }, [searchTerm, statusFilter, proposals, activeTab, pendingProposals, interestedProposals, otherProposals]);
+
+  const handleDeleteProposal = async (proposalId: string) => {
+    if (!isAdmin) return;
+    
+    const confirmed = window.confirm("Sei sicuro di voler eliminare questa proposta? Questa azione non può essere annullata.");
+    if (confirmed && deleteProposal) {
+      await deleteProposal(proposalId);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -67,6 +103,47 @@ export default function CompanyProposalsDashboard() {
     );
   }
 
+  const renderProposals = (proposalsToRender: any[], tabStatus: string) => {
+    if (proposalsToRender.length === 0) {
+      let emptyMessage = "";
+      switch (tabStatus) {
+        case "pending":
+          emptyMessage = "Non ci sono nuove proposte in attesa";
+          break;
+        case "interested":
+          emptyMessage = "Non hai ancora mostrato interesse per nessuna proposta";
+          break;
+        case "other":
+          emptyMessage = "Non ci sono altre proposte";
+          break;
+      }
+      
+      return (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">{emptyMessage}</p>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <div className="grid gap-6">
+        {proposalsToRender.map((proposal) => (
+          <ProposalCard
+            key={proposal.id}
+            proposal={proposal}
+            onStatusUpdate={updateProposalStatus}
+            onSendResponse={sendResponse}
+            onDelete={isAdmin ? handleDeleteProposal : undefined}
+          />
+        ))}
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -87,20 +164,14 @@ export default function CompanyProposalsDashboard() {
         </CardContent>
       </Card>
 
-      <div className="grid gap-6">
-        {filteredProposals.length === 0 ? (
-          <EmptyProposalsState type="company" hasProposals={proposals.length > 0} />
-        ) : (
-          filteredProposals.map((proposal) => (
-            <ProposalCard
-              key={proposal.id}
-              proposal={proposal}
-              onStatusUpdate={updateProposalStatus}
-              onSendResponse={sendResponse}
-            />
-          ))
-        )}
-      </div>
+      <ProposalTabs
+        pendingProposals={pendingProposals}
+        interestedProposals={interestedProposals}
+        otherProposals={otherProposals}
+        onTabChange={setActiveTab}
+      >
+        {renderProposals}
+      </ProposalTabs>
     </div>
   );
 }

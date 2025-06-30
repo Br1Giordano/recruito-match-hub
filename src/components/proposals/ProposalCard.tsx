@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, X, Clock, Mail, Phone, Linkedin, Euro, Calendar, User } from "lucide-react";
+import { Check, X, Clock, Mail, Phone, Linkedin, Euro, Calendar, User, Trash2 } from "lucide-react";
 import { useState } from "react";
 
 interface ProposalCardProps {
@@ -29,9 +29,10 @@ interface ProposalCardProps {
   };
   onStatusUpdate: (proposalId: string, status: string) => void;
   onSendResponse: (proposalId: string, status: string, message: string) => void;
+  onDelete?: (proposalId: string) => void;
 }
 
-export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse }: ProposalCardProps) {
+export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseMessage, setResponseMessage] = useState("");
 
@@ -96,9 +97,21 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse 
               )}
             </CardDescription>
           </div>
-          <Badge className={getStatusColor(proposal.status)}>
-            {getStatusText(proposal.status)}
-          </Badge>
+          <div className="flex items-center gap-2">
+            <Badge className={getStatusColor(proposal.status)}>
+              {getStatusText(proposal.status)}
+            </Badge>
+            {onDelete && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onDelete(proposal.id)}
+                className="text-red-600 border-red-600 hover:bg-red-50"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
       <CardContent>

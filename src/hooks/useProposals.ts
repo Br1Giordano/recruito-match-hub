@@ -45,6 +45,7 @@ export function useProposals() {
     console.log('Fetching proposals for user email:', user.email);
 
     try {
+      // Ora che RLS è disabilitato, possiamo fare una query diretta
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
@@ -63,6 +64,7 @@ export function useProposals() {
         return;
       }
 
+      // Filtriamo le proposte per l'utente corrente basandoci sulla email di contatto dell'offerta di lavoro
       const userProposals = (proposalsData || []).filter(proposal => 
         proposal.job_offers?.contact_email === user.email
       );

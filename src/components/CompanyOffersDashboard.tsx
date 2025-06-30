@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2, Pause, Play } from "lucide-react";
 import JobOfferForm from "./JobOfferForm";
+import JobOfferEditForm from "./JobOfferEditForm";
 import { Database } from "@/integrations/supabase/types";
 
 type CompanyJobOffer = Database['public']['Tables']['job_offers']['Row'];
@@ -22,6 +22,7 @@ export default function CompanyOffersDashboard() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [showNewOfferForm, setShowNewOfferForm] = useState(false);
+  const [editingOffer, setEditingOffer] = useState<CompanyJobOffer | null>(null);
   const { toast } = useToast();
   const { userProfile, user } = useAuth();
   const { isAdmin } = useAdminCheck();
@@ -98,6 +99,15 @@ export default function CompanyOffersDashboard() {
   const handleNewOfferSuccess = () => {
     setShowNewOfferForm(false);
     fetchJobOffers(); // Refresh the list
+  };
+
+  const handleEditOfferSuccess = () => {
+    setEditingOffer(null);
+    fetchJobOffers(); // Refresh the list
+  };
+
+  const handleEditOffer = (offer: CompanyJobOffer) => {
+    setEditingOffer(offer);
   };
 
   const handleDeactivateOffer = async (offerId: string, offerTitle: string) => {
@@ -252,6 +262,16 @@ export default function CompanyOffersDashboard() {
       <JobOfferForm 
         onBack={() => setShowNewOfferForm(false)}
         onSuccess={handleNewOfferSuccess}
+      />
+    );
+  }
+
+  if (editingOffer) {
+    return (
+      <JobOfferEditForm 
+        offer={editingOffer}
+        onBack={() => setEditingOffer(null)}
+        onSuccess={handleEditOfferSuccess}
       />
     );
   }
@@ -443,7 +463,11 @@ export default function CompanyOffersDashboard() {
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleEditOffer(offer)}
+                      >
                         <Edit className="h-4 w-4 mr-2" />
                         Modifica
                       </Button>

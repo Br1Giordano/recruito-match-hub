@@ -36,6 +36,7 @@ export function useProposals() {
   const fetchProposals = async () => {
     if (!user?.email) {
       console.log('User email not available');
+      setProposals([]);
       setIsLoading(false);
       return;
     }
@@ -45,7 +46,7 @@ export function useProposals() {
     console.log('Fetching proposals for user email:', user.email);
 
     try {
-      // Ora che RLS è disabilitato, possiamo fare una query diretta
+      // Query diretta senza RLS - ora completamente disabilitato
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
@@ -61,6 +62,7 @@ export function useProposals() {
           description: `Errore nel caricamento delle proposte: ${proposalsError.message}`,
           variant: "destructive",
         });
+        setProposals([]);
         return;
       }
 
@@ -69,16 +71,10 @@ export function useProposals() {
         proposal.job_offers?.contact_email === user.email
       );
       
-      console.log('All proposals:', proposalsData?.length);
+      console.log('All proposals:', proposalsData?.length || 0);
       console.log('Filtered user proposals:', userProposals.length);
       setProposals(userProposals);
       
-      if (userProposals.length > 0) {
-        toast({
-          title: "Successo",
-          description: `Trovate ${userProposals.length} proposte`,
-        });
-      }
     } catch (error) {
       console.error('Unexpected error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto';
@@ -87,6 +83,7 @@ export function useProposals() {
         description: `Si è verificato un errore imprevisto: ${errorMessage}`,
         variant: "destructive",
       });
+      setProposals([]);
     } finally {
       setIsLoading(false);
     }
@@ -187,6 +184,9 @@ export function useProposals() {
   useEffect(() => {
     if (user?.email) {
       fetchProposals();
+    } else {
+      setProposals([]);
+      setIsLoading(false);
     }
   }, [user?.email]);
 

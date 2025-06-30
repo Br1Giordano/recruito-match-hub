@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -14,29 +14,33 @@ export default function CompanyProposalsDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("pending");
-  const [filteredProposals, setFilteredProposals] = useState<any[]>([]);
   const { user } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
 
-  // Raggruppa le proposte per stato - under_review ora rappresenta "interessato"
-  const pendingProposals = proposals.filter(p => p.status === "pending");
-  const interestedProposals = proposals.filter(p => p.status === "under_review"); // Changed from "interested" to "under_review"
-  const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status)); // Updated to exclude "under_review"
+  // Memoizza i raggruppamenti delle proposte per evitare ricalcoli inutili
+  const groupedProposals = useMemo(() => {
+    const pendingProposals = proposals.filter(p => p.status === "pending");
+    const interestedProposals = proposals.filter(p => p.status === "under_review");
+    const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status));
+    
+    return { pendingProposals, interestedProposals, otherProposals };
+  }, [proposals]);
 
-  useEffect(() => {
+  // Memoizza le proposte filtrate per evitare ricalcoli ad ogni render
+  const filteredProposals = useMemo(() => {
     let currentProposals = [];
     
     // Seleziona le proposte in base alla tab attiva
     switch (activeTab) {
       case "pending":
-        currentProposals = pendingProposals;
+        currentProposals = groupedProposals.pendingProposals;
         break;
       case "interested":
-        currentProposals = interestedProposals;
+        currentProposals = groupedProposals.interestedProposals;
         break;
       case "other":
-        currentProposals = otherProposals;
+        currentProposals = groupedProposals.otherProposals;
         break;
       default:
         currentProposals = proposals;
@@ -59,8 +63,8 @@ export default function CompanyProposalsDashboard() {
       filtered = filtered.filter((proposal) => proposal.status === statusFilter);
     }
 
-    setFilteredProposals(filtered);
-  }, [searchTerm, statusFilter, proposals, activeTab, pendingProposals, interestedProposals, otherProposals]);
+    return filtered;
+  }, [searchTerm, statusFilter, activeTab, groupedProposals, proposals]);
 
   const handleDeleteProposal = async (proposalId: string) => {
     if (!isAdmin) return;
@@ -166,9 +170,9 @@ export default function CompanyProposalsDashboard() {
       </Card>
 
       <ProposalTabs
-        pendingProposals={pendingProposals}
-        interestedProposals={interestedProposals}
-        otherProposals={otherProposals}
+        pendingProposals={groupedProposals.pendingProposals}
+        interestedProposals={groupedProposals.interestedProposals}
+        otherProposals={groupedProposals.otherProposals}
         onTabChange={setActiveTab}
       >
         {renderProposals}

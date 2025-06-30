@@ -41,60 +41,30 @@ export default function CompanyProposalsDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [respondingTo, setRespondingTo] = useState<string | null>(null);
   const [responseMessage, setResponseMessage] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  const { user, userProfile } = useAuth();
+  const { user } = useAuth();
 
   const fetchProposals = async () => {
-    setIsLoading(true);
-
     if (!user) {
       console.log('User not authenticated');
       setIsLoading(false);
       return;
     }
 
+    setIsLoading(true);
+    setError(null);
+    
     console.log('Fetching proposals for user email:', user.email);
 
     try {
-      // Primo: cerchiamo le job offers dell'utente usando l'email
-      const { data: userJobOffers, error: jobOffersError } = await supabase
-        .from("job_offers")
-        .select("id, title, contact_email")
-        .eq("contact_email", user.email);
-
-      console.log('User job offers:', userJobOffers);
-      console.log('Job offers error:', jobOffersError);
-
-      if (jobOffersError) {
-        console.error('Error fetching user job offers:', jobOffersError);
-        toast({
-          title: "Errore",
-          description: "Impossibile recuperare le offerte di lavoro",
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      if (!userJobOffers || userJobOffers.length === 0) {
-        console.log('No job offers found for user');
-        setProposals([]);
-        setFilteredProposals([]);
-        setIsLoading(false);
-        return;
-      }
-
-      const jobOfferIds = userJobOffers.map(offer => offer.id);
-      console.log('Job offer IDs:', jobOfferIds);
-
-      // Secondo: cerchiamo le proposte per questi job offers
+      // Query diretta per le proposte con join alle job offers
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
           *,
           job_offers(title, contact_email)
         `)
-        .in("job_offer_id", jobOfferIds)
         .order("created_at", { ascending: false });
 
       console.log('Proposals data:', proposalsData);
@@ -102,26 +72,33 @@ export default function CompanyProposalsDashboard() {
 
       if (proposalsError) {
         console.error('Error fetching proposals:', proposalsError);
+        setError(`Errore nel caricamento delle proposte: ${proposalsError.message}`);
         toast({
           title: "Errore",
           description: "Impossibile caricare le proposte: " + proposalsError.message,
           variant: "destructive",
         });
-        setProposals([]);
-        setFilteredProposals([]);
       } else {
-        setProposals(proposalsData || []);
-        setFilteredProposals(proposalsData || []);
+        // Filtra le proposte per le job offers dell'utente
+        const userProposals = (proposalsData || []).filter(proposal => 
+          proposal.job_offers?.contact_email === user.email
+        );
         
-        if (proposalsData && proposalsData.length > 0) {
+        console.log('Filtered user proposals:', userProposals);
+        setProposals(userProposals);
+        setFilteredProposals(userProposals);
+        
+        if (userProposals.length > 0) {
           toast({
             title: "Successo",
-            description: `Trovate ${proposalsData.length} proposte`,
+            description: `Trovate ${userProposals.length} proposte`,
           });
         }
       }
     } catch (error) {
       console.error('Unexpected error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto';
+      setError(`Si è verificato un errore imprevisto: ${errorMessage}`);
       toast({
         title: "Errore",
         description: "Si è verificato un errore imprevisto",
@@ -136,7 +113,7 @@ export default function CompanyProposalsDashboard() {
     if (user) {
       fetchProposals();
     }
-  }, [user, userProfile]);
+  }, [user]);
 
   useEffect(() => {
     let filtered = proposals;
@@ -181,7 +158,7 @@ export default function CompanyProposalsDashboard() {
   const sendResponse = async (proposalId: string, status: string) => {
     if (!user) return;
 
-    const companyIdentifier = userProfile?.registration_id || user.email;
+    const companyIdentifier = user.email;
 
     const { error } = await supabase
       .from("proposal_responses")
@@ -269,6 +246,30 @@ export default function CompanyProposalsDashboard() {
               <p className="text-muted-foreground">
                 Devi essere autenticato come azienda per visualizzare le proposte.
               </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Proposte Ricevute</h1>
+          <p className="text-muted-foreground">
+            Revisiona e gestisci le proposte inviate dai recruiter
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            <div className="text-center py-8">
+              <MessageSquare className="mx-auto h-12 w-12 text-red-500" />
+              <h3 className="mt-4 text-lg font-semibold text-red-600">Errore di Caricamento</h3>
+              <p className="text-muted-foreground mb-4">{error}</p>
+              <Button onClick={fetchProposals}>Riprova</Button>
             </div>
           </CardContent>
         </Card>

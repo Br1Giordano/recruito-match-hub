@@ -1,9 +1,8 @@
 
 import { useAuth } from './useAuth';
 
-// Lista degli email amministratori - puoi aggiungere altri email qui
+// Lista degli email amministratori - solo giordano.brunolucio@gmail.com è admin
 const ADMIN_EMAILS = [
-  'contact.recruito@gmail.com',
   'giordano.brunolucio@gmail.com'
 ];
 

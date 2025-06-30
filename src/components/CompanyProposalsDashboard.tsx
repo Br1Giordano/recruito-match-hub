@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageSquare, Shield } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProposals } from "@/hooks/useProposals";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
@@ -21,8 +21,8 @@ export default function CompanyProposalsDashboard() {
 
   // Raggruppa le proposte per stato - under_review ora rappresenta "interessato"
   const pendingProposals = proposals.filter(p => p.status === "pending");
-  const interestedProposals = proposals.filter(p => p.status === "under_review");
-  const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status));
+  const interestedProposals = proposals.filter(p => p.status === "under_review"); // Changed from "interested" to "under_review"
+  const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status)); // Updated to exclude "under_review"
 
   useEffect(() => {
     let currentProposals = [];
@@ -44,14 +44,13 @@ export default function CompanyProposalsDashboard() {
 
     let filtered = currentProposals;
 
-    // Applica i filtri di ricerca con sanitizzazione
+    // Applica i filtri di ricerca
     if (searchTerm) {
-      const sanitizedSearchTerm = searchTerm.toLowerCase().replace(/[<>\"']/g, '');
       filtered = filtered.filter(
         (proposal) =>
-          proposal.candidate_name.toLowerCase().includes(sanitizedSearchTerm) ||
-          proposal.recruiter_name?.toLowerCase().includes(sanitizedSearchTerm) ||
-          proposal.job_offers?.title?.toLowerCase().includes(sanitizedSearchTerm)
+          proposal.candidate_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          proposal.recruiter_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          proposal.job_offers?.title?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
@@ -64,9 +63,7 @@ export default function CompanyProposalsDashboard() {
   }, [searchTerm, statusFilter, proposals, activeTab, pendingProposals, interestedProposals, otherProposals]);
 
   const handleDeleteProposal = async (proposalId: string) => {
-    if (!isAdmin) {
-      return;
-    }
+    if (!isAdmin) return;
     
     const confirmed = window.confirm("Sei sicuro di voler eliminare questa proposta? Questa azione non può essere annullata.");
     if (confirmed && deleteProposal) {
@@ -77,7 +74,7 @@ export default function CompanyProposalsDashboard() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Caricamento proposte sicure...</div>
+        <div className="text-lg">Caricamento proposte...</div>
       </div>
     );
   }
@@ -100,12 +97,6 @@ export default function CompanyProposalsDashboard() {
               <p className="text-muted-foreground">
                 Devi essere autenticato come azienda per visualizzare le proposte.
               </p>
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                <Shield className="mx-auto h-6 w-6 text-blue-600 mb-2" />
-                <p className="text-sm text-blue-700">
-                  Sistema di sicurezza attivo: Row Level Security (RLS) abilitato
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -133,12 +124,6 @@ export default function CompanyProposalsDashboard() {
           <CardContent className="pt-6">
             <div className="text-center py-8">
               <p className="text-muted-foreground">{emptyMessage}</p>
-              <div className="mt-2 p-2 bg-green-50 rounded-lg">
-                <Shield className="mx-auto h-5 w-5 text-green-600 mb-1" />
-                <p className="text-xs text-green-700">
-                  I dati sono protetti da Row Level Security
-                </p>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -163,21 +148,10 @@ export default function CompanyProposalsDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">
-          Proposte Ricevute
-          {isAdmin && (
-            <span className="ml-2 text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded">
-              Admin
-            </span>
-          )}
-        </h1>
+        <h1 className="text-3xl font-bold tracking-tight">Proposte Ricevute</h1>
         <p className="text-muted-foreground">
           Revisiona e gestisci le proposte inviate dai recruiter per le tue offerte di lavoro
         </p>
-        <div className="mt-2 flex items-center gap-2 text-sm text-green-700">
-          <Shield className="h-4 w-4" />
-          <span>Sistema sicuro - Row Level Security attivo</span>
-        </div>
       </div>
 
       <Card>

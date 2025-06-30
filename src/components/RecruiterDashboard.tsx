@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -23,9 +24,9 @@ interface Proposal {
   recruiter_fee_percentage?: number;
   status: string;
   created_at: string;
-  company_registrations: {
+  company_registrations?: {
     nome_azienda: string;
-  };
+  } | null;
   job_offers?: {
     title: string;
   };
@@ -95,7 +96,7 @@ export default function RecruiterDashboard() {
       .from("proposals")
       .select(`
         *,
-        company_registrations!inner(nome_azienda),
+        company_registrations(nome_azienda),
         job_offers(title)
       `)
       .eq("recruiter_id", recruiterId)
@@ -132,7 +133,7 @@ export default function RecruiterDashboard() {
       filtered = filtered.filter(
         (proposal) =>
           proposal.candidate_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          proposal.company_registrations.nome_azienda.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          proposal.company_registrations?.nome_azienda?.toLowerCase().includes(searchTerm.toLowerCase()) ||
           proposal.job_offers?.title?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
@@ -263,7 +264,7 @@ export default function RecruiterDashboard() {
                     </CardTitle>
                     <CardDescription className="flex items-center gap-2 mt-1">
                       <Building2 className="h-4 w-4" />
-                      {proposal.company_registrations.nome_azienda}
+                      {proposal.company_registrations?.nome_azienda || "Azienda"}
                       {proposal.job_offers?.title && (
                         <>
                           <span>•</span>

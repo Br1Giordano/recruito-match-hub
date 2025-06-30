@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -47,49 +46,66 @@ export function useProposals() {
 
     setIsLoading(true);
     
-    console.log('Fetching proposals for authenticated user:', user.email);
+    console.log('Fetching proposals for company user:', user.email);
 
     try {
-      // Query ottimizzata per lavorare con le nuove RLS policy
+      // Prima verifica se l'utente ha offerte di lavoro
+      const { data: userJobOffers, error: jobOffersError } = await supabase
+        .from("job_offers")
+        .select("id, title, contact_email")
+        .eq("contact_email", user.email);
+
+      if (jobOffersError) {
+        console.error('Error fetching job offers:', jobOffersError);
+        toast({
+          title: "Errore",
+          description: "Errore nel caricamento delle offerte di lavoro",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('User job offers:', userJobOffers);
+
+      if (!userJobOffers || userJobOffers.length === 0) {
+        console.log('No job offers found for user');
+        setProposals([]);
+        setIsLoading(false);
+        return;
+      }
+
+      // Ora cerca le proposte per queste offerte
+      const jobOfferIds = userJobOffers.map(offer => offer.id);
+      
       const { data: proposalsData, error: proposalsError } = await supabase
         .from("proposals")
         .select(`
           *,
           job_offers(title, contact_email)
         `)
+        .in("job_offer_id", jobOfferIds)
         .order("created_at", { ascending: false });
 
       if (proposalsError) {
         console.error('Error fetching proposals:', proposalsError);
+        toast({
+          title: "Errore",
+          description: `Errore nel caricamento delle proposte: ${proposalsError.message}`,
+          variant: "destructive",
+        });
+        setProposals([]);
+      } else {
+        const userProposals = proposalsData || [];
+        console.log('Loaded proposals:', userProposals.length);
+        setProposals(userProposals);
         
-        // Gestione specifica errori di sicurezza
-        if (proposalsError.message.includes('RLS') || proposalsError.message.includes('policy')) {
+        if (userProposals.length > 0) {
           toast({
-            title: "Accesso Negato",
-            description: "Non hai i permessi per visualizzare queste proposte.",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Errore",
-            description: `Errore nel caricamento delle proposte: ${proposalsError.message}`,
-            variant: "destructive",
+            title: "Successo",
+            description: `Trovate ${userProposals.length} proposte`,
           });
         }
-        return;
-      }
-
-      // Le RLS policy ora filtrano automaticamente i dati
-      const userProposals = proposalsData || [];
-      
-      console.log('Loaded proposals with RLS security:', userProposals.length);
-      setProposals(userProposals);
-      
-      if (userProposals.length > 0) {
-        toast({
-          title: "Successo",
-          description: `Trovate ${userProposals.length} proposte`,
-        });
       }
     } catch (error) {
       console.error('Unexpected error:', error);
@@ -140,23 +156,14 @@ export function useProposals() {
 
       if (error) {
         console.error('Supabase error:', error);
-        
-        if (error.message.includes('RLS') || error.message.includes('policy')) {
-          toast({
-            title: "Accesso Negato",
-            description: "Non hai i permessi per modificare questa proposta",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Errore",
-            description: `Impossibile aggiornare lo stato della proposta: ${error.message}`,
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Errore",
+          description: `Impossibile aggiornare lo stato della proposta: ${error.message}`,
+          variant: "destructive",
+        });
         return false;
       } else {
-        console.log('Proposal status updated successfully with security validation');
+        console.log('Proposal status updated successfully');
         toast({
           title: "Successo",
           description: "Stato della proposta aggiornato",
@@ -213,22 +220,13 @@ export function useProposals() {
 
       if (error) {
         console.error('Error sending response:', error);
-        
-        if (error.message.includes('RLS') || error.message.includes('policy')) {
-          toast({
-            title: "Accesso Negato",
-            description: "Non hai i permessi per rispondere a questa proposta",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Errore",
-            description: "Impossibile inviare la risposta",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Errore",
+          description: "Impossibile inviare la risposta",
+          variant: "destructive",
+        });
       } else {
-        console.log('Response sent successfully with security validation');
+        console.log('Response sent successfully');
         toast({
           title: "Successo",
           description: "Risposta inviata al recruiter",
@@ -264,22 +262,13 @@ export function useProposals() {
 
       if (error) {
         console.error('Error deleting proposal:', error);
-        
-        if (error.message.includes('RLS') || error.message.includes('policy')) {
-          toast({
-            title: "Accesso Negato",
-            description: "Non hai i permessi per eliminare questa proposta",
-            variant: "destructive",
-          });
-        } else {
-          toast({
-            title: "Errore",
-            description: "Impossibile eliminare la proposta",
-            variant: "destructive",
-          });
-        }
+        toast({
+          title: "Errore",
+          description: "Impossibile eliminare la proposta",
+          variant: "destructive",
+        });
       } else {
-        console.log('Proposal deleted successfully with security validation');
+        console.log('Proposal deleted successfully');
         toast({
           title: "Successo",
           description: "Proposta eliminata con successo",

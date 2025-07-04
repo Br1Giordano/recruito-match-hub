@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -125,18 +126,21 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
                     <span>{proposal.recruiter_name}</span>
                   </div>
                 )}
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={handleShowRecruiterProfile}
+                    disabled={loadingRecruiter || !proposal.recruiter_email}
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2"
+                  >
+                    <UserCircle className="h-4 w-4" />
+                    {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo Recruiter"}
+                  </Button>
+                </div>
                 {proposal.recruiter_email && (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={handleShowRecruiterProfile}
-                      disabled={loadingRecruiter}
-                      variant="outline"
-                      size="sm"
-                      className="flex items-center gap-2"
-                    >
-                      <UserCircle className="h-4 w-4" />
-                      {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo Recruiter"}
-                    </Button>
+                  <div className="text-sm text-muted-foreground mt-2">
+                    Email: {proposal.recruiter_email}
                   </div>
                 )}
               </div>

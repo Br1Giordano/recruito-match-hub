@@ -19,11 +19,25 @@ export default function RecruiterProfileButton() {
   const { profile, loading } = useRecruiterProfile();
   const { signOut } = useAuth();
 
-  if (loading || !profile) {
+  console.log('RecruiterProfileButton - profile:', profile, 'loading:', loading);
+
+  if (loading) {
     return (
       <div className="flex items-center gap-2">
         <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse" />
         <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+      </div>
+    );
+  }
+
+  if (!profile) {
+    console.log('No profile found for recruiter');
+    return (
+      <div className="flex items-center gap-2">
+        <div className="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center">
+          <User className="h-4 w-4 text-gray-500" />
+        </div>
+        <span className="text-sm text-gray-500">Caricamento profilo...</span>
       </div>
     );
   }

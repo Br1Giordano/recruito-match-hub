@@ -32,19 +32,29 @@ export const useRecruiterProfile = () => {
   const { uploadFile, deleteFile, isUploading } = useFileUpload();
 
   const fetchProfile = async () => {
+    console.log('fetchProfile called with userProfile:', userProfile);
+    
     if (!userProfile?.registration_id) {
+      console.log('No registration_id found');
       setLoading(false);
       return;
     }
 
     try {
+      console.log('Fetching profile for registration_id:', userProfile.registration_id);
+      
       const { data, error } = await supabase
         .from('recruiter_registrations')
         .select('*')
         .eq('id', userProfile.registration_id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        throw error;
+      }
+      
+      console.log('Profile fetched successfully:', data);
       setProfile(data as RecruiterProfile);
     } catch (error) {
       console.error('Error fetching profile:', error);

@@ -19,9 +19,9 @@ export default function CompanyProposalsDashboard() {
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
 
-  // Raggruppa le proposte per stato - under_review ora rappresenta "interessato"
+  // Raggruppa le proposte per stato - under_review ora rappresenta "in valutazione"
   const pendingProposals = proposals.filter(p => p.status === "pending");
-  const interestedProposals = proposals.filter(p => p.status === "under_review"); // Changed from "interested" to "under_review"
+  const evaluatingProposals = proposals.filter(p => p.status === "under_review"); // Changed from "interested" to "evaluating"
   const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status)); // Updated to exclude "under_review"
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export default function CompanyProposalsDashboard() {
         currentProposals = pendingProposals;
         break;
       case "interested":
-        currentProposals = interestedProposals;
+        currentProposals = evaluatingProposals; // Changed variable name but kept the same tab key for consistency
         break;
       case "other":
         currentProposals = otherProposals;
@@ -60,7 +60,7 @@ export default function CompanyProposalsDashboard() {
     }
 
     setFilteredProposals(filtered);
-  }, [searchTerm, statusFilter, proposals, activeTab, pendingProposals, interestedProposals, otherProposals]);
+  }, [searchTerm, statusFilter, proposals, activeTab, pendingProposals, evaluatingProposals, otherProposals]);
 
   const handleDeleteProposal = async (proposalId: string) => {
     if (!isAdmin) return;
@@ -112,7 +112,7 @@ export default function CompanyProposalsDashboard() {
           emptyMessage = "Non ci sono nuove proposte in attesa";
           break;
         case "interested":
-          emptyMessage = "Non hai ancora mostrato interesse per nessuna proposta";
+          emptyMessage = "Non hai ancora avviato nessuna valutazione"; // Updated message
           break;
         case "other":
           emptyMessage = "Non ci sono altre proposte";
@@ -167,7 +167,7 @@ export default function CompanyProposalsDashboard() {
 
       <ProposalTabs
         pendingProposals={pendingProposals}
-        interestedProposals={interestedProposals}
+        interestedProposals={evaluatingProposals}
         otherProposals={otherProposals}
         onTabChange={setActiveTab}
       >

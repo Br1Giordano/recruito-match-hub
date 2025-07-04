@@ -58,11 +58,11 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
       case "pending":
         return "In Attesa";
       case "under_review":
-        return "Interessato"; // Changed to show "Interessato" for under_review status
+        return "In Valutazione"; // Changed from "Interessato" to "In Valutazione"
       case "approved":
         return "Approvata";
       case "rejected":
-        return "Rifiutata";
+        return "Scartata"; // Changed from "Rifiutata" to "Scartata"
       case "hired":
         return "Assunto";
       default:
@@ -204,7 +204,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                 className="text-green-600 border-green-600 hover:bg-green-50"
               >
                 <Check className="h-4 w-4 mr-2" />
-                Interessato
+                Procedi con la valutazione
               </Button>
               <Button
                 variant="outline"
@@ -213,7 +213,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                 className="text-red-600 border-red-600 hover:bg-red-50"
               >
                 <X className="h-4 w-4 mr-2" />
-                Non Interessato
+                Scarta la proposta
               </Button>
             </div>
           )}

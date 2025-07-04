@@ -1,9 +1,12 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Euro, Calendar, User, Building2, Phone, Linkedin, FileText } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
+import RecruiterAvatar from "../recruiter/RecruiterAvatar";
+import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 
 interface RecruiterProposalCardProps {
   proposal: {
@@ -30,6 +33,15 @@ interface RecruiterProposalCardProps {
 }
 
 export default function RecruiterProposalCard({ proposal }: RecruiterProposalCardProps) {
+  const { profile: recruiterProfile, fetchProfileByEmail } = useRecruiterProfileByEmail();
+
+  // Carica il profilo del recruiter quando il componente viene montato
+  useState(() => {
+    if (proposal.recruiter_email) {
+      fetchProfileByEmail(proposal.recruiter_email);
+    }
+  });
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -84,6 +96,36 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {/* Profilo Recruiter - Nuovo */}
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <h4 className="font-medium mb-3 text-blue-900">Profilo Recruiter</h4>
+          <div className="flex items-center gap-3">
+            <RecruiterAvatar
+              avatarUrl={recruiterProfile?.avatar_url}
+              name={recruiterProfile ? `${recruiterProfile.nome} ${recruiterProfile.cognome}` : (proposal.recruiter_name || 'Recruiter')}
+              size="md"
+            />
+            <div className="flex-1">
+              <div className="font-medium text-gray-900">
+                {recruiterProfile ? `${recruiterProfile.nome} ${recruiterProfile.cognome}` : (proposal.recruiter_name || 'Recruiter')}
+              </div>
+              <div className="text-sm text-gray-600">
+                {proposal.recruiter_email}
+              </div>
+              {recruiterProfile?.azienda && (
+                <div className="text-sm text-gray-500">
+                  {recruiterProfile.azienda}
+                </div>
+              )}
+              {recruiterProfile?.years_of_experience && (
+                <div className="text-xs text-blue-600 mt-1">
+                  {recruiterProfile.years_of_experience} anni di esperienza
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Descrizione del candidato */}
         {proposal.proposal_description ? (
           <div>
@@ -127,21 +169,6 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
                 </a>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Contatti Recruiter */}
-        <div>
-          <h4 className="font-medium mb-2">Contatti Recruiter:</h4>
-          <div className="text-sm">
-            <div className="flex items-center gap-2">
-              <a href={`mailto:${proposal.recruiter_email}`} className="text-blue-600 hover:underline">
-                {proposal.recruiter_email}
-              </a>
-              {proposal.recruiter_name && (
-                <span className="text-muted-foreground">({proposal.recruiter_name})</span>
-              )}
-            </div>
           </div>
         </div>
 

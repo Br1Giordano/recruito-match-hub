@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -118,7 +117,12 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
 
             {/* Recruiter Information */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Informazioni Recruiter</h3>
+              <h3 
+                className="text-lg font-semibold mb-3 text-blue-600 hover:text-blue-800 cursor-pointer underline"
+                onClick={handleShowRecruiterProfile}
+              >
+                Informazioni Recruiter
+              </h3>
               <div className="bg-gray-50 p-4 rounded-lg">
                 {proposal.recruiter_name && (
                   <div className="mb-2">
@@ -126,21 +130,14 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
                     <span>{proposal.recruiter_name}</span>
                   </div>
                 )}
-                <div className="flex items-center gap-2">
-                  <Button
-                    onClick={handleShowRecruiterProfile}
-                    disabled={loadingRecruiter || !proposal.recruiter_email}
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-2"
-                  >
-                    <UserCircle className="h-4 w-4" />
-                    {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo Recruiter"}
-                  </Button>
-                </div>
                 {proposal.recruiter_email && (
                   <div className="text-sm text-muted-foreground mt-2">
                     Email: {proposal.recruiter_email}
+                  </div>
+                )}
+                {loadingRecruiter && (
+                  <div className="text-sm text-blue-600 mt-2">
+                    Caricamento profilo...
                   </div>
                 )}
               </div>
@@ -152,9 +149,7 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  <a href={`mailto:${proposal.candidate_email}`} className="text-blue-600 hover:underline">
-                    {proposal.candidate_email}
-                  </a>
+                  <span>{proposal.candidate_email}</span>
                 </div>
                 {proposal.candidate_phone && (
                   <div className="flex items-center gap-2">

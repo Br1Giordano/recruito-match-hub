@@ -28,6 +28,10 @@ export default function RecruiterProfileButton() {
     );
   }
 
+  const handleSignOut = async () => {
+    await signOut();
+  };
+
   return (
     <>
       <DropdownMenu>
@@ -63,9 +67,9 @@ export default function RecruiterProfileButton() {
           
           <DropdownMenuSeparator />
           
-          <DropdownMenuItem onClick={signOut}>
+          <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600">
             <LogOut className="mr-2 h-4 w-4" />
-            Esci
+            Esci dall'account
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

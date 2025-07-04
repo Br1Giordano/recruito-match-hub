@@ -126,7 +126,7 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
                     <button
                       onClick={handleShowRecruiterProfile}
                       disabled={loadingRecruiter}
-                      className="text-blue-600 hover:underline disabled:opacity-50 font-medium"
+                      className="text-blue-600 hover:underline disabled:opacity-50 font-medium cursor-pointer"
                     >
                       {proposal.recruiter_email}
                       {loadingRecruiter && " (Caricamento...)"}

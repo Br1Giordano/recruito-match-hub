@@ -1,10 +1,12 @@
 
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Check, X, Clock, Mail, Phone, Linkedin, Euro, Calendar, User, Trash2, FileText } from "lucide-react";
-import { useState } from "react";
+import { Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle } from "lucide-react";
+import ProposalDetailsDialog from "./ProposalDetailsDialog";
+import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
+import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 
 interface ProposalCardProps {
   proposal: {
@@ -21,28 +23,37 @@ interface ProposalCardProps {
     recruiter_fee_percentage?: number;
     status: string;
     created_at: string;
-    recruiter_name?: string;
     recruiter_email?: string;
-    recruiter_phone?: string;
+    recruiter_name?: string;
     job_offers?: {
       title: string;
+      company_name?: string;
     };
   };
-  onStatusUpdate: (proposalId: string, status: string) => void;
-  onSendResponse: (proposalId: string, status: string, message: string) => void;
+  onStatusUpdate?: (proposalId: string, status: string) => void;
+  onSendResponse?: (proposalId: string, response: any) => void;
   onDelete?: (proposalId: string) => void;
 }
 
 export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
-  const [respondingTo, setRespondingTo] = useState<string | null>(null);
-  const [responseMessage, setResponseMessage] = useState("");
+  const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
+  const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
+
+  const handleShowRecruiterProfile = async () => {
+    if (proposal.recruiter_email) {
+      console.log('Fetching recruiter profile for:', proposal.recruiter_email);
+      const profile = await fetchProfileByEmail(proposal.recruiter_email);
+      console.log('Fetched profile:', profile);
+      setShowRecruiterProfile(true);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
         return "bg-yellow-100 text-yellow-800";
       case "under_review":
-        return "bg-green-100 text-green-800"; // Changed to green for "interested" proposals
+        return "bg-blue-100 text-blue-800";
       case "approved":
         return "bg-green-100 text-green-800";
       case "rejected":
@@ -59,11 +70,11 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
       case "pending":
         return "In Attesa";
       case "under_review":
-        return "In Valutazione"; // Changed from "Interessato" to "In Valutazione"
+        return "In Revisione";
       case "approved":
         return "Approvata";
       case "rejected":
-        return "Scartata"; // Changed from "Rifiutata" to "Scartata"
+        return "Rifiutata";
       case "hired":
         return "Assunto";
       default:
@@ -71,202 +82,153 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
     }
   };
 
-  const handleSendResponse = (status: string) => {
-    onSendResponse(proposal.id, status, responseMessage);
-    setRespondingTo(null);
-    setResponseMessage("");
-  };
-
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
+    <>
+      <Card className="w-full">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              {proposal.candidate_name}
-            </CardTitle>
-            <CardDescription className="mt-1">
-              {proposal.recruiter_name && (
-                <>Proposto da {proposal.recruiter_name}</>
-              )}
-              {proposal.job_offers?.title && (
-                <>
-                  <span> • </span>
-                  <span>{proposal.job_offers.title}</span>
-                </>
-              )}
-            </CardDescription>
-          </div>
-          <div className="flex items-center gap-2">
+              <CardTitle className="text-lg">{proposal.candidate_name}</CardTitle>
+            </div>
             <Badge className={getStatusColor(proposal.status)}>
               {getStatusText(proposal.status)}
             </Badge>
+          </div>
+          {proposal.job_offers?.title && (
+            <div className="text-sm text-muted-foreground">
+              Proposto da {proposal.recruiter_name || proposal.recruiter_email} • {proposal.job_offers.title}
+            </div>
+          )}
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {/* Informazioni Recruiter */}
+          {(proposal.recruiter_email || proposal.recruiter_name) && (
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-medium text-blue-900">Recruiter</h4>
+                <Button
+                  onClick={handleShowRecruiterProfile}
+                  disabled={loadingRecruiter}
+                  variant="outline"
+                  size="sm"
+                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                >
+                  <UserCircle className="h-4 w-4 mr-2" />
+                  {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo"}
+                </Button>
+              </div>
+              <div className="text-sm">
+                <div className="font-medium text-gray-900">
+                  {proposal.recruiter_name || 'Recruiter'}
+                </div>
+                <div className="text-gray-600">
+                  {proposal.recruiter_email}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Descrizione del candidato */}
+          {proposal.proposal_description ? (
+            <div>
+              <h4 className="font-medium mb-2">Descrizione del candidato:</h4>
+              <p className="text-sm text-muted-foreground">
+                {proposal.proposal_description.length > 150
+                  ? `${proposal.proposal_description.substring(0, 150)}...`
+                  : proposal.proposal_description}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <h4 className="font-medium mb-2">Descrizione del candidato:</h4>
+              <p className="text-sm text-muted-foreground">Nessuna descrizione fornita</p>
+            </div>
+          )}
+
+          {/* Contatti Candidato */}
+          <div>
+            <h4 className="font-medium mb-2">Contatti Candidato:</h4>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-sm">
+                <User className="h-4 w-4" />
+                <a href={`mailto:${proposal.candidate_email}`} className="text-blue-600 hover:underline">
+                  {proposal.candidate_email}
+                </a>
+              </div>
+              {proposal.candidate_phone && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="h-4 w-4" />
+                  <a href={`tel:${proposal.candidate_phone}`} className="text-blue-600 hover:underline">
+                    {proposal.candidate_phone}
+                  </a>
+                </div>
+              )}
+              {proposal.candidate_linkedin && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Linkedin className="h-4 w-4" />
+                  <a href={proposal.candidate_linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Profilo LinkedIn
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Dettagli */}
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="font-medium">Fee recruiter: </span>
+              <span>{proposal.recruiter_fee_percentage}%</span>
+            </div>
+            {proposal.years_experience && (
+              <div>
+                <span className="font-medium">Esperienza: </span>
+                <span>{proposal.years_experience} anni</span>
+              </div>
+            )}
+            {proposal.expected_salary && (
+              <div className="flex items-center gap-1">
+                <Euro className="h-4 w-4" />
+                <span>€{proposal.expected_salary.toLocaleString()}</span>
+              </div>
+            )}
+            {proposal.availability_weeks && (
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>{proposal.availability_weeks} settimane</span>
+              </div>
+            )}
+          </div>
+
+          {/* Data di ricezione */}
+          <div className="text-xs text-muted-foreground border-t pt-2">
+            Ricevuta il {new Date(proposal.created_at).toLocaleDateString('it-IT')} alle {new Date(proposal.created_at).toLocaleTimeString('it-IT')}
+          </div>
+
+          {/* Pulsanti azione */}
+          <div className="flex justify-end gap-2 pt-2">
+            <ProposalDetailsDialog proposal={proposal} />
             {onDelete && (
               <Button
-                variant="outline"
-                size="sm"
                 onClick={() => onDelete(proposal.id)}
-                className="text-red-600 border-red-600 hover:bg-red-50"
+                variant="destructive"
+                size="sm"
               >
-                <Trash2 className="h-4 w-4" />
+                Elimina
               </Button>
             )}
           </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div>
-            <h4 className="text-sm font-medium mb-2">Descrizione del candidato:</h4>
-            <p className="text-sm text-muted-foreground">
-              {proposal.proposal_description || "Nessuna descrizione fornita"}
-            </p>
-          </div>
+        </CardContent>
+      </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Contatti Candidato:</h4>
-              <div className="space-y-1 text-sm">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  <a href={`mailto:${proposal.candidate_email}`} className="text-blue-600 hover:underline">
-                    {proposal.candidate_email}
-                  </a>
-                </div>
-                {proposal.candidate_phone && (
-                  <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4" />
-                    <a href={`tel:${proposal.candidate_phone}`} className="text-blue-600 hover:underline">
-                      {proposal.candidate_phone}
-                    </a>
-                  </div>
-                )}
-                {proposal.candidate_linkedin && (
-                  <div className="flex items-center gap-2">
-                    <Linkedin className="h-4 w-4" />
-                    <a href={proposal.candidate_linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      LinkedIn
-                    </a>
-                  </div>
-                )}
-                {proposal.candidate_cv_url && (
-                  <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4" />
-                    <a href={proposal.candidate_cv_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      Visualizza CV
-                    </a>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="text-sm font-medium">Dettagli:</h4>
-              <div className="space-y-1 text-sm">
-                {proposal.years_experience && (
-                  <div>Esperienza: {proposal.years_experience} anni</div>
-                )}
-                {proposal.expected_salary && (
-                  <div className="flex items-center gap-1">
-                    <Euro className="h-4 w-4" />
-                    Salario desiderato: €{proposal.expected_salary.toLocaleString()}
-                  </div>
-                )}
-                {proposal.availability_weeks && (
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    Disponibile in: {proposal.availability_weeks} settimane
-                  </div>
-                )}
-                {proposal.recruiter_fee_percentage && (
-                  <div>Fee recruiter: {proposal.recruiter_fee_percentage}%</div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {(proposal.recruiter_name || proposal.recruiter_email) && (
-            <div className="border-t pt-4">
-              <h4 className="text-sm font-medium mb-2">Contatti Recruiter:</h4>
-              <div className="flex items-center gap-4 text-sm">
-                {proposal.recruiter_email && (
-                  <a href={`mailto:${proposal.recruiter_email}`} className="text-blue-600 hover:underline">
-                    {proposal.recruiter_email}
-                  </a>
-                )}
-                {proposal.recruiter_phone && (
-                  <a href={`tel:${proposal.recruiter_phone}`} className="text-blue-600 hover:underline">
-                    {proposal.recruiter_phone}
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-
-          {proposal.status === "pending" && (
-            <div className="flex items-center gap-2 pt-4 border-t">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onStatusUpdate(proposal.id, "under_review")}
-                className="text-green-600 border-green-600 hover:bg-green-50"
-              >
-                <Check className="h-4 w-4 mr-2" />
-                Procedi con la valutazione
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => onStatusUpdate(proposal.id, "rejected")}
-                className="text-red-600 border-red-600 hover:bg-red-50"
-              >
-                <X className="h-4 w-4 mr-2" />
-                Scarta la proposta
-              </Button>
-            </div>
-          )}
-
-          {respondingTo === proposal.id && (
-            <div className="space-y-3 pt-4 border-t bg-gray-50 p-4 rounded">
-              <Textarea
-                placeholder="Scrivi una risposta al recruiter..."
-                value={responseMessage}
-                onChange={(e) => setResponseMessage(e.target.value)}
-              />
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  onClick={() => handleSendResponse("interested")}
-                >
-                  Invia Interesse
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleSendResponse("not_interested")}
-                >
-                  Declina
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setRespondingTo(null);
-                    setResponseMessage("");
-                  }}
-                >
-                  Annulla
-                </Button>
-              </div>
-            </div>
-          )}
-
-          <div className="text-xs text-muted-foreground">
-            Ricevuta il {new Date(proposal.created_at).toLocaleDateString('it-IT')} alle {new Date(proposal.created_at).toLocaleTimeString('it-IT')}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Modal Profilo Recruiter */}
+      <RecruiterProfileViewModal
+        open={showRecruiterProfile}
+        onOpenChange={setShowRecruiterProfile}
+        profile={recruiterProfile}
+      />
+    </>
   );
 }

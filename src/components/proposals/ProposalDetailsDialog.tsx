@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -117,12 +118,7 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
 
             {/* Recruiter Information */}
             <div>
-              <h3 
-                className="text-lg font-semibold mb-3 text-blue-600 hover:text-blue-800 cursor-pointer underline"
-                onClick={handleShowRecruiterProfile}
-              >
-                Informazioni Recruiter
-              </h3>
+              <h3 className="text-lg font-semibold mb-3">Informazioni Recruiter</h3>
               <div className="bg-gray-50 p-4 rounded-lg">
                 {proposal.recruiter_name && (
                   <div className="mb-2">
@@ -131,14 +127,23 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
                   </div>
                 )}
                 {proposal.recruiter_email && (
-                  <div className="text-sm text-muted-foreground mt-2">
+                  <div className="text-sm text-muted-foreground mb-3">
                     Email: {proposal.recruiter_email}
                   </div>
                 )}
-                {loadingRecruiter && (
-                  <div className="text-sm text-blue-600 mt-2">
-                    Caricamento profilo...
-                  </div>
+                
+                {/* Recruiter Profile Button - Always visible when there's recruiter info */}
+                {(proposal.recruiter_email || proposal.recruiter_name) && (
+                  <Button
+                    onClick={handleShowRecruiterProfile}
+                    disabled={loadingRecruiter}
+                    variant="default"
+                    size="sm"
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    <UserCircle className="h-4 w-4 mr-2" />
+                    {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo Recruiter"}
+                  </Button>
                 )}
               </div>
             </div>

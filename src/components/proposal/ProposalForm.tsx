@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 import ProposalFormFields from "./ProposalFormFields";
@@ -36,6 +36,7 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
     recruiter_name: "",
     recruiter_email: "",
     recruiter_phone: "",
+    candidate_cv_url: "", // Aggiunto campo per l'URL del CV
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -70,6 +71,7 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         candidate_email: formData.candidate_email,
         candidate_phone: formData.candidate_phone || null,
         candidate_linkedin: formData.candidate_linkedin || null,
+        candidate_cv_url: formData.candidate_cv_url || null, // Aggiunto campo CV
         years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
         current_salary: formData.current_salary ? parseInt(formData.current_salary) : null,
         expected_salary: formData.expected_salary ? parseInt(formData.expected_salary) : null,

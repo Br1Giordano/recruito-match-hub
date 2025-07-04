@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, X, Clock, Mail, Phone, Linkedin, Euro, Calendar, User, Trash2 } from "lucide-react";
+import { Check, X, Clock, Mail, Phone, Linkedin, Euro, Calendar, User, Trash2, FileText } from "lucide-react";
 import { useState } from "react";
 
 interface ProposalCardProps {
@@ -13,6 +13,7 @@ interface ProposalCardProps {
     candidate_email: string;
     candidate_phone?: string;
     candidate_linkedin?: string;
+    candidate_cv_url?: string;
     proposal_description: string;
     years_experience?: number;
     expected_salary?: number;
@@ -146,6 +147,14 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                     <Linkedin className="h-4 w-4" />
                     <a href={proposal.candidate_linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                       LinkedIn
+                    </a>
+                  </div>
+                )}
+                {proposal.candidate_cv_url && (
+                  <div className="flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    <a href={proposal.candidate_cv_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      Visualizza CV
                     </a>
                   </div>
                 )}

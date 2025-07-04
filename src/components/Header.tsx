@@ -1,8 +1,8 @@
-
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileMenu from "./MobileMenu";
+import RecruiterProfileButton from "./recruiter/RecruiterProfileButton";
 
 interface HeaderProps {
   onShowAuth?: () => void;
@@ -12,7 +12,7 @@ interface HeaderProps {
 const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
 
   const scrollToSection = (sectionId: string) => {
     if (isHomePage) {
@@ -108,21 +108,40 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
           </button>
           
           <div className="flex items-center space-x-4 ml-8">
-            <Button
-              onClick={handleCompanyButtonClick}
-              size="sm"
-              className="gradient-recruito text-white border-0 hover:opacity-90"
-            >
-              Prova Beta - Azienda
-            </Button>
-            <Button
-              onClick={handleRecruiterButtonClick}
-              size="sm"
-              variant="outline"
-              className="hover:bg-gray-50"
-            >
-              Demo Recruiter
-            </Button>
+            {/* Se l'utente è autenticato, mostra il profilo o i pulsanti in base al tipo utente */}
+            {user && userProfile ? (
+              <>
+                {userProfile.user_type === 'recruiter' ? (
+                  <RecruiterProfileButton />
+                ) : (
+                  <Button
+                    onClick={onShowDashboard}
+                    size="sm"
+                    className="gradient-recruito text-white border-0 hover:opacity-90"
+                  >
+                    Dashboard Azienda
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <Button
+                  onClick={handleCompanyButtonClick}
+                  size="sm"
+                  className="gradient-recruito text-white border-0 hover:opacity-90"
+                >
+                  Prova Beta - Azienda
+                </Button>
+                <Button
+                  onClick={handleRecruiterButtonClick}
+                  size="sm"
+                  variant="outline"
+                  className="hover:bg-gray-50"
+                >
+                  Demo Recruiter
+                </Button>
+              </>
+            )}
           </div>
         </nav>
 

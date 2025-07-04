@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Euro, Calendar, User, Building2, Mail, Phone, Linkedin } from "lucide-react";
+import { Eye, Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle } from "lucide-react";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
 
@@ -118,24 +117,26 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
 
             {/* Recruiter Information */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Contatti Recruiter</h3>
+              <h3 className="text-lg font-semibold mb-3">Informazioni Recruiter</h3>
               <div className="bg-gray-50 p-4 rounded-lg">
-                {proposal.recruiter_email && (
+                {proposal.recruiter_name && (
                   <div className="mb-2">
-                    <span className="font-medium">Email: </span>
-                    <button
-                      onClick={handleShowRecruiterProfile}
-                      disabled={loadingRecruiter}
-                      className="text-blue-600 hover:underline disabled:opacity-50 font-medium cursor-pointer"
-                    >
-                      {proposal.recruiter_email}
-                      {loadingRecruiter && " (Caricamento...)"}
-                    </button>
+                    <span className="font-medium">Nome: </span>
+                    <span>{proposal.recruiter_name}</span>
                   </div>
                 )}
-                {proposal.recruiter_name && (
-                  <div className="text-sm text-muted-foreground">
-                    Nome: {proposal.recruiter_name}
+                {proposal.recruiter_email && (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={handleShowRecruiterProfile}
+                      disabled={loadingRecruiter}
+                      variant="outline"
+                      size="sm"
+                      className="flex items-center gap-2"
+                    >
+                      <UserCircle className="h-4 w-4" />
+                      {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo Recruiter"}
+                    </Button>
                   </div>
                 )}
               </div>
@@ -146,7 +147,7 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
               <h3 className="text-lg font-semibold mb-3">Dettagli Candidato</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
+                  <User className="h-4 w-4" />
                   <a href={`mailto:${proposal.candidate_email}`} className="text-blue-600 hover:underline">
                     {proposal.candidate_email}
                   </a>

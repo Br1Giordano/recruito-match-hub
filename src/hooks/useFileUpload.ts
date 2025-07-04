@@ -10,14 +10,28 @@ export const useFileUpload = () => {
   const uploadFile = async (file: File, folder: string = ''): Promise<string | null> => {
     if (!file) return null;
 
-    // Validazione del file
-    if (file.type !== 'application/pdf') {
-      toast({
-        title: "Errore",
-        description: "Solo file PDF sono consentiti",
-        variant: "destructive",
-      });
-      return null;
+    // Validazione del file per CV
+    if (folder === '' || folder === 'cvs') {
+      if (file.type !== 'application/pdf') {
+        toast({
+          title: "Errore",
+          description: "Solo file PDF sono consentiti per i CV",
+          variant: "destructive",
+        });
+        return null;
+      }
+    }
+
+    // Validazione per immagini avatar
+    if (folder === 'avatars') {
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Errore",
+          description: "Solo file immagine sono consentiti per gli avatar",
+          variant: "destructive",
+        });
+        return null;
+      }
     }
 
     if (file.size > 10 * 1024 * 1024) { // 10MB max
@@ -36,8 +50,11 @@ export const useFileUpload = () => {
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = folder ? `${folder}/${fileName}` : fileName;
 
+      // Scegli il bucket appropriato
+      const bucketName = folder === 'avatars' ? 'recruiter-avatars' : 'candidate-cvs';
+
       const { data, error } = await supabase.storage
-        .from('candidate-cvs')
+        .from(bucketName)
         .upload(filePath, file);
 
       if (error) {
@@ -46,12 +63,12 @@ export const useFileUpload = () => {
 
       // Ottieni l'URL pubblico del file
       const { data: urlData } = supabase.storage
-        .from('candidate-cvs')
+        .from(bucketName)
         .getPublicUrl(filePath);
 
       toast({
         title: "Successo",
-        description: "CV caricato con successo",
+        description: folder === 'avatars' ? "Avatar caricato con successo" : "CV caricato con successo",
       });
 
       return urlData.publicUrl;
@@ -70,8 +87,11 @@ export const useFileUpload = () => {
 
   const deleteFile = async (filePath: string): Promise<boolean> => {
     try {
+      // Determina il bucket dal path
+      const bucketName = filePath.includes('avatars') ? 'recruiter-avatars' : 'candidate-cvs';
+      
       const { error } = await supabase.storage
-        .from('candidate-cvs')
+        .from(bucketName)
         .remove([filePath]);
 
       if (error) {

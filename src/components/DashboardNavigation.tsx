@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -10,6 +11,7 @@ import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
 import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut } from "lucide-react";
 import JobOffersBoard from "./JobOffersBoard";
 import { useToast } from "@/components/ui/use-toast";
+import RecruiterProfileButton from "./recruiter/RecruiterProfileButton";
 
 interface DashboardNavigationProps {
   onBack?: () => void;
@@ -190,10 +192,7 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
                 <h1 className="text-xl font-semibold">Dashboard Recruiter</h1>
               </div>
             </div>
-            <Button variant="ghost" onClick={onSignOut} className="flex items-center gap-2">
-              <LogOut className="h-4 w-4" />
-              Esci
-            </Button>
+            <RecruiterProfileButton />
           </div>
         </div>
       </div>

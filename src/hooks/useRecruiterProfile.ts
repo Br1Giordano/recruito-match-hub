@@ -47,7 +47,7 @@ export const useRecruiterProfile = () => {
         .from('recruiter_registrations')
         .select('*')
         .eq('id', userProfile.registration_id)
-        .single();
+        .maybeSingle(); // Usa maybeSingle invece di single per evitare errori quando non ci sono risultati
 
       if (error) {
         console.error('Error fetching profile:', error);
@@ -55,14 +55,17 @@ export const useRecruiterProfile = () => {
       }
       
       console.log('Profile fetched successfully:', data);
-      setProfile(data as RecruiterProfile);
+      setProfile(data as RecruiterProfile | null);
     } catch (error) {
       console.error('Error fetching profile:', error);
-      toast({
-        title: "Errore",
-        description: "Impossibile caricare il profilo",
-        variant: "destructive",
-      });
+      // Non mostrare toast di errore se il profilo semplicemente non esiste
+      if (error?.code !== 'PGRST116') {
+        toast({
+          title: "Errore",
+          description: "Impossibile caricare il profilo",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -96,6 +99,41 @@ export const useRecruiterProfile = () => {
     }
   };
 
+  const createProfile = async (profileData: Partial<RecruiterProfile>) => {
+    if (!userProfile?.registration_id) return false;
+
+    try {
+      const { data, error } = await supabase
+        .from('recruiter_registrations')
+        .insert([{
+          id: userProfile.registration_id,
+          nome: profileData.nome || '',
+          cognome: profileData.cognome || '',
+          email: profileData.email || '',
+          ...profileData
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setProfile(data as RecruiterProfile);
+      toast({
+        title: "Successo",
+        description: "Profilo creato con successo",
+      });
+      return true;
+    } catch (error) {
+      console.error('Error creating profile:', error);
+      toast({
+        title: "Errore",
+        description: "Errore nella creazione del profilo",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   const uploadAvatar = async (file: File) => {
     // Elimina l'avatar precedente se esiste
     if (profile?.avatar_url) {
@@ -121,6 +159,7 @@ export const useRecruiterProfile = () => {
     profile,
     loading,
     updateProfile,
+    createProfile,
     uploadAvatar,
     isUploading,
     refetchProfile: fetchProfile

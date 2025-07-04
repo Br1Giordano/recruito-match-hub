@@ -17,9 +17,13 @@ import { useAuth } from '@/hooks/useAuth';
 export default function RecruiterProfileButton() {
   const [showProfile, setShowProfile] = useState(false);
   const { profile, loading } = useRecruiterProfile();
-  const { signOut } = useAuth();
+  const { signOut, userProfile } = useAuth();
 
   console.log('RecruiterProfileButton - profile:', profile, 'loading:', loading);
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   if (loading) {
     return (
@@ -30,21 +34,9 @@ export default function RecruiterProfileButton() {
     );
   }
 
-  if (!profile) {
-    console.log('No profile found for recruiter');
-    return (
-      <div className="flex items-center gap-2">
-        <div className="h-8 w-8 bg-gray-300 rounded-full flex items-center justify-center">
-          <User className="h-4 w-4 text-gray-500" />
-        </div>
-        <span className="text-sm text-gray-500">Caricamento profilo...</span>
-      </div>
-    );
-  }
-
-  const handleSignOut = async () => {
-    await signOut();
-  };
+  // Se non c'è profilo, mostra comunque un menu funzionale con i dati base dell'utente
+  const displayName = profile ? `${profile.nome} ${profile.cognome}` : 'Recruiter';
+  const displayCompany = profile?.azienda || 'Account Recruiter';
 
   return (
     <>
@@ -52,16 +44,16 @@ export default function RecruiterProfileButton() {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2 h-auto p-2">
             <RecruiterAvatar
-              avatarUrl={profile.avatar_url}
-              name={`${profile.nome} ${profile.cognome}`}
+              avatarUrl={profile?.avatar_url}
+              name={displayName}
               size="sm"
             />
             <div className="hidden md:block text-left">
               <div className="text-sm font-medium">
-                {profile.nome} {profile.cognome}
+                {displayName}
               </div>
               <div className="text-xs text-gray-500">
-                {profile.azienda || 'Recruiter'}
+                {displayCompany}
               </div>
             </div>
             <ChevronDown className="h-4 w-4 text-gray-400" />
@@ -81,13 +73,17 @@ export default function RecruiterProfileButton() {
           
           <DropdownMenuSeparator />
           
-          <DropdownMenuItem onClick={handleSignOut} className="text-red-600 focus:text-red-600">
+          <DropdownMenuItem 
+            onClick={handleSignOut} 
+            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+          >
             <LogOut className="mr-2 h-4 w-4" />
             Esci dall'account
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
+      {/* Mostra sempre il modal, anche se il profilo non esiste ancora */}
       <RecruiterProfileModal 
         open={showProfile} 
         onOpenChange={setShowProfile} 

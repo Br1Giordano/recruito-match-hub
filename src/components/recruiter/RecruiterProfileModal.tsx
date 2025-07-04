@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -15,6 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { MapPin, Briefcase, Globe, Linkedin, X, Plus } from 'lucide-react';
 import RecruiterAvatar from './RecruiterAvatar';
 import { useRecruiterProfile } from '@/hooks/useRecruiterProfile';
+import { useAuth } from '@/hooks/useAuth';
 
 interface RecruiterProfileModalProps {
   open: boolean;
@@ -22,12 +23,14 @@ interface RecruiterProfileModalProps {
 }
 
 export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterProfileModalProps) {
-  const { profile, updateProfile, uploadAvatar, isUploading } = useRecruiterProfile();
+  const { profile, updateProfile, createProfile, uploadAvatar, isUploading } = useRecruiterProfile();
+  const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [newSpecialization, setNewSpecialization] = useState('');
   const [formData, setFormData] = useState({
     nome: '',
     cognome: '',
+    email: '',
     bio: '',
     location: '',
     years_of_experience: '',
@@ -36,11 +39,19 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
     specializations: [] as string[]
   });
 
-  const handleEdit = () => {
-    if (profile) {
+  // Se non c'è profilo, inizia in modalità editing
+  useEffect(() => {
+    if (!profile && open) {
+      setIsEditing(true);
+      setFormData(prev => ({
+        ...prev,
+        email: user?.email || ''
+      }));
+    } else if (profile && open) {
       setFormData({
         nome: profile.nome || '',
         cognome: profile.cognome || '',
+        email: profile.email || '',
         bio: profile.bio || '',
         location: profile.location || '',
         years_of_experience: profile.years_of_experience?.toString() || '',
@@ -48,7 +59,11 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
         website_url: profile.website_url || '',
         specializations: profile.specializations || []
       });
+      setIsEditing(false);
     }
+  }, [profile, open, user?.email]);
+
+  const handleEdit = () => {
     setIsEditing(true);
   };
 
@@ -58,7 +73,13 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
       years_of_experience: formData.years_of_experience ? parseInt(formData.years_of_experience) : null
     };
     
-    const success = await updateProfile(updates);
+    let success = false;
+    if (profile) {
+      success = await updateProfile(updates);
+    } else {
+      success = await createProfile(updates);
+    }
+    
     if (success) {
       setIsEditing(false);
     }
@@ -81,21 +102,34 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
     }));
   };
 
-  if (!profile) return null;
+  const displayProfile = profile || {
+    nome: formData.nome,
+    cognome: formData.cognome,
+    email: formData.email,
+    bio: formData.bio,
+    location: formData.location,
+    years_of_experience: formData.years_of_experience ? parseInt(formData.years_of_experience) : null,
+    linkedin_url: formData.linkedin_url,
+    website_url: formData.website_url,
+    specializations: formData.specializations,
+    avatar_url: null
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Profilo Recruiter</DialogTitle>
+          <DialogTitle>
+            {profile ? 'Profilo Recruiter' : 'Crea il tuo Profilo Recruiter'}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
           {/* Header con avatar e info base */}
           <div className="flex items-start gap-6">
             <RecruiterAvatar
-              avatarUrl={profile.avatar_url}
-              name={`${profile.nome} ${profile.cognome}`}
+              avatarUrl={displayProfile.avatar_url}
+              name={`${displayProfile.nome} ${displayProfile.cognome}`}
               size="lg"
               onUpload={uploadAvatar}
               isUploading={isUploading}
@@ -107,39 +141,51 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label htmlFor="nome">Nome</Label>
+                      <Label htmlFor="nome">Nome *</Label>
                       <Input
                         id="nome"
                         value={formData.nome}
                         onChange={(e) => setFormData(prev => ({ ...prev, nome: e.target.value }))}
+                        required
                       />
                     </div>
                     <div>
-                      <Label htmlFor="cognome">Cognome</Label>
+                      <Label htmlFor="cognome">Cognome *</Label>
                       <Input
                         id="cognome"
                         value={formData.cognome}
                         onChange={(e) => setFormData(prev => ({ ...prev, cognome: e.target.value }))}
+                        required
                       />
                     </div>
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                      required
+                    />
                   </div>
                 </div>
               ) : (
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">
-                    {profile.nome} {profile.cognome}
+                    {displayProfile.nome} {displayProfile.cognome}
                   </h2>
-                  <p className="text-gray-600">{profile.email}</p>
-                  {profile.location && (
+                  <p className="text-gray-600">{displayProfile.email}</p>
+                  {displayProfile.location && (
                     <div className="flex items-center gap-1 text-gray-500 mt-1">
                       <MapPin className="h-4 w-4" />
-                      <span>{profile.location}</span>
+                      <span>{displayProfile.location}</span>
                     </div>
                   )}
-                  {profile.years_of_experience && (
+                  {displayProfile.years_of_experience && (
                     <div className="flex items-center gap-1 text-gray-500 mt-1">
                       <Briefcase className="h-4 w-4" />
-                      <span>{profile.years_of_experience} anni di esperienza</span>
+                      <span>{displayProfile.years_of_experience} anni di esperienza</span>
                     </div>
                   )}
                 </div>
@@ -162,7 +208,7 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
               />
             ) : (
               <p className="mt-2 text-gray-700">
-                {profile.bio || "Nessuna bio disponibile"}
+                {displayProfile.bio || "Nessuna bio disponibile"}
               </p>
             )}
           </div>
@@ -218,17 +264,17 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
               </div>
             ) : (
               <div className="flex gap-3 mt-2">
-                {profile.linkedin_url && (
+                {displayProfile.linkedin_url && (
                   <Button variant="outline" size="sm" asChild>
-                    <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
+                    <a href={displayProfile.linkedin_url} target="_blank" rel="noopener noreferrer">
                       <Linkedin className="h-4 w-4 mr-2" />
                       LinkedIn
                     </a>
                   </Button>
                 )}
-                {profile.website_url && (
+                {displayProfile.website_url && (
                   <Button variant="outline" size="sm" asChild>
-                    <a href={profile.website_url} target="_blank" rel="noopener noreferrer">
+                    <a href={displayProfile.website_url} target="_blank" rel="noopener noreferrer">
                       <Globe className="h-4 w-4 mr-2" />
                       Sito web
                     </a>
@@ -268,7 +314,7 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
               </div>
             ) : (
               <div className="flex flex-wrap gap-2 mt-2">
-                {profile.specializations?.map((spec, index) => (
+                {displayProfile.specializations?.map((spec, index) => (
                   <Badge key={index} variant="secondary">
                     {spec}
                   </Badge>
@@ -284,8 +330,11 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
                 <Button variant="outline" onClick={() => setIsEditing(false)}>
                   Annulla
                 </Button>
-                <Button onClick={handleSave}>
-                  Salva modifiche
+                <Button 
+                  onClick={handleSave}
+                  disabled={!formData.nome || !formData.cognome || !formData.email}
+                >
+                  {profile ? 'Salva modifiche' : 'Crea profilo'}
                 </Button>
               </>
             ) : (

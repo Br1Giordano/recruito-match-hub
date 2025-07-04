@@ -71,6 +71,13 @@ export default function CompanyProposalsDashboard() {
     }
   };
 
+  // Fix: Simplified sendResponse handler to match the expected signature
+  const handleSendResponse = async (proposalId: string, response: any) => {
+    if (sendResponse) {
+      await sendResponse(proposalId, response.status, response.message);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -137,7 +144,7 @@ export default function CompanyProposalsDashboard() {
             key={proposal.id}
             proposal={proposal}
             onStatusUpdate={updateProposalStatus}
-            onSendResponse={sendResponse}
+            onSendResponse={handleSendResponse}
             onDelete={isAdmin ? handleDeleteProposal : undefined}
           />
         ))}

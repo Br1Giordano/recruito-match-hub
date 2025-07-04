@@ -35,6 +35,7 @@ export const useRecruiterProfileByEmail = () => {
     console.log('Fetching recruiter profile by email:', email);
     
     try {
+      // First try to get the full profile from recruiter_registrations
       const { data, error } = await supabase
         .from('recruiter_registrations')
         .select('*')
@@ -43,8 +44,15 @@ export const useRecruiterProfileByEmail = () => {
 
       if (error) {
         console.error('Error fetching recruiter profile by email:', error);
-        setProfile(null);
-        return null;
+        // Create a basic profile with email information if there's an error
+        const basicProfile: RecruiterProfile = {
+          id: '',
+          nome: email.split('@')[0] || 'Recruiter',
+          cognome: '',
+          email: email,
+        };
+        setProfile(basicProfile);
+        return basicProfile;
       }
 
       if (!data) {
@@ -65,8 +73,15 @@ export const useRecruiterProfileByEmail = () => {
       return data as RecruiterProfile;
     } catch (error) {
       console.error('Error in fetchProfileByEmail:', error);
-      setProfile(null);
-      return null;
+      // Create a basic profile even on error
+      const basicProfile: RecruiterProfile = {
+        id: '',
+        nome: email.split('@')[0] || 'Recruiter',
+        cognome: '',
+        email: email,
+      };
+      setProfile(basicProfile);
+      return basicProfile;
     } finally {
       setLoading(false);
     }

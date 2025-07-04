@@ -1,10 +1,12 @@
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Euro, Calendar, User, Phone, Linkedin } from "lucide-react";
+import { Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
-import RecruiterProfileCard from "../recruiter/RecruiterProfileCard";
+import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
+import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 
 interface ProposalCardProps {
   proposal: {
@@ -34,6 +36,18 @@ interface ProposalCardProps {
 }
 
 export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
+  const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
+  const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
+
+  const handleShowRecruiterProfile = async () => {
+    if (proposal.recruiter_email) {
+      console.log('Fetching recruiter profile for:', proposal.recruiter_email);
+      const profile = await fetchProfileByEmail(proposal.recruiter_email);
+      console.log('Fetched profile:', profile);
+      setShowRecruiterProfile(true);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -69,7 +83,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
   };
 
   return (
-    <div className="space-y-6">
+    <>
       <Card className="w-full">
         <CardHeader>
           <div className="flex justify-between items-start">
@@ -83,12 +97,39 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
           </div>
           {proposal.job_offers?.title && (
             <div className="text-sm text-muted-foreground">
-              Proposta per: <span className="font-medium">{proposal.job_offers.title}</span>
+              Proposto da {proposal.recruiter_name || proposal.recruiter_email} • {proposal.job_offers.title}
             </div>
           )}
         </CardHeader>
 
         <CardContent className="space-y-4">
+          {/* Informazioni Recruiter */}
+          {(proposal.recruiter_email || proposal.recruiter_name) && (
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-medium text-blue-900">Recruiter</h4>
+                <Button
+                  onClick={handleShowRecruiterProfile}
+                  disabled={loadingRecruiter}
+                  variant="outline"
+                  size="sm"
+                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                >
+                  <UserCircle className="h-4 w-4 mr-2" />
+                  {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo"}
+                </Button>
+              </div>
+              <div className="text-sm">
+                <div className="font-medium text-gray-900">
+                  {proposal.recruiter_name || 'Recruiter'}
+                </div>
+                <div className="text-gray-600">
+                  {proposal.recruiter_email}
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Descrizione del candidato */}
           {proposal.proposal_description ? (
             <div>
@@ -182,14 +223,12 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
         </CardContent>
       </Card>
 
-      {/* Profilo Recruiter - Versione compatta */}
-      {(proposal.recruiter_email || proposal.recruiter_name) && (
-        <RecruiterProfileCard 
-          recruiterEmail={proposal.recruiter_email}
-          recruiterName={proposal.recruiter_name}
-          compact={true}
-        />
-      )}
-    </div>
+      {/* Modal Profilo Recruiter */}
+      <RecruiterProfileViewModal
+        open={showRecruiterProfile}
+        onOpenChange={setShowRecruiterProfile}
+        profile={recruiterProfile}
+      />
+    </>
   );
 }

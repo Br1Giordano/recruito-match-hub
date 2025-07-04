@@ -43,6 +43,9 @@ export default function RecruiterProfileViewModal({
 }: RecruiterProfileViewModalProps) {
   if (!profile) return null;
 
+  // Debug log per verificare i dati del profilo
+  console.log('RecruiterProfileViewModal - Profile data:', profile);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -184,6 +187,14 @@ export default function RecruiterProfileViewModal({
                   </Button>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Messaggio o nota aggiuntiva se presente */}
+          {profile.messaggio && !profile.bio && (
+            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+              <h4 className="font-semibold text-yellow-800 mb-2">Messaggio del Recruiter:</h4>
+              <p className="text-yellow-700">{profile.messaggio}</p>
             </div>
           )}
 

@@ -131,9 +131,6 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
               avatarUrl={displayProfile.avatar_url}
               name={`${displayProfile.nome} ${displayProfile.cognome}`}
               size="lg"
-              onUpload={uploadAvatar}
-              isUploading={isUploading}
-              editable={isEditing}
             />
             
             <div className="flex-1">

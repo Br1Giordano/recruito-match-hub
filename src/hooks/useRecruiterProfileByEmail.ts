@@ -35,29 +35,23 @@ export const useRecruiterProfileByEmail = () => {
     console.log('Fetching recruiter profile by email:', email);
     
     try {
-      // First try to get the full profile from recruiter_registrations
+      // Cerco il profilo completo da recruiter_registrations
       const { data, error } = await supabase
         .from('recruiter_registrations')
         .select('*')
         .eq('email', email)
         .maybeSingle();
 
+      console.log('Raw recruiter data from DB:', data);
+      console.log('Query error:', error);
+
       if (error) {
         console.error('Error fetching recruiter profile by email:', error);
-        // Create a basic profile with email information if there's an error
-        const basicProfile: RecruiterProfile = {
-          id: '',
-          nome: email.split('@')[0] || 'Recruiter',
-          cognome: '',
-          email: email,
-        };
-        setProfile(basicProfile);
-        return basicProfile;
       }
 
       if (!data) {
         console.log('No recruiter profile found for email:', email);
-        // Create a basic profile with email information if no full profile exists
+        // Creo un profilo base con le informazioni email
         const basicProfile: RecruiterProfile = {
           id: '',
           nome: email.split('@')[0] || 'Recruiter',
@@ -68,12 +62,13 @@ export const useRecruiterProfileByEmail = () => {
         return basicProfile;
       }
       
-      console.log('Recruiter profile fetched by email:', data);
-      setProfile(data as RecruiterProfile);
-      return data as RecruiterProfile;
+      console.log('Complete recruiter profile fetched:', data);
+      const fullProfile = data as RecruiterProfile;
+      setProfile(fullProfile);
+      return fullProfile;
     } catch (error) {
-      console.error('Error in fetchProfileByEmail:', error);
-      // Create a basic profile even on error
+      console.error('Unexpected error in fetchProfileByEmail:', error);
+      // Crea un profilo base anche in caso di errore
       const basicProfile: RecruiterProfile = {
         id: '',
         nome: email.split('@')[0] || 'Recruiter',

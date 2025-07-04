@@ -26,7 +26,10 @@ export const useRecruiterProfileByEmail = () => {
   const [loading, setLoading] = useState(false);
 
   const fetchProfileByEmail = async (email: string) => {
-    if (!email) return null;
+    if (!email) {
+      console.log('No email provided');
+      return null;
+    }
     
     setLoading(true);
     console.log('Fetching recruiter profile by email:', email);
@@ -40,14 +43,29 @@ export const useRecruiterProfileByEmail = () => {
 
       if (error) {
         console.error('Error fetching recruiter profile by email:', error);
+        setProfile(null);
         return null;
+      }
+
+      if (!data) {
+        console.log('No recruiter profile found for email:', email);
+        // Create a basic profile with email information if no full profile exists
+        const basicProfile: RecruiterProfile = {
+          id: '',
+          nome: email.split('@')[0] || 'Recruiter',
+          cognome: '',
+          email: email,
+        };
+        setProfile(basicProfile);
+        return basicProfile;
       }
       
       console.log('Recruiter profile fetched by email:', data);
-      setProfile(data as RecruiterProfile | null);
-      return data as RecruiterProfile | null;
+      setProfile(data as RecruiterProfile);
+      return data as RecruiterProfile;
     } catch (error) {
       console.error('Error in fetchProfileByEmail:', error);
+      setProfile(null);
       return null;
     } finally {
       setLoading(false);

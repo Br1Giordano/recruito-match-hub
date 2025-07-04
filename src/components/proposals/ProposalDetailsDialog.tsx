@@ -36,7 +36,9 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
 
   const handleShowRecruiterProfile = async () => {
     if (proposal.recruiter_email) {
-      await fetchProfileByEmail(proposal.recruiter_email);
+      console.log('Fetching recruiter profile for:', proposal.recruiter_email);
+      const profile = await fetchProfileByEmail(proposal.recruiter_email);
+      console.log('Fetched profile:', profile);
       setShowRecruiterProfile(true);
     }
   };
@@ -115,35 +117,29 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
             </div>
 
             {/* Recruiter Information */}
-            {(proposal.recruiter_name || proposal.recruiter_email) && (
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Informazioni Recruiter</h3>
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  {proposal.recruiter_name && (
-                    <div className="mb-2">
-                      <span className="font-medium">Nome: </span>
-                      {proposal.recruiter_email ? (
-                        <button
-                          onClick={handleShowRecruiterProfile}
-                          disabled={loadingRecruiter}
-                          className="text-blue-600 hover:underline disabled:opacity-50"
-                        >
-                          {proposal.recruiter_name}
-                          {loadingRecruiter && " (Caricamento...)"}
-                        </button>
-                      ) : (
-                        <span>{proposal.recruiter_name}</span>
-                      )}
-                    </div>
-                  )}
-                  {proposal.recruiter_email && (
-                    <div className="text-sm text-muted-foreground">
-                      Email: {proposal.recruiter_email}
-                    </div>
-                  )}
-                </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Contatti Recruiter</h3>
+              <div className="bg-gray-50 p-4 rounded-lg">
+                {proposal.recruiter_email && (
+                  <div className="mb-2">
+                    <span className="font-medium">Email: </span>
+                    <button
+                      onClick={handleShowRecruiterProfile}
+                      disabled={loadingRecruiter}
+                      className="text-blue-600 hover:underline disabled:opacity-50 font-medium"
+                    >
+                      {proposal.recruiter_email}
+                      {loadingRecruiter && " (Caricamento...)"}
+                    </button>
+                  </div>
+                )}
+                {proposal.recruiter_name && (
+                  <div className="text-sm text-muted-foreground">
+                    Nome: {proposal.recruiter_name}
+                  </div>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Candidate Details */}
             <div>

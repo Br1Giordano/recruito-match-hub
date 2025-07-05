@@ -33,13 +33,7 @@ export default function RecruiterAvatar({ avatarUrl, name, size = 'md' }: Recrui
 
   return (
     <Avatar className={sizeClasses[size]}>
-      {avatarUrl && (
-        <AvatarImage 
-          src={avatarUrl} 
-          alt={name}
-          className="object-cover"
-        />
-      )}
+      <AvatarImage src={avatarUrl} alt={name} />
       <AvatarFallback className={`bg-blue-100 text-blue-600 font-semibold ${textSizeClasses[size]}`}>
         {getInitials(name)}
       </AvatarFallback>

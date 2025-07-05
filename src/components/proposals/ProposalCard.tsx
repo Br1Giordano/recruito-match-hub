@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Euro, Calendar, User, Phone, Linkedin, UserCircle } from "lucide-react";
+import { Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
@@ -36,10 +37,13 @@ interface ProposalCardProps {
 
 export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
-  const { profile: recruiterProfile, loading: loadingRecruiter } = useRecruiterProfileByEmail(proposal.recruiter_email);
+  const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
 
-  const handleShowRecruiterProfile = () => {
-    if (recruiterProfile) {
+  const handleShowRecruiterProfile = async () => {
+    if (proposal.recruiter_email) {
+      console.log('Fetching recruiter profile for:', proposal.recruiter_email);
+      const profile = await fetchProfileByEmail(proposal.recruiter_email);
+      console.log('Fetched profile:', profile);
       setShowRecruiterProfile(true);
     }
   };
@@ -93,73 +97,35 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
           </div>
           {proposal.job_offers?.title && (
             <div className="text-sm text-muted-foreground">
-              Proposto per {proposal.job_offers.title}
+              Proposto da {proposal.recruiter_name || proposal.recruiter_email} • {proposal.job_offers.title}
             </div>
           )}
         </CardHeader>
 
         <CardContent className="space-y-4">
           {/* Informazioni Recruiter */}
-          {proposal.recruiter_email && (
+          {(proposal.recruiter_email || proposal.recruiter_name) && (
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex justify-between items-center mb-2">
                 <h4 className="font-medium text-blue-900">Recruiter</h4>
                 <Button
                   onClick={handleShowRecruiterProfile}
-                  disabled={loadingRecruiter || !recruiterProfile}
+                  disabled={loadingRecruiter}
                   variant="outline"
                   size="sm"
                   className="text-blue-600 border-blue-300 hover:bg-blue-100"
                 >
                   <UserCircle className="h-4 w-4 mr-2" />
-                  {loadingRecruiter ? "Caricamento..." : 
-                   recruiterProfile ? "Visualizza Profilo" : "Profilo non disponibile"}
+                  {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo"}
                 </Button>
               </div>
               <div className="text-sm">
-                {recruiterProfile ? (
-                  <>
-                    <div className="font-medium text-gray-900">
-                      {recruiterProfile.nome} {recruiterProfile.cognome}
-                    </div>
-                    <div className="text-gray-600">
-                      {recruiterProfile.email}
-                    </div>
-                    {recruiterProfile.azienda && (
-                      <div className="text-gray-500 text-xs mt-1">
-                        {recruiterProfile.azienda}
-                      </div>
-                    )}
-                    {recruiterProfile.settori && (
-                      <div className="text-gray-500 text-xs mt-1">
-                        Settori: {recruiterProfile.settori}
-                      </div>
-                    )}
-                    {recruiterProfile.specializations && recruiterProfile.specializations.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-2">
-                        {recruiterProfile.specializations.slice(0, 3).map((spec, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            {spec}
-                          </Badge>
-                        ))}
-                        {recruiterProfile.specializations.length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{recruiterProfile.specializations.length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="font-medium text-gray-900">
-                      {proposal.recruiter_name || 'Recruiter'}
-                    </div>
-                    <div className="text-gray-600">
-                      {proposal.recruiter_email}
-                    </div>
-                  </>
-                )}
+                <div className="font-medium text-gray-900">
+                  {proposal.recruiter_name || 'Recruiter'}
+                </div>
+                <div className="text-gray-600">
+                  {proposal.recruiter_email}
+                </div>
               </div>
             </div>
           )}

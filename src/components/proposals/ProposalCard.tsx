@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,14 +36,7 @@ interface ProposalCardProps {
 
 export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
-  const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
-
-  // Carica il profilo del recruiter solo una volta quando il componente viene montato
-  useEffect(() => {
-    if (proposal.recruiter_email && !recruiterProfile) {
-      fetchProfileByEmail(proposal.recruiter_email);
-    }
-  }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile]);
+  const { profile: recruiterProfile, loading: loadingRecruiter } = useRecruiterProfileByEmail(proposal.recruiter_email);
 
   const handleShowRecruiterProfile = () => {
     if (recruiterProfile) {
@@ -135,6 +128,25 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                     {recruiterProfile.azienda && (
                       <div className="text-gray-500 text-xs mt-1">
                         {recruiterProfile.azienda}
+                      </div>
+                    )}
+                    {recruiterProfile.settori && (
+                      <div className="text-gray-500 text-xs mt-1">
+                        Settori: {recruiterProfile.settori}
+                      </div>
+                    )}
+                    {recruiterProfile.specializations && recruiterProfile.specializations.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mt-2">
+                        {recruiterProfile.specializations.slice(0, 3).map((spec, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {spec}
+                          </Badge>
+                        ))}
+                        {recruiterProfile.specializations.length > 3 && (
+                          <Badge variant="outline" className="text-xs">
+                            +{recruiterProfile.specializations.length - 3}
+                          </Badge>
+                        )}
                       </div>
                     )}
                   </>

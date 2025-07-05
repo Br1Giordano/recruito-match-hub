@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface RecruiterProfile {
@@ -26,40 +26,40 @@ interface RecruiterProfile {
 const profileCache = new Map<string, { profile: RecruiterProfile | null; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
 
-export const useRecruiterProfileByEmail = () => {
+export const useRecruiterProfileByEmail = (email?: string) => {
   const [profile, setProfile] = useState<RecruiterProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const fetchingRef = useRef<Set<string>>(new Set());
 
-  const fetchProfileByEmail = useCallback(async (email: string) => {
-    if (!email) {
+  const fetchProfileByEmail = useCallback(async (emailToFetch: string) => {
+    if (!emailToFetch) {
       console.log('No email provided');
       return null;
     }
 
     // Controlla la cache
-    const cached = profileCache.get(email);
+    const cached = profileCache.get(emailToFetch);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('Using cached profile for:', email);
+      console.log('Using cached profile for:', emailToFetch);
       setProfile(cached.profile);
       return cached.profile;
     }
 
     // Evita fetch multipli simultanei per la stessa email
-    if (fetchingRef.current.has(email)) {
-      console.log('Already fetching profile for:', email);
+    if (fetchingRef.current.has(emailToFetch)) {
+      console.log('Already fetching profile for:', emailToFetch);
       return null;
     }
 
-    fetchingRef.current.add(email);
+    fetchingRef.current.add(emailToFetch);
     setLoading(true);
-    console.log('Fetching recruiter profile by email:', email);
+    console.log('Fetching recruiter profile by email:', emailToFetch);
     
     try {
       const { data, error } = await supabase
         .from('recruiter_registrations')
         .select('*')
-        .eq('email', email)
+        .eq('email', emailToFetch)
         .maybeSingle();
 
       console.log('Raw recruiter data from DB:', data);
@@ -67,14 +67,14 @@ export const useRecruiterProfileByEmail = () => {
 
       if (error) {
         console.error('Error fetching recruiter profile by email:', error);
-        profileCache.set(email, { profile: null, timestamp: Date.now() });
+        profileCache.set(emailToFetch, { profile: null, timestamp: Date.now() });
         setProfile(null);
         return null;
       }
 
       if (!data) {
-        console.log('No recruiter profile found for email:', email);
-        profileCache.set(email, { profile: null, timestamp: Date.now() });
+        console.log('No recruiter profile found for email:', emailToFetch);
+        profileCache.set(emailToFetch, { profile: null, timestamp: Date.now() });
         setProfile(null);
         return null;
       }
@@ -83,19 +83,26 @@ export const useRecruiterProfileByEmail = () => {
       const fullProfile = data as RecruiterProfile;
       
       // Salva nella cache
-      profileCache.set(email, { profile: fullProfile, timestamp: Date.now() });
+      profileCache.set(emailToFetch, { profile: fullProfile, timestamp: Date.now() });
       setProfile(fullProfile);
       return fullProfile;
     } catch (error) {
       console.error('Unexpected error in fetchProfileByEmail:', error);
-      profileCache.set(email, { profile: null, timestamp: Date.now() });
+      profileCache.set(emailToFetch, { profile: null, timestamp: Date.now() });
       setProfile(null);
       return null;
     } finally {
       setLoading(false);
-      fetchingRef.current.delete(email);
+      fetchingRef.current.delete(emailToFetch);
     }
   }, []);
+
+  // Auto-fetch quando l'email viene fornita
+  useEffect(() => {
+    if (email && !profile) {
+      fetchProfileByEmail(email);
+    }
+  }, [email, fetchProfileByEmail, profile]);
 
   return {
     profile,

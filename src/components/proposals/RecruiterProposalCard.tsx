@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Euro, Calendar, User, Phone, Linkedin, MapPin, Building2 } from "lucide-react";
@@ -31,14 +30,7 @@ interface RecruiterProposalCardProps {
 }
 
 export default function RecruiterProposalCard({ proposal }: RecruiterProposalCardProps) {
-  const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
-
-  // Carica il profilo del recruiter solo una volta quando il componente viene montato
-  useEffect(() => {
-    if (proposal.recruiter_email && !recruiterProfile) {
-      fetchProfileByEmail(proposal.recruiter_email);
-    }
-  }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile]);
+  const { profile: recruiterProfile, loading: loadingRecruiter } = useRecruiterProfileByEmail(proposal.recruiter_email);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -129,6 +121,14 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
                 </div>
               </div>
               
+              {/* Settori di specializzazione */}
+              {recruiterProfile.settori && (
+                <div className="bg-white p-2 rounded border">
+                  <div className="text-xs font-medium text-gray-700 mb-1">Settori di competenza:</div>
+                  <div className="text-sm text-gray-600">{recruiterProfile.settori}</div>
+                </div>
+              )}
+              
               {/* Informazioni aggiuntive */}
               <div className="flex flex-wrap gap-2">
                 {recruiterProfile.years_of_experience && (
@@ -142,6 +142,20 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
                   </Badge>
                 )}
               </div>
+
+              {/* Specializzazioni dettagliate */}
+              {recruiterProfile.specializations && recruiterProfile.specializations.length > 0 && (
+                <div>
+                  <div className="text-xs font-medium text-gray-700 mb-2">Specializzazioni:</div>
+                  <div className="flex flex-wrap gap-1">
+                    {recruiterProfile.specializations.map((spec, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {spec}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Contatti aggiuntivi */}
               <div className="flex gap-3 text-xs">

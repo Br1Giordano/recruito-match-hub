@@ -38,23 +38,16 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
   const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
 
-  // Carica il profilo del recruiter quando il componente viene montato
+  // Carica il profilo del recruiter solo una volta quando il componente viene montato
   useEffect(() => {
-    if (proposal.recruiter_email) {
+    if (proposal.recruiter_email && !recruiterProfile) {
       fetchProfileByEmail(proposal.recruiter_email);
     }
-  }, [proposal.recruiter_email, fetchProfileByEmail]);
+  }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile]);
 
-  const handleShowRecruiterProfile = async () => {
+  const handleShowRecruiterProfile = () => {
     if (recruiterProfile) {
       setShowRecruiterProfile(true);
-    } else if (proposal.recruiter_email) {
-      console.log('Fetching recruiter profile for:', proposal.recruiter_email);
-      const profile = await fetchProfileByEmail(proposal.recruiter_email);
-      console.log('Fetched profile:', profile);
-      if (profile) {
-        setShowRecruiterProfile(true);
-      }
     }
   };
 

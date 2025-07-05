@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -34,12 +33,12 @@ interface RecruiterProposalCardProps {
 export default function RecruiterProposalCard({ proposal }: RecruiterProposalCardProps) {
   const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
 
-  // Carica il profilo del recruiter quando il componente viene montato
+  // Carica il profilo del recruiter solo una volta quando il componente viene montato
   useEffect(() => {
-    if (proposal.recruiter_email) {
+    if (proposal.recruiter_email && !recruiterProfile) {
       fetchProfileByEmail(proposal.recruiter_email);
     }
-  }, [proposal.recruiter_email, fetchProfileByEmail]);
+  }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

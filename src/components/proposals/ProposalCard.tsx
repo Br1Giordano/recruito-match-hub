@@ -3,9 +3,10 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle } from "lucide-react";
+import { Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle, Star } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
+import RecruiterReviewModal from "../recruiter/RecruiterReviewModal";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 
 interface ProposalCardProps {
@@ -37,6 +38,7 @@ interface ProposalCardProps {
 
 export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
   const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
 
   const handleShowRecruiterProfile = async () => {
@@ -108,16 +110,31 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex justify-between items-center mb-2">
                 <h4 className="font-medium text-blue-900">Recruiter</h4>
-                <Button
-                  onClick={handleShowRecruiterProfile}
-                  disabled={loadingRecruiter}
-                  variant="outline"
-                  size="sm"
-                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
-                >
-                  <UserCircle className="h-4 w-4 mr-2" />
-                  {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleShowRecruiterProfile}
+                    disabled={loadingRecruiter}
+                    variant="outline"
+                    size="sm"
+                    className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                  >
+                    <UserCircle className="h-4 w-4 mr-2" />
+                    {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo"}
+                  </Button>
+                  
+                  {/* Pulsante Recensione - Solo per proposte approvate/assunto */}
+                  {(proposal.status === 'approved' || proposal.status === 'hired') && (
+                    <Button
+                      onClick={() => setShowReviewModal(true)}
+                      variant="outline"
+                      size="sm"
+                      className="text-yellow-600 border-yellow-300 hover:bg-yellow-100"
+                    >
+                      <Star className="h-4 w-4 mr-2" />
+                      Recensisci
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="text-sm">
                 <div className="font-medium text-gray-900">
@@ -229,6 +246,16 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
         onOpenChange={setShowRecruiterProfile}
         profile={recruiterProfile}
       />
+
+      {/* Modal Recensione */}
+      {proposal.recruiter_email && (
+        <RecruiterReviewModal
+          open={showReviewModal}
+          onOpenChange={setShowReviewModal}
+          recruiterEmail={proposal.recruiter_email}
+          proposalId={proposal.id}
+        />
+      )}
     </>
   );
 }

@@ -1,12 +1,12 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Euro, Calendar, User, Building2, Phone, Linkedin, FileText } from "lucide-react";
+import { Eye, Euro, Calendar, User, Building2, Phone, Linkedin, FileText, Star } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterAvatar from "../recruiter/RecruiterAvatar";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
+import { useRecruiterStats } from "@/hooks/useRecruiterStats";
 
 interface RecruiterProposalCardProps {
   proposal: {
@@ -34,13 +34,15 @@ interface RecruiterProposalCardProps {
 
 export default function RecruiterProposalCard({ proposal }: RecruiterProposalCardProps) {
   const { profile: recruiterProfile, fetchProfileByEmail } = useRecruiterProfileByEmail();
+  const { stats, fetchRecruiterStats } = useRecruiterStats();
 
   // Carica il profilo del recruiter quando il componente viene montato
-  useState(() => {
+  useEffect(() => {
     if (proposal.recruiter_email) {
       fetchProfileByEmail(proposal.recruiter_email);
+      fetchRecruiterStats(proposal.recruiter_email);
     }
-  });
+  }, [proposal.recruiter_email]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -96,7 +98,7 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Profilo Recruiter - Nuovo */}
+        {/* Profilo Recruiter - Aggiornato con statistiche */}
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
           <h4 className="font-medium mb-3 text-blue-900">Profilo Recruiter</h4>
           <div className="flex items-center gap-3">
@@ -104,6 +106,12 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
               avatarUrl={recruiterProfile?.avatar_url}
               name={recruiterProfile ? `${recruiterProfile.nome} ${recruiterProfile.cognome}` : (proposal.recruiter_name || 'Recruiter')}
               size="md"
+              stats={stats ? {
+                interestedProposals: stats.interestedProposals,
+                averageRating: stats.averageRating,
+                totalReviews: stats.totalReviews
+              } : undefined}
+              showStats={true}
             />
             <div className="flex-1">
               <div className="font-medium text-gray-900">
@@ -124,6 +132,31 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
               )}
             </div>
           </div>
+          
+          {/* Statistiche Performance - Nuovo */}
+          {stats && (
+            <div className="mt-3 pt-3 border-t border-blue-200">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-lg font-semibold text-green-600">{stats.interestedProposals}</div>
+                  <div className="text-xs text-gray-600">Interessati</div>
+                </div>
+                <div>
+                  <div className="text-lg font-semibold text-purple-600">{stats.approvedProposals}</div>
+                  <div className="text-xs text-gray-600">Approvati</div>
+                </div>
+                <div>
+                  <div className="flex items-center justify-center gap-1">
+                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                    <span className="text-lg font-semibold text-yellow-600">
+                      {stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '-'}
+                    </span>
+                  </div>
+                  <div className="text-xs text-gray-600">Rating</div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Descrizione del candidato */}

@@ -12,7 +12,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { MapPin, Briefcase, Globe, Linkedin, X, Plus } from 'lucide-react';
+import { MapPin, Briefcase, Globe, Linkedin, X, Plus, Camera, Upload } from 'lucide-react';
 import RecruiterAvatar from './RecruiterAvatar';
 import { useRecruiterProfile } from '@/hooks/useRecruiterProfile';
 import { useAuth } from '@/hooks/useAuth';
@@ -85,6 +85,13 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
     }
   };
 
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      await uploadAvatar(file);
+    }
+  };
+
   const addSpecialization = () => {
     if (newSpecialization.trim() && !formData.specializations.includes(newSpecialization.trim())) {
       setFormData(prev => ({
@@ -127,11 +134,49 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
         <div className="space-y-6">
           {/* Header con avatar e info base */}
           <div className="flex items-start gap-6">
-            <RecruiterAvatar
-              avatarUrl={displayProfile.avatar_url}
-              name={`${displayProfile.nome} ${displayProfile.cognome}`}
-              size="lg"
-            />
+            {/* Avatar section with upload functionality */}
+            <div className="flex flex-col items-center gap-3">
+              <RecruiterAvatar
+                avatarUrl={displayProfile.avatar_url}
+                name={`${displayProfile.nome} ${displayProfile.cognome}`}
+                size="lg"
+              />
+              
+              {/* Avatar upload button */}
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  disabled={isUploading}
+                />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  disabled={isUploading}
+                  className="flex items-center gap-2"
+                >
+                  {isUploading ? (
+                    <>
+                      <Upload className="h-4 w-4 animate-spin" />
+                      Caricamento...
+                    </>
+                  ) : (
+                    <>
+                      <Camera className="h-4 w-4" />
+                      {displayProfile.avatar_url ? 'Cambia foto' : 'Aggiungi foto'}
+                    </>
+                  )}
+                </Button>
+              </div>
+              
+              {displayProfile.avatar_url && (
+                <p className="text-xs text-gray-500 text-center">
+                  Clicca "Cambia foto" per<br />aggiornare l'immagine
+                </p>
+              )}
+            </div>
             
             <div className="flex-1">
               {isEditing ? (

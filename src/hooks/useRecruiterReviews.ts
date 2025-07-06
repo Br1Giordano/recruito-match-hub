@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useAuth } from './useAuth';
 
 interface CreateReviewData {
@@ -30,7 +30,7 @@ export const useRecruiterReviews = () => {
 
     try {
       const { error } = await supabase
-        .from('recruiter_reviews')
+        .from('recruiter_reviews' as any)
         .insert({
           recruiter_email: reviewData.recruiterEmail,
           company_email: user.email,
@@ -73,7 +73,7 @@ export const useRecruiterReviews = () => {
 
     try {
       const { error } = await supabase
-        .from('recruiter_reviews')
+        .from('recruiter_reviews' as any)
         .update({
           rating,
           review_text: reviewText,

@@ -44,7 +44,7 @@ export const useRecruiterStats = () => {
 
       // Fetch reviews
       const { data: reviewsData, error: reviewsError } = await supabase
-        .from('recruiter_reviews')
+        .from('recruiter_reviews' as any)
         .select('*')
         .eq('recruiter_email', recruiterEmail)
         .order('created_at', { ascending: false });
@@ -60,7 +60,7 @@ export const useRecruiterStats = () => {
       
       const totalReviews = reviewsData?.length || 0;
       const averageRating = totalReviews > 0 
-        ? reviewsData.reduce((sum, review) => sum + review.rating, 0) / totalReviews 
+        ? reviewsData.reduce((sum: number, review: any) => sum + review.rating, 0) / totalReviews 
         : 0;
 
       setStats({

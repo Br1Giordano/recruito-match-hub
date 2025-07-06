@@ -42,15 +42,16 @@ export const useRecruiterStats = () => {
         return;
       }
 
-      // Fetch reviews
+      // Fetch reviews - Fix the query to use the correct table name
       const { data: reviewsData, error: reviewsError } = await supabase
-        .from('recruiter_reviews' as any)
+        .from('recruiter_reviews')
         .select('*')
         .eq('recruiter_email', recruiterEmail)
         .order('created_at', { ascending: false });
 
       if (reviewsError) {
         console.error('Error fetching reviews:', reviewsError);
+        // Don't return here, continue with stats calculation even if reviews fail
       }
 
       // Calculate statistics
@@ -59,8 +60,8 @@ export const useRecruiterStats = () => {
       const approvedProposals = proposalsData?.filter(p => p.status === 'approved' || p.status === 'hired').length || 0;
       
       const totalReviews = reviewsData?.length || 0;
-      const averageRating = totalReviews > 0 
-        ? reviewsData.reduce((sum: number, review: any) => sum + review.rating, 0) / totalReviews 
+      const averageRating = totalReviews > 0 && reviewsData
+        ? reviewsData.reduce((sum, review) => sum + review.rating, 0) / totalReviews 
         : 0;
 
       setStats({
@@ -71,8 +72,8 @@ export const useRecruiterStats = () => {
         totalReviews
       });
 
-      // Safely set reviews data
-      setReviews(reviewsData || []);
+      // Safely set reviews data - ensure it's an array
+      setReviews(Array.isArray(reviewsData) ? reviewsData : []);
       
     } catch (error) {
       console.error('Error fetching recruiter stats:', error);

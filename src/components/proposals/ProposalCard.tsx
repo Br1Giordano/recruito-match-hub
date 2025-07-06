@@ -1,9 +1,8 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle, Star, CheckCircle, Play } from "lucide-react";
+import { Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle, Star, CheckCircle, Play, X } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
 import RecruiterReviewModal from "../recruiter/RecruiterReviewModal";
@@ -62,6 +61,12 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
     }
   };
 
+  const handleReject = () => {
+    if (onStatusUpdate) {
+      onStatusUpdate(proposal.id, 'rejected');
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
@@ -117,7 +122,6 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* Informazioni Recruiter */}
           {(proposal.recruiter_email || proposal.recruiter_name) && (
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex justify-between items-center mb-2">
@@ -134,7 +138,6 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                     {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo"}
                   </Button>
                   
-                  {/* Pulsante Recensione - Solo per proposte approvate/assunto */}
                   {(proposal.status === 'approved' || proposal.status === 'hired') && (
                     <Button
                       onClick={() => setShowReviewModal(true)}
@@ -159,7 +162,6 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
             </div>
           )}
 
-          {/* Descrizione del candidato */}
           {proposal.proposal_description ? (
             <div>
               <h4 className="font-medium mb-2">Descrizione del candidato:</h4>
@@ -176,7 +178,6 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
             </div>
           )}
 
-          {/* Contatti Candidato */}
           <div>
             <h4 className="font-medium mb-2">Contatti Candidato:</h4>
             <div className="space-y-1">
@@ -205,7 +206,6 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
             </div>
           </div>
 
-          {/* Dettagli */}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <span className="font-medium">Fee recruiter: </span>
@@ -231,37 +231,55 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
             )}
           </div>
 
-          {/* Data di ricezione */}
           <div className="text-xs text-muted-foreground border-t pt-2">
             Ricevuta il {new Date(proposal.created_at).toLocaleDateString('it-IT')} alle {new Date(proposal.created_at).toLocaleTimeString('it-IT')}
           </div>
 
-          {/* Pulsanti azione */}
           <div className="flex justify-end gap-2 pt-2">
-            {/* Pulsante Avvia Valutazione - Solo per proposte in attesa */}
             {proposal.status === 'pending' && (
-              <Button
-                onClick={handleStartEvaluation}
-                variant="default"
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-              >
-                <Play className="h-4 w-4 mr-2" />
-                Avvia Valutazione
-              </Button>
+              <>
+                <Button
+                  onClick={handleReject}
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Rifiuta
+                </Button>
+                <Button
+                  onClick={handleStartEvaluation}
+                  variant="default"
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  Avvia Valutazione
+                </Button>
+              </>
             )}
             
-            {/* Pulsante Approva - Solo per proposte in revisione */}
             {proposal.status === 'under_review' && (
-              <Button
-                onClick={handleApprove}
-                variant="default"
-                size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white"
-              >
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Approva
-              </Button>
+              <>
+                <Button
+                  onClick={handleReject}
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Rifiuta
+                </Button>
+                <Button
+                  onClick={handleApprove}
+                  variant="default"
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  Approva
+                </Button>
+              </>
             )}
             
             <ProposalDetailsDialog proposal={proposal} />
@@ -278,14 +296,12 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
         </CardContent>
       </Card>
 
-      {/* Modal Profilo Recruiter */}
       <RecruiterProfileViewModal
         open={showRecruiterProfile}
         onOpenChange={setShowRecruiterProfile}
         profile={recruiterProfile}
       />
 
-      {/* Modal Recensione */}
       {proposal.recruiter_email && (
         <RecruiterReviewModal
           open={showReviewModal}

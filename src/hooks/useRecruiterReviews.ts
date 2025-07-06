@@ -30,7 +30,7 @@ export const useRecruiterReviews = () => {
 
     try {
       const { error } = await supabase
-        .from('recruiter_reviews' as any)
+        .from('recruiter_reviews')
         .insert({
           recruiter_email: reviewData.recruiterEmail,
           company_email: user.email,
@@ -73,7 +73,7 @@ export const useRecruiterReviews = () => {
 
     try {
       const { error } = await supabase
-        .from('recruiter_reviews' as any)
+        .from('recruiter_reviews')
         .update({
           rating,
           review_text: reviewText,

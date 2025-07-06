@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle, Star, CheckCircle } from "lucide-react";
+import { Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle, Star, CheckCircle, Play } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
 import RecruiterReviewModal from "../recruiter/RecruiterReviewModal";
@@ -47,6 +47,12 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
       const profile = await fetchProfileByEmail(proposal.recruiter_email);
       console.log('Fetched profile:', profile);
       setShowRecruiterProfile(true);
+    }
+  };
+
+  const handleStartEvaluation = () => {
+    if (onStatusUpdate) {
+      onStatusUpdate(proposal.id, 'under_review');
     }
   };
 
@@ -232,6 +238,19 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
 
           {/* Pulsanti azione */}
           <div className="flex justify-end gap-2 pt-2">
+            {/* Pulsante Avvia Valutazione - Solo per proposte in attesa */}
+            {proposal.status === 'pending' && (
+              <Button
+                onClick={handleStartEvaluation}
+                variant="default"
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              >
+                <Play className="h-4 w-4 mr-2" />
+                Avvia Valutazione
+              </Button>
+            )}
+            
             {/* Pulsante Approva - Solo per proposte in revisione */}
             {proposal.status === 'under_review' && (
               <Button

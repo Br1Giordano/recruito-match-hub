@@ -71,6 +71,7 @@ export const useRecruiterStats = () => {
         totalReviews
       });
 
+      // Safely set reviews data
       setReviews(reviewsData || []);
       
     } catch (error) {

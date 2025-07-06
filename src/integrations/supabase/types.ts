@@ -325,6 +325,47 @@ export type Database = {
         }
         Relationships: []
       }
+      recruiter_reviews: {
+        Row: {
+          company_email: string
+          created_at: string
+          id: string
+          proposal_id: string | null
+          rating: number
+          recruiter_email: string
+          review_text: string | null
+          updated_at: string
+        }
+        Insert: {
+          company_email: string
+          created_at?: string
+          id?: string
+          proposal_id?: string | null
+          rating: number
+          recruiter_email: string
+          review_text?: string | null
+          updated_at?: string
+        }
+        Update: {
+          company_email?: string
+          created_at?: string
+          id?: string
+          proposal_id?: string | null
+          rating?: number
+          recruiter_email?: string
+          review_text?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recruiter_reviews_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_profiles: {
         Row: {
           auth_user_id: string | null

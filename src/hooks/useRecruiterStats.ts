@@ -42,7 +42,7 @@ export const useRecruiterStats = () => {
         return;
       }
 
-      // Fetch reviews - Fix the query to use the correct table name
+      // Fetch reviews - Now the table exists
       const { data: reviewsData, error: reviewsError } = await supabase
         .from('recruiter_reviews')
         .select('*')

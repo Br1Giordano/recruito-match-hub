@@ -9,6 +9,7 @@ import ProposalFilters from "./proposals/ProposalFilters";
 import ProposalCard from "./proposals/ProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import ProposalTabs from "./proposals/ProposalTabs";
+import CompactKPIHeader from "./proposals/CompactKPIHeader";
 
 export default function CompanyProposalsDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,6 +24,20 @@ export default function CompanyProposalsDashboard() {
   const pendingProposals = proposals.filter(p => p.status === "pending");
   const evaluatingProposals = proposals.filter(p => p.status === "under_review"); // Changed from "interested" to "evaluating"
   const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status)); // Updated to exclude "under_review"
+
+  // Calcola KPI
+  const totalProposals = proposals.length;
+  const activeProposals = pendingProposals.length + evaluatingProposals.length;
+  
+  // Calcola tempo medio di risposta (simulato per ora)
+  const avgResponseTime = proposals.length > 0 
+    ? proposals.reduce((acc, proposal) => {
+        const createdAt = new Date(proposal.created_at);
+        const now = new Date();
+        const hoursDiff = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+        return acc + hoursDiff;
+      }, 0) / proposals.length
+    : 0;
 
   useEffect(() => {
     let currentProposals = [];
@@ -154,32 +169,40 @@ export default function CompanyProposalsDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Proposte Ricevute</h1>
-        <p className="text-muted-foreground">
-          Revisiona e gestisci le proposte inviate dai recruiter per le tue offerte di lavoro
-        </p>
+      <CompactKPIHeader
+        totalProposals={totalProposals}
+        activeProposals={activeProposals}
+        avgResponseTime={avgResponseTime}
+      />
+      
+      <div className="container mx-auto px-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Proposte Ricevute</h1>
+          <p className="text-muted-foreground">
+            Revisiona e gestisci le proposte inviate dai recruiter per le tue offerte di lavoro
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="pt-6">
+            <ProposalFilters
+              searchTerm={searchTerm}
+              statusFilter={statusFilter}
+              onSearchChange={setSearchTerm}
+              onStatusChange={setStatusFilter}
+            />
+          </CardContent>
+        </Card>
+
+        <ProposalTabs
+          pendingProposals={pendingProposals}
+          interestedProposals={evaluatingProposals}
+          otherProposals={otherProposals}
+          onTabChange={setActiveTab}
+        >
+          {renderProposals}
+        </ProposalTabs>
       </div>
-
-      <Card>
-        <CardContent className="pt-6">
-          <ProposalFilters
-            searchTerm={searchTerm}
-            statusFilter={statusFilter}
-            onSearchChange={setSearchTerm}
-            onStatusChange={setStatusFilter}
-          />
-        </CardContent>
-      </Card>
-
-      <ProposalTabs
-        pendingProposals={pendingProposals}
-        interestedProposals={evaluatingProposals}
-        otherProposals={otherProposals}
-        onTabChange={setActiveTab}
-      >
-        {renderProposals}
-      </ProposalTabs>
     </div>
   );
 }

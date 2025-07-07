@@ -81,19 +81,20 @@ export default function KanbanCard({
   return (
     <Card
       className={cn(
-        "p-3 cursor-pointer transition-all duration-150",
-        `border-l-4 ${config.borderColor}`,
-        isActive && "ring-2 ring-blue-500",
+        "p-3 cursor-pointer transition-all duration-150 rounded-lg",
+        "box-border min-h-fit",
+        isActive && "shadow-md",
         isDragging && "opacity-50 scale-95",
-        "hover:shadow-md"
+        "hover:shadow-md focus-within:shadow-md"
       )}
+      style={{
+        borderLeft: `4px solid ${config.color}`,
+        backgroundColor: isActive ? `${config.color}10` : '#FFFFFF'
+      }}
       draggable
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={onClick}
-      style={{
-        backgroundColor: isActive ? `${config.color}10` : undefined
-      }}
       onMouseEnter={(e) => {
         if (!isActive) {
           e.currentTarget.style.backgroundColor = `${config.color}10`;
@@ -101,9 +102,18 @@ export default function KanbanCard({
       }}
       onMouseLeave={(e) => {
         if (!isActive) {
-          e.currentTarget.style.backgroundColor = 'white';
+          e.currentTarget.style.backgroundColor = '#FFFFFF';
         }
       }}
+      onFocus={(e) => {
+        e.currentTarget.style.boxShadow = `0 0 0 2px ${config.color}`;
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.boxShadow = '';
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Candidatura di ${proposal.candidate_name} - ${config.label}`}
     >
       <div className="space-y-3">
         {/* Header with checkbox and badge */}
@@ -113,8 +123,12 @@ export default function KanbanCard({
             onCheckedChange={onSelect}
             onClick={(e) => e.stopPropagation()}
             className="mt-1"
+            aria-label={`Seleziona candidatura di ${proposal.candidate_name}`}
           />
-          <Badge className={cn("text-xs", config.textColor, config.bgColor)}>
+          <Badge 
+            className={cn("text-xs", config.textColor, config.bgColor)}
+            aria-label={`Stato: ${config.label}`}
+          >
             {config.label}
           </Badge>
         </div>
@@ -144,10 +158,13 @@ export default function KanbanCard({
             ))}
           </div>
           <div className="flex items-center gap-1">
-            <div className={cn(
-              "w-2 h-2 rounded-full",
-              matchScore >= 80 ? "bg-green-500" : matchScore >= 60 ? "bg-yellow-500" : "bg-red-500"
-            )}></div>
+            <div 
+              className={cn(
+                "w-2 h-2 rounded-full",
+                matchScore >= 80 ? "bg-green-500" : matchScore >= 60 ? "bg-yellow-500" : "bg-red-500"
+              )}
+              aria-label={`Match score: ${matchScore}%`}
+            ></div>
             <span className="text-xs font-medium text-gray-900">{matchScore}%</span>
           </div>
         </div>
@@ -158,11 +175,13 @@ export default function KanbanCard({
             <span className="font-medium text-gray-700 truncate">
               {proposal.recruiter_name || "Recruiter"}
             </span>
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" aria-hidden="true" />
             <span>{recruiterRating.toFixed(1)}</span>
+            <span>•</span>
+            <span>{recruiterSuccessRate}%</span>
           </div>
           <div className="flex items-center gap-1">
-            <Calendar className="h-3 w-3" />
+            <Calendar className="h-3 w-3" aria-hidden="true" />
             <span>{daysSinceReceived}gg</span>
           </div>
         </div>

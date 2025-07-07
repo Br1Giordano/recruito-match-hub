@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle, X, User, Mail, Phone, Linkedin, Download, Clock, Building2 } from "lucide-react";
+import { CheckCircle, X, User, Mail, Phone, Linkedin, Download, Clock, Building2, Star } from "lucide-react";
+import RecruiterReviewModal from "../recruiter/RecruiterReviewModal";
 
 interface ProposalDetailPanelProps {
   proposal: {
@@ -34,6 +35,7 @@ interface ProposalDetailPanelProps {
 
 export default function ProposalDetailPanel({ proposal, onApprove, onReject }: ProposalDetailPanelProps) {
   const [activeTab, setActiveTab] = useState("info");
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   if (!proposal) {
     return (
@@ -56,9 +58,9 @@ export default function ProposalDetailPanel({ proposal, onApprove, onReject }: P
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "under_review":
         return "bg-blue-100 text-blue-800";
+      case "under_review":
+        return "bg-orange-100 text-orange-800";
       case "approved":
         return "bg-green-100 text-green-800";
       case "rejected":
@@ -83,6 +85,9 @@ export default function ProposalDetailPanel({ proposal, onApprove, onReject }: P
     }
   };
 
+  const canReview = (proposal.status === "approved" || proposal.status === "rejected") && proposal.recruiter_email;
+  const progressPercentage = (pipelineStep / 5) * 100;
+
   return (
     <div className="w-3/5 bg-white border-l flex flex-col">
       {/* Header */}
@@ -102,16 +107,22 @@ export default function ProposalDetailPanel({ proposal, onApprove, onReject }: P
           <span>Pipeline: step {pipelineStep} di 5</span>
           <span>Aggiornato {new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}</span>
         </div>
-        <Progress value={(pipelineStep / 5) * 100} className="h-2" />
+        <Progress 
+          value={progressPercentage} 
+          className="h-1.5" 
+          aria-label={`${progressPercentage}% completamento pipeline`}
+          title={`Pipeline completata al ${progressPercentage.toFixed(0)}%`}
+        />
       </div>
 
       {/* Tabs Content */}
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-3 mx-6 mt-4">
+          <TabsList className="grid w-full grid-cols-4 mx-6 mt-4">
             <TabsTrigger value="info">Info</TabsTrigger>
             <TabsTrigger value="cv">CV</TabsTrigger>
             <TabsTrigger value="cronologia">Cronologia</TabsTrigger>
+            <TabsTrigger value="recensione">Recensione</TabsTrigger>
           </TabsList>
           
           <div className="flex-1 overflow-y-auto p-6">
@@ -180,7 +191,6 @@ export default function ProposalDetailPanel({ proposal, onApprove, onReject }: P
                 </CardContent>
               </Card>
 
-              {/* Recruiter Info */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -258,6 +268,39 @@ export default function ProposalDetailPanel({ proposal, onApprove, onReject }: P
                 </CardContent>
               </Card>
             </TabsContent>
+
+            <TabsContent value="recensione" className="mt-0">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Star className="h-5 w-5" />
+                    Recensione Recruiter
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {canReview ? (
+                    <div className="space-y-4">
+                      <p className="text-gray-600">
+                        Valuta la performance del recruiter per questa candidatura
+                      </p>
+                      <Button onClick={() => setIsReviewModalOpen(true)}>
+                        <Star className="h-4 w-4 mr-2" />
+                        Lascia una recensione
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">
+                        {proposal.status === "pending" || proposal.status === "under_review" 
+                          ? "Completa la valutazione della candidatura per recensire il recruiter"
+                          : "Nessuna informazione recruiter disponibile"
+                        }
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
           </div>
         </Tabs>
       </div>
@@ -287,6 +330,16 @@ export default function ProposalDetailPanel({ proposal, onApprove, onReject }: P
           Shortcut: A = Approva • R = Rifiuta • D = Dettagli
         </p>
       </div>
+
+      {/* Review Modal */}
+      {proposal.recruiter_email && (
+        <RecruiterReviewModal
+          open={isReviewModalOpen}
+          onOpenChange={setIsReviewModalOpen}
+          recruiterEmail={proposal.recruiter_email}
+          proposalId={proposal.id}
+        />
+      )}
     </div>
   );
 }

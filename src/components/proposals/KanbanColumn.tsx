@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import KanbanCard from "./KanbanCard";
@@ -75,28 +74,35 @@ export default function KanbanColumn({
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-white rounded-lg shadow-sm border-2 transition-all duration-200",
+        "flex flex-col h-full bg-white rounded-lg shadow-sm border-2 transition-all duration-150",
+        "box-border min-h-full",
         isDragOver ? "border-blue-300 bg-blue-50" : "border-gray-200"
       )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      role="region"
+      aria-label={`Colonna ${config.label}`}
     >
       {/* Column Header */}
-      <div className={cn("p-4 border-b", config.bgColor)}>
+      <div className={cn("p-4 border-b rounded-t-lg", config.bgColor)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-lg">{config.icon}</span>
+            <span className="text-lg" aria-label={config.label}>{config.icon}</span>
             <h3 className={cn("font-semibold", config.textColor)}>{config.label}</h3>
           </div>
-          <Badge variant="secondary" className={cn("text-xs", config.textColor)}>
+          <Badge 
+            variant="secondary" 
+            className={cn("text-xs", config.textColor)}
+            aria-label={`${proposals.length} candidature`}
+          >
             {proposals.length}
           </Badge>
         </div>
       </div>
 
       {/* Cards Container */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-3">
+      <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0">
         {proposals.length === 0 ? (
           <div className="text-center py-8 text-gray-500">
             <p className="text-sm">Nessuna candidatura</p>

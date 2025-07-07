@@ -9,10 +9,21 @@ import ProposalDetailPanel from "./proposals/ProposalDetailPanel";
 export default function CompanyProposalsDashboard() {
   const [selectedProposals, setSelectedProposals] = useState<string[]>([]);
   const [activeProposalId, setActiveProposalId] = useState<string | null>(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
 
   const { user } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, deleteProposal } = useProposals();
+
+  // Handle responsive breakpoints
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -126,10 +137,10 @@ export default function CompanyProposalsDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F7FAFC]">
-      <div className="flex h-screen">
-        {/* Kanban Board - 60% */}
-        <div className="w-3/5 bg-white border-r">
+    <div className="min-h-screen bg-[#F8FAFC]">
+      <div className={cn("flex h-screen", isMobile && "flex-col")}>
+        {/* Kanban Board */}
+        <div className={cn("bg-white border-r", isMobile ? "flex-1" : "w-2/5")}>
           <KanbanBoard
             proposals={proposals}
             onStatusChange={handleStatusChange}
@@ -140,8 +151,8 @@ export default function CompanyProposalsDashboard() {
           />
         </div>
 
-        {/* Detail Panel - 40% */}
-        <div className="w-2/5">
+        {/* Detail Panel */}
+        <div className={cn(isMobile ? "flex-1" : "w-3/5")}>
           <ProposalDetailPanel
             proposal={activeProposal || null}
             onApprove={handleApprove}

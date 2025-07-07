@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -7,7 +8,6 @@ import { useAuth } from "@/hooks/useAuth";
 import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
-import ATSProposalsDashboard from "./ATSProposalsDashboard";
 import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut } from "lucide-react";
 import JobOffersBoard from "./JobOffersBoard";
 import { useToast } from "@/components/ui/use-toast";
@@ -252,25 +252,17 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
       </div>
 
       <div className="container mx-auto p-4">
-        <Tabs defaultValue="ats-proposals" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="ats-proposals" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              ATS Proposte
-            </TabsTrigger>
+        <Tabs defaultValue="proposals" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="proposals" className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
-              Proposte Standard
+              Proposte Ricevute
             </TabsTrigger>
             <TabsTrigger value="offers" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
               Le Mie Offerte
             </TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="ats-proposals">
-            <ATSProposalsDashboard />
-          </TabsContent>
           
           <TabsContent value="proposals">
             <CompanyProposalsDashboard />

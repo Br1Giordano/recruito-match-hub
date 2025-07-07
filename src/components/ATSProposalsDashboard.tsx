@@ -71,7 +71,7 @@ export default function ATSProposalsDashboard() {
             handleApprove(activeProposal.id);
           }
           break;
-        case 'x':
+        case 'r':
           if (!e.ctrlKey && !e.metaKey) {
             e.preventDefault();
             handleReject(activeProposal.id);
@@ -256,7 +256,7 @@ export default function ATSProposalsDashboard() {
         <div className="bg-gray-800 text-white px-4 py-2 text-xs">
           <span className="opacity-75">Shortcuts: </span>
           <span className="font-mono">A</span> Approva • 
-          <span className="font-mono">X</span> Rifiuta • 
+          <span className="font-mono">R</span> Rifiuta • 
           <span className="font-mono">D</span> Dettagli • 
           <span className="font-mono">ESC</span> Chiudi
         </div>

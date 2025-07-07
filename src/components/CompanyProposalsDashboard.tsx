@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
@@ -20,10 +19,11 @@ export default function CompanyProposalsDashboard() {
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
 
-  // Raggruppa le proposte per stato - under_review ora rappresenta "in valutazione"
+  // Raggruppa le proposte per stato
   const pendingProposals = proposals.filter(p => p.status === "pending");
-  const evaluatingProposals = proposals.filter(p => p.status === "under_review"); // Changed from "interested" to "evaluating"
-  const otherProposals = proposals.filter(p => !["pending", "under_review"].includes(p.status)); // Updated to exclude "under_review"
+  const evaluatingProposals = proposals.filter(p => p.status === "under_review");
+  const approvedProposals = proposals.filter(p => p.status === "approved");
+  const otherProposals = proposals.filter(p => !["pending", "under_review", "approved"].includes(p.status));
 
   // Calcola KPI
   const totalProposals = proposals.length;
@@ -48,7 +48,10 @@ export default function CompanyProposalsDashboard() {
         currentProposals = pendingProposals;
         break;
       case "interested":
-        currentProposals = evaluatingProposals; // Changed variable name but kept the same tab key for consistency
+        currentProposals = evaluatingProposals;
+        break;
+      case "approved":
+        currentProposals = approvedProposals;
         break;
       case "other":
         currentProposals = otherProposals;
@@ -75,7 +78,7 @@ export default function CompanyProposalsDashboard() {
     }
 
     setFilteredProposals(filtered);
-  }, [searchTerm, statusFilter, proposals, activeTab, pendingProposals, evaluatingProposals, otherProposals]);
+  }, [searchTerm, statusFilter, proposals, activeTab, pendingProposals, evaluatingProposals, approvedProposals, otherProposals]);
 
   const handleDeleteProposal = async (proposalId: string) => {
     if (!isAdmin) return;
@@ -86,7 +89,6 @@ export default function CompanyProposalsDashboard() {
     }
   };
 
-  // Fix: Simplified sendResponse handler to match the expected signature
   const handleSendResponse = async (proposalId: string, response: any) => {
     if (sendResponse) {
       await sendResponse(proposalId, response.status, response.message);
@@ -134,7 +136,10 @@ export default function CompanyProposalsDashboard() {
           emptyMessage = "Non ci sono nuove proposte in attesa";
           break;
         case "interested":
-          emptyMessage = "Non hai ancora avviato nessuna valutazione"; // Updated message
+          emptyMessage = "Non hai ancora avviato nessuna valutazione";
+          break;
+        case "approved":
+          emptyMessage = "Non ci sono proposte approvate";
           break;
         case "other":
           emptyMessage = "Non ci sono altre proposte";
@@ -197,6 +202,7 @@ export default function CompanyProposalsDashboard() {
         <ProposalTabs
           pendingProposals={pendingProposals}
           interestedProposals={evaluatingProposals}
+          approvedProposals={approvedProposals}
           otherProposals={otherProposals}
           onTabChange={setActiveTab}
         >

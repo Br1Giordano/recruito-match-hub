@@ -1,11 +1,13 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
+import { useAuth } from "@/hooks/useAuth";
+import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import ProposalFormFields from "./ProposalFormFields";
 
 type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
@@ -36,10 +38,40 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
     recruiter_name: "",
     recruiter_email: "",
     recruiter_phone: "",
-    candidate_cv_url: "", // Aggiunto campo per l'URL del CV
+    candidate_cv_url: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { fetchProfileByEmail } = useRecruiterProfileByEmail();
+
+  // Autofill recruiter data when component mounts
+  useEffect(() => {
+    const autofillRecruiterData = async () => {
+      if (user?.email) {
+        console.log('Autofilling recruiter data for:', user.email);
+        const recruiterProfile = await fetchProfileByEmail(user.email);
+        
+        if (recruiterProfile) {
+          console.log('Found recruiter profile:', recruiterProfile);
+          setFormData(prev => ({
+            ...prev,
+            recruiter_name: `${recruiterProfile.nome} ${recruiterProfile.cognome}`.trim(),
+            recruiter_email: recruiterProfile.email,
+            recruiter_phone: recruiterProfile.telefono || "",
+          }));
+        } else {
+          // Fallback to user email if no profile found
+          setFormData(prev => ({
+            ...prev,
+            recruiter_email: user.email,
+          }));
+        }
+      }
+    };
+
+    autofillRecruiterData();
+  }, [user?.email, fetchProfileByEmail]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -71,7 +103,7 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         candidate_email: formData.candidate_email,
         candidate_phone: formData.candidate_phone || null,
         candidate_linkedin: formData.candidate_linkedin || null,
-        candidate_cv_url: formData.candidate_cv_url || null, // Aggiunto campo CV
+        candidate_cv_url: formData.candidate_cv_url || null,
         years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
         current_salary: formData.current_salary ? parseInt(formData.current_salary) : null,
         expected_salary: formData.expected_salary ? parseInt(formData.expected_salary) : null,

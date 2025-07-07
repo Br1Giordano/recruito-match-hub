@@ -1,8 +1,8 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProposals } from "@/hooks/useProposals";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { cn } from "@/lib/utils";
 import KanbanBoard from "./proposals/KanbanBoard";
 import ProposalDetailPanel from "./proposals/ProposalDetailPanel";
 

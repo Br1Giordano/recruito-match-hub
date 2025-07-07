@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -147,7 +146,7 @@ export default function KanbanBoard({
         {/* Status Filters - Grid Layout */}
         <div className="flex items-center gap-4">
           <span className="text-sm font-medium text-gray-700">Mostra solo:</span>
-          <div className="grid grid-auto-flow-column gap-3">
+          <div style={{ display: 'grid', gridAutoFlow: 'column', gap: '12px' }}>
             {Object.entries(statusConfig).map(([status, config]) => (
               <div key={status} className="flex items-center space-x-2">
                 <Checkbox
@@ -183,11 +182,7 @@ export default function KanbanBoard({
         ) : (
           <div className="h-full bg-[#F8FAFC] p-6">
             <div 
-              className="flex gap-6 h-full overflow-x-auto"
-              style={{
-                scrollbarWidth: 'thin',
-                scrollbarColor: '#CBD5E1 transparent'
-              }}
+              className="flex gap-6 h-full overflow-x-auto kanban-scrollbar"
             >
               {Object.entries(statusConfig).map(([status, config]) => (
                 <div 
@@ -216,30 +211,28 @@ export default function KanbanBoard({
         )}
       </div>
 
-      <style jsx>{`
-        .grid-auto-flow-column {
-          display: grid;
-          grid-auto-flow: column;
-          gap: 12px;
-        }
-        
-        /* Webkit scrollbar styling */
-        ::-webkit-scrollbar {
+      <style>{`
+        .kanban-scrollbar::-webkit-scrollbar {
           height: 8px;
           width: 8px;
         }
         
-        ::-webkit-scrollbar-track {
+        .kanban-scrollbar::-webkit-scrollbar-track {
           background: transparent;
         }
         
-        ::-webkit-scrollbar-thumb {
+        .kanban-scrollbar::-webkit-scrollbar-thumb {
           background: #CBD5E1;
           border-radius: 4px;
         }
         
-        ::-webkit-scrollbar-thumb:hover {
+        .kanban-scrollbar::-webkit-scrollbar-thumb:hover {
           background: #94A3B8;
+        }
+        
+        .kanban-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #CBD5E1 transparent;
         }
       `}</style>
     </div>

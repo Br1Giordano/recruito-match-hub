@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          email: string
+          id: string
+          role: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          email: string
+          id?: string
+          role?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          id?: string
+          role?: string
+        }
+        Relationships: []
+      }
       company_registrations: {
         Row: {
           created_at: string
@@ -406,6 +430,10 @@ export type Database = {
       cleanup_old_login_attempts: {
         Args: Record<PropertyKey, never>
         Returns: undefined
+      }
+      is_admin: {
+        Args: { user_email: string }
+        Returns: boolean
       }
       link_user_to_registration: {
         Args: { p_registration_id: string; p_user_type: string }

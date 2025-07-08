@@ -100,7 +100,11 @@ export default function RecruiterReviewModal({
               onChange={(e) => setReviewText(e.target.value)}
               placeholder="Condividi la tua esperienza con questo recruiter..."
               rows={4}
+              maxLength={500}
             />
+            <div className="text-xs text-gray-500 mt-1">
+              {reviewText.length}/500 caratteri
+            </div>
           </div>
 
           {/* Actions */}

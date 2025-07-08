@@ -26,6 +26,25 @@ export const useRecruiterReviews = () => {
       return false;
     }
 
+    // Input validation
+    if (reviewData.rating < 1 || reviewData.rating > 5) {
+      toast({
+        title: "Errore",
+        description: "La valutazione deve essere compresa tra 1 e 5 stelle",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (reviewData.reviewText && reviewData.reviewText.length > 500) {
+      toast({
+        title: "Errore", 
+        description: "Il commento non può superare i 500 caratteri",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     setLoading(true);
 
     try {
@@ -69,6 +88,25 @@ export const useRecruiterReviews = () => {
   };
 
   const updateReview = async (reviewId: string, rating: number, reviewText?: string) => {
+    // Input validation
+    if (rating < 1 || rating > 5) {
+      toast({
+        title: "Errore",
+        description: "La valutazione deve essere compresa tra 1 e 5 stelle",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (reviewText && reviewText.length > 500) {
+      toast({
+        title: "Errore", 
+        description: "Il commento non può superare i 500 caratteri",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     setLoading(true);
 
     try {

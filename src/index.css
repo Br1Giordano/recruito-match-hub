@@ -52,15 +52,6 @@
     --recruito-blue: 210 100% 50%;
     --recruito-teal: 180 100% 40%;
     --recruito-green: 120 100% 50%;
-    
-    /* Proposal status colors */
-    --status-new: 217 91% 60%;        /* #0A84FF */
-    --status-review: 32 99% 52%;      /* #FF9F0A */
-    --status-approved: 122 72% 51%;   /* #34C759 */
-    --status-rejected: 1 83% 63%;     /* #FF3B30 */
-    
-    /* KPI Background */
-    --kpi-bg: 210 20% 98%;           /* #F8FAFC */
   }
 
   .dark {

@@ -69,11 +69,6 @@ export default {
 				'recruito-blue': 'hsl(var(--recruito-blue))',
 				'recruito-teal': 'hsl(var(--recruito-teal))',
 				'recruito-green': 'hsl(var(--recruito-green))',
-				'status-new': 'hsl(var(--status-new))',
-				'status-review': 'hsl(var(--status-review))',
-				'status-approved': 'hsl(var(--status-approved))',
-				'status-rejected': 'hsl(var(--status-rejected))',
-				'kpi-bg': 'hsl(var(--kpi-bg))',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Star, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -33,18 +32,14 @@ interface StatusConfig {
 interface KanbanCardProps {
   proposal: Proposal;
   config: StatusConfig;
-  isSelected: boolean;
   isActive: boolean;
-  onSelect: (checked: boolean) => void;
   onClick: () => void;
 }
 
 export default function KanbanCard({
   proposal,
   config,
-  isSelected,
   isActive,
-  onSelect,
   onClick
 }: KanbanCardProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -81,64 +76,27 @@ export default function KanbanCard({
   return (
     <Card
       className={cn(
-        "p-3 cursor-pointer transition-all duration-150 rounded-lg",
-        "box-border min-h-fit",
-        isActive && "shadow-md",
+        "p-3 cursor-pointer transition-all duration-150",
+        isActive && "ring-2 ring-primary",
         isDragging && "opacity-50 scale-95",
-        "hover:shadow-md focus-within:shadow-md"
+        "hover:shadow-md"
       )}
       style={{
-        borderLeft: `4px solid ${config.color}`,
-        backgroundColor: isActive ? `${config.color}10` : '#FFFFFF'
+        borderLeft: `4px solid ${config.color}`
       }}
       draggable
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={onClick}
-      onMouseEnter={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.backgroundColor = `${config.color}10`;
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!isActive) {
-          e.currentTarget.style.backgroundColor = '#FFFFFF';
-        }
-      }}
-      onFocus={(e) => {
-        e.currentTarget.style.boxShadow = `0 0 0 2px ${config.color}`;
-      }}
-      onBlur={(e) => {
-        e.currentTarget.style.boxShadow = '';
-      }}
-      tabIndex={0}
-      role="button"
-      aria-label={`Candidatura di ${proposal.candidate_name} - ${config.label}`}
     >
       <div className="space-y-3">
-        {/* Header with checkbox and badge */}
-        <div className="flex items-start justify-between">
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={onSelect}
-            onClick={(e) => e.stopPropagation()}
-            className="mt-1"
-            aria-label={`Seleziona candidatura di ${proposal.candidate_name}`}
-          />
-          <Badge 
-            className={cn("text-xs", config.textColor, config.bgColor)}
-            aria-label={`Stato: ${config.label}`}
-          >
-            {config.label}
-          </Badge>
-        </div>
 
         {/* Candidate Info */}
         <div>
-          <h4 className="font-semibold text-gray-900 text-sm mb-1">
+          <h4 className="font-semibold text-foreground text-sm mb-1">
             {proposal.candidate_name}
           </h4>
-          <div className="flex items-center gap-2 text-xs text-gray-600">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{proposal.job_offers?.title || "Posizione"}</span>
             <span>•</span>
             <span className="font-medium">{getSeniorityLevel(proposal.years_experience)}</span>
@@ -151,7 +109,7 @@ export default function KanbanCard({
             {getTopSkills(proposal.proposal_description).map((skill, index) => (
               <span 
                 key={index} 
-                className="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
+                className="inline-flex px-2 py-1 text-xs bg-muted text-muted-foreground rounded"
               >
                 {skill}
               </span>
@@ -163,25 +121,24 @@ export default function KanbanCard({
                 "w-2 h-2 rounded-full",
                 matchScore >= 80 ? "bg-green-500" : matchScore >= 60 ? "bg-yellow-500" : "bg-red-500"
               )}
-              aria-label={`Match score: ${matchScore}%`}
             ></div>
-            <span className="text-xs font-medium text-gray-900">{matchScore}%</span>
+            <span className="text-xs font-medium text-foreground">{matchScore}%</span>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between text-xs text-gray-500">
+        <div className="flex items-center justify-between text-xs text-muted-foreground">
           <div className="flex items-center gap-1">
-            <span className="font-medium text-gray-700 truncate">
+            <span className="font-medium text-foreground truncate">
               {proposal.recruiter_name || "Recruiter"}
             </span>
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" aria-hidden="true" />
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
             <span>{recruiterRating.toFixed(1)}</span>
             <span>•</span>
             <span>{recruiterSuccessRate}%</span>
           </div>
           <div className="flex items-center gap-1">
-            <Calendar className="h-3 w-3" aria-hidden="true" />
+            <Calendar className="h-3 w-3" />
             <span>{daysSinceReceived}gg</span>
           </div>
         </div>

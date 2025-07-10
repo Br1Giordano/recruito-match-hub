@@ -34,8 +34,6 @@ interface KanbanColumnProps {
   proposals: Proposal[];
   onStatusChange: (proposalId: string, newStatus: string) => void;
   onProposalClick: (proposalId: string) => void;
-  selectedProposals: string[];
-  onProposalSelect: (proposalId: string, checked: boolean) => void;
   activeProposalId: string | null;
 }
 
@@ -45,8 +43,6 @@ export default function KanbanColumn({
   proposals,
   onStatusChange,
   onProposalClick,
-  selectedProposals,
-  onProposalSelect,
   activeProposalId
 }: KanbanColumnProps) {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -74,28 +70,21 @@ export default function KanbanColumn({
   return (
     <div
       className={cn(
-        "flex flex-col h-full bg-white rounded-lg shadow-sm border-2 transition-all duration-150",
-        "box-border min-h-full",
-        isDragOver ? "border-blue-300 bg-blue-50" : "border-gray-200"
+        "flex flex-col h-full bg-card rounded-lg border transition-all duration-150",
+        isDragOver ? "border-primary bg-primary/5" : "border-border"
       )}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      role="region"
-      aria-label={`Colonna ${config.label}`}
     >
       {/* Column Header */}
-      <div className={cn("p-4 border-b rounded-t-lg", config.bgColor)}>
+      <div className="p-4 border-b bg-muted/30">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-lg" aria-label={config.label}>{config.icon}</span>
-            <h3 className={cn("font-semibold", config.textColor)}>{config.label}</h3>
+            <span className="text-lg">{config.icon}</span>
+            <h3 className="font-semibold text-foreground">{config.label}</h3>
           </div>
-          <Badge 
-            variant="secondary" 
-            className={cn("text-xs", config.textColor)}
-            aria-label={`${proposals.length} candidature`}
-          >
+          <Badge variant="secondary" className="text-xs">
             {proposals.length}
           </Badge>
         </div>
@@ -104,7 +93,7 @@ export default function KanbanColumn({
       {/* Cards Container */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0">
         {proposals.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-muted-foreground">
             <p className="text-sm">Nessuna candidatura</p>
           </div>
         ) : (
@@ -113,9 +102,7 @@ export default function KanbanColumn({
               key={proposal.id}
               proposal={proposal}
               config={config}
-              isSelected={selectedProposals.includes(proposal.id)}
               isActive={activeProposalId === proposal.id}
-              onSelect={(checked) => onProposalSelect(proposal.id, checked)}
               onClick={() => onProposalClick(proposal.id)}
             />
           ))

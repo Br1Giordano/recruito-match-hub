@@ -116,9 +116,7 @@ export default function CompactListView({
                         key={proposal.id}
                         proposal={proposal}
                         config={config}
-                        isSelected={selectedProposals.includes(proposal.id)}
                         isActive={activeProposalId === proposal.id}
-                        onSelect={(checked) => onProposalSelect(proposal.id, checked)}
                         onClick={() => onProposalClick(proposal.id)}
                       />
                     ))

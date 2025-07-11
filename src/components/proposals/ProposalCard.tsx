@@ -1,177 +1,256 @@
-
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Star, MapPin, Calendar } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Euro, Calendar, User, Phone, Linkedin, UserCircle } from "lucide-react";
+import ProposalDetailsDialog from "./ProposalDetailsDialog";
+import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
+import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 
 interface ProposalCardProps {
   proposal: {
     id: string;
     candidate_name: string;
     candidate_email: string;
+    candidate_phone?: string;
+    candidate_linkedin?: string;
+    candidate_cv_url?: string;
     proposal_description: string;
     years_experience?: number;
     expected_salary?: number;
+    availability_weeks?: number;
+    recruiter_fee_percentage?: number;
     status: string;
     created_at: string;
+    recruiter_email?: string;
     recruiter_name?: string;
     job_offers?: {
       title: string;
+      company_name?: string;
     };
   };
-  isSelected: boolean;
-  isActive: boolean;
-  matchScore: number;
-  recruiterRating: number;
-  recruiterSuccessRate: number;
-  onSelect: (checked: boolean) => void;
-  onClick: () => void;
-  onKeyDown: (event: React.KeyboardEvent) => void;
+  onStatusUpdate?: (proposalId: string, status: string) => void;
+  onSendResponse?: (proposalId: string, response: any) => void;
+  onDelete?: (proposalId: string) => void;
 }
 
-export default function ProposalCard({ 
-  proposal, 
-  isSelected,
-  isActive,
-  matchScore,
-  recruiterRating,
-  recruiterSuccessRate,
-  onSelect,
-  onClick,
-  onKeyDown
-}: ProposalCardProps) {
+export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
+  const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
+  const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
+
+  // Carica il profilo del recruiter solo una volta quando il componente viene montato
+  useEffect(() => {
+    if (proposal.recruiter_email && !recruiterProfile) {
+      fetchProfileByEmail(proposal.recruiter_email);
+    }
+  }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile]);
+
+  const handleShowRecruiterProfile = () => {
+    if (recruiterProfile) {
+      setShowRecruiterProfile(true);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+        return "bg-yellow-100 text-yellow-800";
       case "under_review":
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-blue-100 text-blue-800";
       case "approved":
-        return "bg-green-100 text-green-800 border-green-200";
+        return "bg-green-100 text-green-800";
       case "rejected":
-        return "bg-red-100 text-red-800 border-red-200";
+        return "bg-red-100 text-red-800";
+      case "hired":
+        return "bg-purple-100 text-purple-800";
       default:
-        return "bg-gray-100 text-gray-800 border-gray-200";
+        return "bg-gray-100 text-gray-800";
     }
   };
 
   const getStatusText = (status: string) => {
     switch (status) {
       case "pending":
-        return "Nuova";
+        return "In Attesa";
       case "under_review":
-        return "Screening";
+        return "In Revisione";
       case "approved":
         return "Approvata";
       case "rejected":
-        return "Scartata";
+        return "Rifiutata";
+      case "hired":
+        return "Assunto";
       default:
         return status;
     }
   };
 
-  const getMatchScoreColor = (score: number) => {
-    if (score >= 80) return "bg-green-500";
-    if (score >= 60) return "bg-yellow-500";
-    return "bg-red-500";
-  };
-
-  const getSeniorityLevel = (experience?: number) => {
-    if (!experience) return "Junior";
-    if (experience < 3) return "Junior";
-    if (experience < 7) return "Mid";
-    return "Senior";
-  };
-
-  const getTopSkills = (description: string) => {
-    // Simulazione estrazione skill dal description
-    const skills = ["React", "TypeScript", "Node.js", "Python", "AWS", "Docker"];
-    return skills.slice(0, 3);
-  };
-
-  const daysSinceReceived = Math.floor(
-    (new Date().getTime() - new Date(proposal.created_at).getTime()) / (1000 * 60 * 60 * 24)
-  );
-
   return (
-    <Card 
-      className={cn(
-        "relative h-28 p-4 cursor-pointer transition-all duration-150 border bg-white rounded-lg",
-        isActive && "ring-2 ring-[#0A84FF] border-[#0A84FF]",
-        "hover:border-[#0A84FF] hover:shadow-md"
-      )}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      tabIndex={0}
-    >
-      <div className="flex items-start gap-3 h-full">
-        {/* Checkbox */}
-        <div className="pt-1">
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={onSelect}
-            onClick={(e) => e.stopPropagation()}
-            className="h-4 w-4"
-          />
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          {/* Row 1: Nome, Ruolo, Seniority */}
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <h3 className="font-semibold text-gray-900 truncate">{proposal.candidate_name}</h3>
-              <span className="text-gray-500">•</span>
-              <span className="text-sm text-gray-600 truncate">{proposal.job_offers?.title || "Posizione"}</span>
-              <span className="text-gray-500">•</span>
-              <span className="text-sm font-medium text-gray-700">{getSeniorityLevel(proposal.years_experience)}</span>
+    <>
+      <Card className="w-full">
+        <CardHeader>
+          <div className="flex justify-between items-start">
+            <div className="flex items-center gap-2">
+              <User className="h-5 w-5" />
+              <CardTitle className="text-lg">{proposal.candidate_name}</CardTitle>
             </div>
-            
-            <Badge className={cn("text-xs px-2 py-1 border", getStatusColor(proposal.status))}>
+            <Badge className={getStatusColor(proposal.status)}>
               {getStatusText(proposal.status)}
             </Badge>
           </div>
+          {proposal.job_offers?.title && (
+            <div className="text-sm text-muted-foreground">
+              Proposto per {proposal.job_offers.title}
+            </div>
+          )}
+        </CardHeader>
 
-          {/* Row 2: Skills + Match Score */}
-          <div className="flex items-center gap-2 mb-2">
-            <div className="flex gap-1">
-              {getTopSkills(proposal.proposal_description).map((skill, index) => (
-                <span 
-                  key={index} 
-                  className="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded-md"
+        <CardContent className="space-y-4">
+          {/* Informazioni Recruiter */}
+          {proposal.recruiter_email && (
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div className="flex justify-between items-center mb-2">
+                <h4 className="font-medium text-blue-900">Recruiter</h4>
+                <Button
+                  onClick={handleShowRecruiterProfile}
+                  disabled={loadingRecruiter || !recruiterProfile}
+                  variant="outline"
+                  size="sm"
+                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
                 >
-                  {skill}
-                </span>
-              ))}
+                  <UserCircle className="h-4 w-4 mr-2" />
+                  {loadingRecruiter ? "Caricamento..." : 
+                   recruiterProfile ? "Visualizza Profilo" : "Profilo non disponibile"}
+                </Button>
+              </div>
+              <div className="text-sm">
+                {recruiterProfile ? (
+                  <>
+                    <div className="font-medium text-gray-900">
+                      {recruiterProfile.nome} {recruiterProfile.cognome}
+                    </div>
+                    <div className="text-gray-600">
+                      {recruiterProfile.email}
+                    </div>
+                    {recruiterProfile.azienda && (
+                      <div className="text-gray-500 text-xs mt-1">
+                        {recruiterProfile.azienda}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="font-medium text-gray-900">
+                      {proposal.recruiter_name || 'Recruiter'}
+                    </div>
+                    <div className="text-gray-600">
+                      {proposal.recruiter_email}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
-            
-            <div className="flex items-center gap-1 ml-auto">
-              <div className={cn("w-2 h-2 rounded-full", getMatchScoreColor(matchScore))}></div>
-              <span className="text-sm font-medium text-gray-900">{matchScore}%</span>
+          )}
+
+          {/* Descrizione del candidato */}
+          {proposal.proposal_description ? (
+            <div>
+              <h4 className="font-medium mb-2">Descrizione del candidato:</h4>
+              <p className="text-sm text-muted-foreground">
+                {proposal.proposal_description.length > 150
+                  ? `${proposal.proposal_description.substring(0, 150)}...`
+                  : proposal.proposal_description}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <h4 className="font-medium mb-2">Descrizione del candidato:</h4>
+              <p className="text-sm text-muted-foreground">Nessuna descrizione fornita</p>
+            </div>
+          )}
+
+          {/* Contatti Candidato */}
+          <div>
+            <h4 className="font-medium mb-2">Contatti Candidato:</h4>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 text-sm">
+                <User className="h-4 w-4" />
+                <a href={`mailto:${proposal.candidate_email}`} className="text-blue-600 hover:underline">
+                  {proposal.candidate_email}
+                </a>
+              </div>
+              {proposal.candidate_phone && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Phone className="h-4 w-4" />
+                  <a href={`tel:${proposal.candidate_phone}`} className="text-blue-600 hover:underline">
+                    {proposal.candidate_phone}
+                  </a>
+                </div>
+              )}
+              {proposal.candidate_linkedin && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Linkedin className="h-4 w-4" />
+                  <a href={proposal.candidate_linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                    Profilo LinkedIn
+                  </a>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Footer: Recruiter info + Data */}
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <div className="flex items-center gap-1">
-              <span className="font-medium text-gray-700">{proposal.recruiter_name || "Recruiter"}</span>
-              <div className="flex items-center gap-1">
-                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                <span>{recruiterRating.toFixed(1)}</span>
+          {/* Dettagli */}
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <span className="font-medium">Fee recruiter: </span>
+              <span>{proposal.recruiter_fee_percentage}%</span>
+            </div>
+            {proposal.years_experience && (
+              <div>
+                <span className="font-medium">Esperienza: </span>
+                <span>{proposal.years_experience} anni</span>
               </div>
-              <span>•</span>
-              <span>{recruiterSuccessRate}% posizioni chiuse</span>
-            </div>
-            
-            <div className="flex items-center gap-1">
-              <Calendar className="h-3 w-3" />
-              <span>Ricevuta {daysSinceReceived}gg fa</span>
-            </div>
+            )}
+            {proposal.expected_salary && (
+              <div className="flex items-center gap-1">
+                <Euro className="h-4 w-4" />
+                <span>€{proposal.expected_salary.toLocaleString()}</span>
+              </div>
+            )}
+            {proposal.availability_weeks && (
+              <div className="flex items-center gap-1">
+                <Calendar className="h-4 w-4" />
+                <span>{proposal.availability_weeks} settimane</span>
+              </div>
+            )}
           </div>
-        </div>
-      </div>
-    </Card>
+
+          {/* Data di ricezione */}
+          <div className="text-xs text-muted-foreground border-t pt-2">
+            Ricevuta il {new Date(proposal.created_at).toLocaleDateString('it-IT')} alle {new Date(proposal.created_at).toLocaleTimeString('it-IT')}
+          </div>
+
+          {/* Pulsanti azione */}
+          <div className="flex justify-end gap-2 pt-2">
+            <ProposalDetailsDialog proposal={proposal} />
+            {onDelete && (
+              <Button
+                onClick={() => onDelete(proposal.id)}
+                variant="destructive"
+                size="sm"
+              >
+                Elimina
+              </Button>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Modal Profilo Recruiter */}
+      <RecruiterProfileViewModal
+        open={showRecruiterProfile}
+        onOpenChange={setShowRecruiterProfile}
+        profile={recruiterProfile}
+      />
+    </>
   );
 }

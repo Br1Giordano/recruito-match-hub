@@ -66,88 +66,87 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
     <header className="bg-white/95 backdrop-blur-sm border-b border-gray-100 sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Link to="/" className="flex items-center">
+          <Link to="/">
             <img 
               src="/lovable-uploads/2b14001c-d6fa-47cf-84de-a64fba53c4fb.png" 
               alt="Recruito Logo" 
-              className="h-10 sm:h-12 w-auto cursor-pointer"
+              className="h-12 w-auto cursor-pointer"
             />
           </Link>
         </div>
         
-        <nav className="hidden lg:flex items-center space-x-6">
+        <nav className="hidden md:flex items-center space-x-8">
           <button 
             onClick={() => handleNavClick('come-funziona')} 
-            className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer text-sm font-medium"
+            className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
             Come Funziona
           </button>
           <button 
             onClick={() => handleNavClick('problema')} 
-            className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer text-sm font-medium"
+            className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
             Problema
           </button>
           <button 
             onClick={() => handleNavClick('soluzione')} 
-            className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer text-sm font-medium"
+            className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
             Soluzione
           </button>
           <button 
             onClick={() => handleNavClick('mercato')} 
-            className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer text-sm font-medium"
+            className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
             Mercato
           </button>
           <button 
             onClick={() => handleNavClick('business')} 
-            className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer text-sm font-medium"
+            className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
             Business
           </button>
+          
+          <div className="flex items-center space-x-4 ml-8">
+            {/* Se l'utente è autenticato, mostra il profilo o i pulsanti in base al tipo utente */}
+            {user && userProfile ? (
+              <>
+                {userProfile.user_type === 'recruiter' ? (
+                  <RecruiterProfileButton />
+                ) : (
+                  <Button
+                    onClick={onShowDashboard}
+                    size="sm"
+                    className="gradient-recruito text-white border-0 hover:opacity-90"
+                  >
+                    Dashboard Azienda
+                  </Button>
+                )}
+              </>
+            ) : (
+              <>
+                <Button
+                  onClick={handleCompanyButtonClick}
+                  size="sm"
+                  className="gradient-recruito text-white border-0 hover:opacity-90"
+                >
+                  Prova Beta - Azienda
+                </Button>
+                <Button
+                  onClick={handleRecruiterButtonClick}
+                  size="sm"
+                  variant="outline"
+                  className="hover:bg-gray-50"
+                >
+                  Demo Recruiter
+                </Button>
+              </>
+            )}
+          </div>
         </nav>
 
-        <div className="flex items-center space-x-3">
-          {/* Pulsanti per utenti autenticati o guest */}
-          {user && userProfile ? (
-            <>
-              {userProfile.user_type === 'recruiter' ? (
-                <RecruiterProfileButton />
-              ) : (
-                <Button
-                  onClick={onShowDashboard}
-                  size="sm"
-                  className="gradient-recruito text-white border-0 hover:opacity-90 hidden sm:inline-flex"
-                >
-                  Dashboard
-                </Button>
-              )}
-            </>
-          ) : (
-            <div className="hidden sm:flex items-center space-x-2">
-              <Button
-                onClick={handleCompanyButtonClick}
-                size="sm"
-                className="gradient-recruito text-white border-0 hover:opacity-90"
-              >
-                Azienda
-              </Button>
-              <Button
-                onClick={handleRecruiterButtonClick}
-                size="sm"
-                variant="outline"
-                className="hover:bg-muted border-border"
-              >
-                Recruiter
-              </Button>
-            </div>
-          )}
-          
-          {/* Mobile menu */}
-          <div className="lg:hidden">
-            <MobileMenu />
-          </div>
+        <div className="flex items-center">
+          <MobileMenu />
         </div>
       </div>
     </header>

@@ -68,36 +68,28 @@ const Index = () => {
         <Hero onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />
         
         {/* Demo Section with improved styling */}
-        <section className="py-16 lg:py-20 bg-gradient-to-r from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 relative overflow-hidden" data-demo-section id="demo">
+        <div className="py-20 bg-gradient-to-r from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 relative overflow-hidden" data-demo-section id="demo">
           {/* Background decoration */}
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="absolute top-10 left-10 w-32 h-32 bg-recruito-blue/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-recruito-teal/10 rounded-full blur-3xl"></div>
           
           <div className="container mx-auto px-4 text-center relative z-10">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 text-gradient">🚀 Unisciti alla Beta</h2>
-              <p className="text-lg sm:text-xl text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
+            <div className="max-w-3xl mx-auto">
+              <h2 className="text-4xl font-bold mb-6 text-gradient">🚀 Join the Beta</h2>
+              <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
                 Esplora in anteprima il sistema completo di gestione proposte e candidature. 
                 Testa tutte le funzionalità per recruiter e aziende in un ambiente completamente funzionale.
               </p>
               
-              <div className="bg-card/90 backdrop-blur-sm rounded-2xl p-6 lg:p-8 shadow-xl border hover-lift">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift">
                 {user ? (
-                  <Button 
-                    onClick={() => setShowDashboard(true)} 
-                    size="lg" 
-                    className="gradient-recruito text-white text-base lg:text-lg px-8 lg:px-12 py-3 lg:py-4 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                  >
+                  <Button onClick={() => setShowDashboard(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                     Accedi ai primi test
                   </Button>
                 ) : (
                   <div className="space-y-4">
-                    <Button 
-                      onClick={() => setShowAuth(true)} 
-                      size="lg" 
-                      className="gradient-recruito text-white text-base lg:text-lg px-8 lg:px-12 py-3 lg:py-4 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
-                    >
+                    <Button onClick={() => setShowAuth(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                       <LogIn className="h-5 w-5 mr-2" />
                       Accedi / Registrati
                     </Button>
@@ -107,18 +99,18 @@ const Index = () => {
                   </div>
                 )}
                 
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 text-left">
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-background/50">
-                    <div className="w-3 h-3 bg-recruito-blue rounded-full mt-1 flex-shrink-0"></div>
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-recruito-blue rounded-full mt-2 flex-shrink-0"></div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-1">Dashboard Recruiter</h4>
+                      <h4 className="font-semibold text-gray-800">Dashboard Recruiter</h4>
                       <p className="text-sm text-muted-foreground">Invia proposte e gestisci candidature</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3 p-4 rounded-lg bg-background/50">
-                    <div className="w-3 h-3 bg-recruito-teal rounded-full mt-1 flex-shrink-0"></div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-recruito-teal rounded-full mt-2 flex-shrink-0"></div>
                     <div>
-                      <h4 className="font-semibold text-foreground mb-1">Dashboard Azienda</h4>
+                      <h4 className="font-semibold text-gray-800">Dashboard Azienda</h4>
                       <p className="text-sm text-muted-foreground">Ricevi proposte e gestisci offerte</p>
                     </div>
                   </div>
@@ -126,7 +118,7 @@ const Index = () => {
               </div>
             </div>
           </div>
-        </section>
+        </div>
         
         <HowItWorks />
         <ProblemSolution />

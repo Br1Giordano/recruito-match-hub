@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 interface ProposalTabsProps {
   pendingProposals: any[];
   interestedProposals: any[];
-  approvedProposals: any[];
   otherProposals: any[];
   onTabChange?: (value: string) => void;
   children: (proposals: any[], status: string) => React.ReactNode;
@@ -14,14 +13,13 @@ interface ProposalTabsProps {
 export default function ProposalTabs({ 
   pendingProposals, 
   interestedProposals, 
-  approvedProposals,
   otherProposals, 
   onTabChange,
   children 
 }: ProposalTabsProps) {
   return (
     <Tabs defaultValue="pending" onValueChange={onTabChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="pending" className="flex items-center gap-2">
           Nuove Proposte
           {pendingProposals.length > 0 && (
@@ -33,16 +31,8 @@ export default function ProposalTabs({
         <TabsTrigger value="interested" className="flex items-center gap-2">
           Di Interesse
           {interestedProposals.length > 0 && (
-            <Badge variant="default" className="ml-1 bg-blue-500">
-              {interestedProposals.length}
-            </Badge>
-          )}
-        </TabsTrigger>
-        <TabsTrigger value="approved" className="flex items-center gap-2">
-          Approvate
-          {approvedProposals.length > 0 && (
             <Badge variant="default" className="ml-1 bg-green-500">
-              {approvedProposals.length}
+              {interestedProposals.length}
             </Badge>
           )}
         </TabsTrigger>
@@ -62,10 +52,6 @@ export default function ProposalTabs({
       
       <TabsContent value="interested" className="mt-6">
         {children(interestedProposals, "interested")}
-      </TabsContent>
-      
-      <TabsContent value="approved" className="mt-6">
-        {children(approvedProposals, "approved")}
       </TabsContent>
       
       <TabsContent value="other" className="mt-6">

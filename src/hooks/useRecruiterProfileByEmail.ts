@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface RecruiterProfile {
@@ -19,23 +19,43 @@ interface RecruiterProfile {
   specializations?: string[];
   years_of_experience?: number;
   location?: string;
+  created_at?: string;
 }
+
+// Cache globale per evitare fetch multipli
+const profileCache = new Map<string, { profile: RecruiterProfile | null; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minuti
 
 export const useRecruiterProfileByEmail = () => {
   const [profile, setProfile] = useState<RecruiterProfile | null>(null);
   const [loading, setLoading] = useState(false);
+  const fetchingRef = useRef<Set<string>>(new Set());
 
-  const fetchProfileByEmail = async (email: string) => {
+  const fetchProfileByEmail = useCallback(async (email: string) => {
     if (!email) {
       console.log('No email provided');
       return null;
     }
-    
+
+    // Controlla la cache
+    const cached = profileCache.get(email);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      console.log('Using cached profile for:', email);
+      setProfile(cached.profile);
+      return cached.profile;
+    }
+
+    // Evita fetch multipli simultanei per la stessa email
+    if (fetchingRef.current.has(email)) {
+      console.log('Already fetching profile for:', email);
+      return null;
+    }
+
+    fetchingRef.current.add(email);
     setLoading(true);
     console.log('Fetching recruiter profile by email:', email);
     
     try {
-      // Cerco il profilo completo da recruiter_registrations
       const { data, error } = await supabase
         .from('recruiter_registrations')
         .select('*')
@@ -47,40 +67,35 @@ export const useRecruiterProfileByEmail = () => {
 
       if (error) {
         console.error('Error fetching recruiter profile by email:', error);
+        profileCache.set(email, { profile: null, timestamp: Date.now() });
+        setProfile(null);
+        return null;
       }
 
       if (!data) {
         console.log('No recruiter profile found for email:', email);
-        // Creo un profilo base con le informazioni email
-        const basicProfile: RecruiterProfile = {
-          id: '',
-          nome: email.split('@')[0] || 'Recruiter',
-          cognome: '',
-          email: email,
-        };
-        setProfile(basicProfile);
-        return basicProfile;
+        profileCache.set(email, { profile: null, timestamp: Date.now() });
+        setProfile(null);
+        return null;
       }
       
       console.log('Complete recruiter profile fetched:', data);
       const fullProfile = data as RecruiterProfile;
+      
+      // Salva nella cache
+      profileCache.set(email, { profile: fullProfile, timestamp: Date.now() });
       setProfile(fullProfile);
       return fullProfile;
     } catch (error) {
       console.error('Unexpected error in fetchProfileByEmail:', error);
-      // Crea un profilo base anche in caso di errore
-      const basicProfile: RecruiterProfile = {
-        id: '',
-        nome: email.split('@')[0] || 'Recruiter',
-        cognome: '',
-        email: email,
-      };
-      setProfile(basicProfile);
-      return basicProfile;
+      profileCache.set(email, { profile: null, timestamp: Date.now() });
+      setProfile(null);
+      return null;
     } finally {
       setLoading(false);
+      fetchingRef.current.delete(email);
     }
-  };
+  }, []);
 
   return {
     profile,

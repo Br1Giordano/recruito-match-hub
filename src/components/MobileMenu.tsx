@@ -22,84 +22,51 @@ const MobileMenu = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="md:hidden">
       <Button
         variant="ghost"
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 hover:bg-muted"
+        className="p-2"
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </Button>
 
       {isOpen && (
-        <>
-          {/* Backdrop */}
-          <div 
-            className="fixed inset-0 bg-black/20 z-40 lg:hidden" 
-            onClick={() => setIsOpen(false)}
-          />
-          
-          {/* Menu */}
-          <div className="absolute top-full right-0 w-64 bg-card border border-border rounded-lg shadow-lg z-50 mt-2">
-            <div className="p-4 space-y-3">
-              <button 
-                onClick={() => handleNavClick('come-funziona')} 
-                className="block w-full text-left text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded hover:bg-muted"
-              >
-                Come Funziona
-              </button>
-              <button 
-                onClick={() => handleNavClick('problema')} 
-                className="block w-full text-left text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded hover:bg-muted"
-              >
-                Problema
-              </button>
-              <button 
-                onClick={() => handleNavClick('soluzione')} 
-                className="block w-full text-left text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded hover:bg-muted"
-              >
-                Soluzione
-              </button>
-              <button 
-                onClick={() => handleNavClick('mercato')} 
-                className="block w-full text-left text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded hover:bg-muted"
-              >
-                Mercato
-              </button>
-              <button 
-                onClick={() => handleNavClick('business')} 
-                className="block w-full text-left text-muted-foreground hover:text-foreground transition-colors py-2 px-2 rounded hover:bg-muted"
-              >
-                Business
-              </button>
-              
-              <div className="border-t border-border pt-3 mt-4 space-y-2">
-                <Button
-                  size="sm"
-                  className="w-full gradient-recruito text-white border-0 hover:opacity-90"
-                  onClick={() => {
-                    setIsOpen(false);
-                    // Add appropriate navigation logic here
-                  }}
-                >
-                  Azienda
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="w-full hover:bg-muted border-border"
-                  onClick={() => {
-                    setIsOpen(false);
-                    // Add appropriate navigation logic here
-                  }}
-                >
-                  Recruiter
-                </Button>
-              </div>
-            </div>
+        <div className="absolute top-full left-0 right-0 bg-white border-b shadow-lg z-50">
+          <div className="container mx-auto px-4 py-4 space-y-4">
+            <button 
+              onClick={() => handleNavClick('come-funziona')} 
+              className="block w-full text-left text-gray-600 hover:text-gray-900 transition-colors py-2"
+            >
+              Come Funziona
+            </button>
+            <button 
+              onClick={() => handleNavClick('problema')} 
+              className="block w-full text-left text-gray-600 hover:text-gray-900 transition-colors py-2"
+            >
+              Problema
+            </button>
+            <button 
+              onClick={() => handleNavClick('soluzione')} 
+              className="block w-full text-left text-gray-600 hover:text-gray-900 transition-colors py-2"
+            >
+              Soluzione
+            </button>
+            <button 
+              onClick={() => handleNavClick('mercato')} 
+              className="block w-full text-left text-gray-600 hover:text-gray-900 transition-colors py-2"
+            >
+              Mercato
+            </button>
+            <button 
+              onClick={() => handleNavClick('business')} 
+              className="block w-full text-left text-gray-600 hover:text-gray-900 transition-colors py-2"
+            >
+              Business
+            </button>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

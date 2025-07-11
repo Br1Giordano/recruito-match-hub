@@ -1,12 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Eye, Euro, Calendar, User, Building2, Phone, Linkedin, FileText, Star } from "lucide-react";
+import { Euro, Calendar, User, Phone, Linkedin, MapPin, Building2 } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterAvatar from "../recruiter/RecruiterAvatar";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
-import { useRecruiterStats } from "@/hooks/useRecruiterStats";
 
 interface RecruiterProposalCardProps {
   proposal: {
@@ -33,16 +31,14 @@ interface RecruiterProposalCardProps {
 }
 
 export default function RecruiterProposalCard({ proposal }: RecruiterProposalCardProps) {
-  const { profile: recruiterProfile, fetchProfileByEmail } = useRecruiterProfileByEmail();
-  const { stats, fetchRecruiterStats } = useRecruiterStats();
+  const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
 
-  // Carica il profilo del recruiter quando il componente viene montato
+  // Carica il profilo del recruiter solo una volta quando il componente viene montato
   useEffect(() => {
-    if (proposal.recruiter_email) {
+    if (proposal.recruiter_email && !recruiterProfile) {
       fetchProfileByEmail(proposal.recruiter_email);
-      fetchRecruiterStats(proposal.recruiter_email);
     }
-  }, [proposal.recruiter_email]);
+  }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -92,73 +88,85 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
         </div>
         {proposal.job_offers?.title && (
           <div className="text-sm text-muted-foreground">
-            Proposto da {proposal.recruiter_name || proposal.recruiter_email} • {proposal.job_offers.title}
+            Proposto per {proposal.job_offers.title}
           </div>
         )}
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Profilo Recruiter - Aggiornato con statistiche */}
+        {/* Profilo Recruiter Completo */}
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
           <h4 className="font-medium mb-3 text-blue-900">Profilo Recruiter</h4>
-          <div className="flex items-center gap-3">
-            <RecruiterAvatar
-              avatarUrl={recruiterProfile?.avatar_url}
-              name={recruiterProfile ? `${recruiterProfile.nome} ${recruiterProfile.cognome}` : (proposal.recruiter_name || 'Recruiter')}
-              size="md"
-              stats={stats ? {
-                interestedProposals: stats.interestedProposals,
-                averageRating: stats.averageRating,
-                totalReviews: stats.totalReviews
-              } : undefined}
-              showStats={true}
-            />
-            <div className="flex-1">
-              <div className="font-medium text-gray-900">
-                {recruiterProfile ? `${recruiterProfile.nome} ${recruiterProfile.cognome}` : (proposal.recruiter_name || 'Recruiter')}
-              </div>
-              <div className="text-sm text-gray-600">
-                {proposal.recruiter_email}
-              </div>
-              {recruiterProfile?.azienda && (
-                <div className="text-sm text-gray-500">
-                  {recruiterProfile.azienda}
-                </div>
-              )}
-              {recruiterProfile?.years_of_experience && (
-                <div className="text-xs text-blue-600 mt-1">
-                  {recruiterProfile.years_of_experience} anni di esperienza
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Statistiche Performance - Nuovo */}
-          {stats && (
-            <div className="mt-3 pt-3 border-t border-blue-200">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-lg font-semibold text-green-600">{stats.interestedProposals}</div>
-                  <div className="text-xs text-gray-600">Interessati</div>
-                </div>
-                <div>
-                  <div className="text-lg font-semibold text-purple-600">{stats.approvedProposals}</div>
-                  <div className="text-xs text-gray-600">Approvati</div>
-                </div>
-                <div>
-                  <div className="flex items-center justify-center gap-1">
-                    <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    <span className="text-lg font-semibold text-yellow-600">
-                      {stats.averageRating > 0 ? stats.averageRating.toFixed(1) : '-'}
-                    </span>
+          {loadingRecruiter ? (
+            <div className="text-sm text-gray-500">Caricamento profilo recruiter...</div>
+          ) : recruiterProfile ? (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <RecruiterAvatar
+                  avatarUrl={recruiterProfile.avatar_url}
+                  name={`${recruiterProfile.nome} ${recruiterProfile.cognome}`}
+                  size="md"
+                />
+                <div className="flex-1">
+                  <div className="font-medium text-gray-900">
+                    {recruiterProfile.nome} {recruiterProfile.cognome}
                   </div>
-                  <div className="text-xs text-gray-600">Rating</div>
+                  <div className="text-sm text-gray-600">
+                    {recruiterProfile.email}
+                  </div>
+                  {recruiterProfile.azienda && (
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <Building2 className="h-3 w-3" />
+                      {recruiterProfile.azienda}
+                    </div>
+                  )}
+                  {recruiterProfile.location && (
+                    <div className="flex items-center gap-1 text-sm text-gray-500">
+                      <MapPin className="h-3 w-3" />
+                      {recruiterProfile.location}
+                    </div>
+                  )}
                 </div>
               </div>
+              
+              {/* Informazioni aggiuntive */}
+              <div className="flex flex-wrap gap-2">
+                {recruiterProfile.years_of_experience && (
+                  <Badge variant="secondary" className="text-xs">
+                    {recruiterProfile.years_of_experience} anni di esperienza
+                  </Badge>
+                )}
+                {recruiterProfile.specializations && recruiterProfile.specializations.length > 0 && (
+                  <Badge variant="outline" className="text-xs">
+                    {recruiterProfile.specializations.length} specializzazioni
+                  </Badge>
+                )}
+              </div>
+
+              {/* Contatti aggiuntivi */}
+              <div className="flex gap-3 text-xs">
+                {recruiterProfile.telefono && (
+                  <div className="flex items-center gap-1 text-gray-600">
+                    <Phone className="h-3 w-3" />
+                    <span>{recruiterProfile.telefono}</span>
+                  </div>
+                )}
+                {recruiterProfile.linkedin_url && (
+                  <div className="flex items-center gap-1 text-blue-600">
+                    <Linkedin className="h-3 w-3" />
+                    <span>LinkedIn</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">
+              Profilo recruiter non trovato o non ancora completato
             </div>
           )}
         </div>
 
+        {/* Resto del contenuto rimane uguale */}
         {/* Descrizione del candidato */}
         {proposal.proposal_description ? (
           <div>

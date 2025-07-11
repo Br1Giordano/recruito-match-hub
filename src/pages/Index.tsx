@@ -12,6 +12,8 @@ import DashboardNavigation from "@/components/DashboardNavigation";
 import AuthPage from "@/components/auth/AuthPage";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { LogIn } from "lucide-react";
 
 const Index = () => {
@@ -19,6 +21,51 @@ const Index = () => {
   const [showAuth, setShowAuth] = useState(false);
   const [loadingTimeout, setLoadingTimeout] = useState(false);
   const { user, loading } = useAuth();
+  const { toast } = useToast();
+
+  // Gestione URL di conferma email
+  useEffect(() => {
+    const handleEmailConfirmation = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const token = urlParams.get('token');
+      const type = urlParams.get('type');
+      
+      if (token && type === 'email') {
+        console.log('Processing email confirmation...');
+        try {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: token,
+            type: 'email'
+          });
+          
+          if (error) {
+            console.error('Email confirmation error:', error);
+            toast({
+              title: "Errore conferma email",
+              description: "Si è verificato un errore durante la conferma dell'email. Prova ad accedere normalmente.",
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Email confermata!",
+              description: "La tua email è stata confermata con successo. Benvenuto!",
+            });
+            // Pulisci l'URL dai parametri
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+        } catch (error) {
+          console.error('Unexpected email confirmation error:', error);
+          toast({
+            title: "Errore",
+            description: "Si è verificato un errore imprevisto.",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+
+    handleEmailConfirmation();
+  }, [toast]);
 
   // Timeout di sicurezza ridotto a 2 secondi per un'esperienza più veloce
   useEffect(() => {

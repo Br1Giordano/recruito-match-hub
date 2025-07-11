@@ -3,19 +3,15 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProposals } from "@/hooks/useProposals";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Building2, Users, TrendingUp, Clock } from "lucide-react";
-import KanbanBoard from "./proposals/KanbanBoard";
-import ProposalDetailPanel from "./proposals/ProposalDetailPanel";
+import { Button } from "@/components/ui/button";
+import { Star, Building2, Users, ChevronLeft, ChevronRight, List } from "lucide-react";
+import ProposalSimpleView from "./proposals/ProposalSimpleView";
 
 export default function CompanyProposalsDashboard() {
-  const [activeProposalId, setActiveProposalId] = useState<string | null>(null);
+  const [currentProposalIndex, setCurrentProposalIndex] = useState(0);
 
   const { user } = useAuth();
   const { proposals, isLoading, updateProposalStatus } = useProposals();
-
-  const handleProposalClick = (proposalId: string) => {
-    setActiveProposalId(proposalId);
-  };
 
   const handleStatusChange = async (proposalId: string, newStatus: string) => {
     if (updateProposalStatus) {
@@ -24,25 +20,50 @@ export default function CompanyProposalsDashboard() {
   };
 
   const handleApprove = async () => {
-    if (activeProposalId && updateProposalStatus) {
-      await updateProposalStatus(activeProposalId, 'approved');
+    const currentProposal = proposals[currentProposalIndex];
+    if (currentProposal && updateProposalStatus) {
+      await updateProposalStatus(currentProposal.id, 'approved');
     }
   };
 
   const handleReject = async () => {
-    if (activeProposalId && updateProposalStatus) {
-      await updateProposalStatus(activeProposalId, 'rejected');
+    const currentProposal = proposals[currentProposalIndex];
+    if (currentProposal && updateProposalStatus) {
+      await updateProposalStatus(currentProposal.id, 'rejected');
     }
   };
 
-  const activeProposal = proposals.find(p => p.id === activeProposalId);
+  const handleStartReview = async () => {
+    const currentProposal = proposals[currentProposalIndex];
+    if (currentProposal && updateProposalStatus) {
+      await updateProposalStatus(currentProposal.id, 'under_review');
+    }
+  };
+
+  const handleViewRecruiterProfile = () => {
+    // TODO: Implement recruiter profile view
+    console.log("View recruiter profile");
+  };
+
+  const nextProposal = () => {
+    if (currentProposalIndex < proposals.length - 1) {
+      setCurrentProposalIndex(currentProposalIndex + 1);
+    }
+  };
+
+  const prevProposal = () => {
+    if (currentProposalIndex > 0) {
+      setCurrentProposalIndex(currentProposalIndex - 1);
+    }
+  };
 
   // Calcolo statistiche 
   const totalProposals = proposals.length;
   const approvedProposals = proposals.filter(p => p.status === 'approved').length;
   const underReviewProposals = proposals.filter(p => p.status === 'under_review').length;
-  const avgResponseTime = 2.5; // Mock data - giorni medi di risposta
   const avgRating = 4.2; // Mock data - rating medio recruiter
+
+  const currentProposal = proposals[currentProposalIndex];
 
   if (isLoading) {
     return (
@@ -116,38 +137,59 @@ export default function CompanyProposalsDashboard() {
           </div>
         </Card>
 
-        {/* Proposte */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
+        {/* Navigation e Proposta Corrente */}
+        {proposals.length > 0 ? (
+          <div className="space-y-4">
+            {/* Navigation Header */}
             <Card className="p-4">
-              <h3 className="text-lg font-semibold mb-4">Proposte Ricevute</h3>
-              <KanbanBoard
-                proposals={proposals}
-                onStatusChange={handleStatusChange}
-                onProposalClick={handleProposalClick}
-                activeProposalId={activeProposalId}
-              />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <h3 className="text-lg font-semibold">Proposte Ricevute</h3>
+                  <Badge variant="secondary">
+                    {currentProposalIndex + 1} di {totalProposals}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={prevProposal}
+                    disabled={currentProposalIndex === 0}
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={nextProposal}
+                    disabled={currentProposalIndex === proposals.length - 1}
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
             </Card>
-          </div>
-          
-          <div className="lg:col-span-1">
-            {activeProposal ? (
-              <ProposalDetailPanel
-                proposal={activeProposal}
+
+            {/* Proposta Corrente */}
+            {currentProposal && (
+              <ProposalSimpleView
+                proposal={currentProposal}
                 onApprove={handleApprove}
                 onReject={handleReject}
+                onStartReview={handleStartReview}
+                onViewRecruiterProfile={handleViewRecruiterProfile}
               />
-            ) : (
-              <Card className="p-6 text-center">
-                <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="font-semibold text-foreground mb-2">Seleziona una proposta</h3>
-                <p className="text-muted-foreground text-sm">
-                  Clicca su una proposta per visualizzarne i dettagli
-                </p>
-              </Card>
             )}
           </div>
-        </div>
+        ) : (
+          <Card className="p-12 text-center">
+            <List className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">Nessuna proposta ricevuta</h3>
+            <p className="text-muted-foreground">
+              Quando riceverai delle proposte dai recruiter, appariranno qui.
+            </p>
+          </Card>
+        )}
       </div>
     </div>
   );

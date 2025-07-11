@@ -232,6 +232,8 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
 }
 
 function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; onSignOut: () => void }) {
+  const [showProfileModal, setShowProfileModal] = useState(false);
+
   return (
     <>
       <div className="border-b bg-white shadow-sm">
@@ -252,19 +254,41 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <DeleteAccountDialog trigger={
-                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
-                  <Settings className="h-4 w-4" />
-                </Button>
-              } />
-              <Button variant="ghost" onClick={onSignOut} className="flex items-center gap-2">
-                <LogOut className="h-4 w-4" />
-                Esci
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-recruito-teal rounded-lg flex items-center justify-center">
+                      <Building2 className="h-4 w-4 text-white" />
+                    </div>
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-white border shadow-lg">
+                  <DropdownMenuItem 
+                    onClick={() => setShowProfileModal(true)}
+                    className="cursor-pointer hover:bg-gray-50"
+                  >
+                    <User className="h-4 w-4 mr-2" />
+                    Il mio profilo
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DeleteAccountDialog trigger={
+                    <DropdownMenuItem className="cursor-pointer hover:bg-red-50 text-red-600">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Esci dall'account
+                    </DropdownMenuItem>
+                  } />
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
         </div>
       </div>
+
+      <CompanyProfileModal 
+        open={showProfileModal} 
+        onOpenChange={setShowProfileModal} 
+      />
 
       <div className="container mx-auto p-4">
         <Tabs defaultValue="proposals" className="space-y-6">

@@ -1,0 +1,139 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './useAuth';
+import { useToast } from './use-toast';
+
+interface CompanyProfile {
+  id: string;
+  nome_azienda: string;
+  settore: string | null;
+  email: string;
+  telefono: string | null;
+  messaggio: string | null;
+  sede: string | null;
+  employee_count_range: string | null;
+  created_at: string;
+  status: string | null;
+}
+
+export function useCompanyProfile() {
+  const [profile, setProfile] = useState<CompanyProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const { user, userProfile } = useAuth();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (user && userProfile?.user_type === 'company') {
+      fetchProfile();
+    } else {
+      setLoading(false);
+    }
+  }, [user, userProfile]);
+
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      if (!userProfile?.registration_id) return;
+
+      const { data, error } = await supabase
+        .from('company_registrations')
+        .select('*')
+        .eq('id', userProfile.registration_id)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching company profile:', error);
+        return;
+      }
+
+      setProfile(data);
+    } catch (error) {
+      console.error('Error fetching company profile:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateProfile = async (updates: Partial<CompanyProfile>) => {
+    try {
+      if (!profile) return false;
+
+      const { error } = await supabase
+        .from('company_registrations')
+        .update(updates)
+        .eq('id', profile.id);
+
+      if (error) {
+        toast({
+          title: "Errore",
+          description: "Non è stato possibile aggiornare il profilo.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      await fetchProfile();
+      toast({
+        title: "Successo",
+        description: "Profilo aggiornato con successo!",
+      });
+      return true;
+    } catch (error) {
+      console.error('Error updating company profile:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore imprevisto.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const createProfile = async (profileData: Omit<CompanyProfile, 'id' | 'created_at' | 'status'>) => {
+    try {
+      const { data, error } = await supabase
+        .from('company_registrations')
+        .insert([profileData])
+        .select()
+        .single();
+
+      if (error) {
+        toast({
+          title: "Errore",
+          description: "Non è stato possibile creare il profilo.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      // Link the profile to the user
+      if (user && data) {
+        const { linkToRegistration } = useAuth();
+        await linkToRegistration(data.id, 'company');
+      }
+
+      await fetchProfile();
+      toast({
+        title: "Successo",
+        description: "Profilo creato con successo!",
+      });
+      return true;
+    } catch (error) {
+      console.error('Error creating company profile:', error);
+      toast({
+        title: "Errore",
+        description: "Si è verificato un errore imprevisto.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  return {
+    profile,
+    loading,
+    updateProfile,
+    createProfile,
+    refreshProfile: fetchProfile
+  };
+}

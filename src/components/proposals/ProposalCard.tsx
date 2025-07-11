@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Euro, Calendar, User, Phone, Linkedin, UserCircle } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
-import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
-import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
+import RecruiterDashboardView from "../recruiter/RecruiterDashboardView";
 
 interface ProposalCardProps {
   proposal: {
@@ -36,19 +35,9 @@ interface ProposalCardProps {
 
 export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
-  const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
-
-  // Carica il profilo del recruiter solo una volta quando il componente viene montato
-  useEffect(() => {
-    if (proposal.recruiter_email && !recruiterProfile) {
-      fetchProfileByEmail(proposal.recruiter_email);
-    }
-  }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile]);
 
   const handleShowRecruiterProfile = () => {
-    if (recruiterProfile) {
-      setShowRecruiterProfile(true);
-    }
+    setShowRecruiterProfile(true);
   };
 
   const getStatusColor = (status: string) => {
@@ -113,41 +102,22 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                 <h4 className="font-medium text-blue-900">Recruiter</h4>
                 <Button
                   onClick={handleShowRecruiterProfile}
-                  disabled={loadingRecruiter || !recruiterProfile}
+                  disabled={!proposal.recruiter_email}
                   variant="outline"
                   size="sm"
                   className="text-blue-600 border-blue-300 hover:bg-blue-100"
                 >
                   <UserCircle className="h-4 w-4 mr-2" />
-                  {loadingRecruiter ? "Caricamento..." : 
-                   recruiterProfile ? "Visualizza Profilo" : "Profilo non disponibile"}
+                  Visualizza Profilo
                 </Button>
               </div>
               <div className="text-sm">
-                {recruiterProfile ? (
-                  <>
-                    <div className="font-medium text-gray-900">
-                      {recruiterProfile.nome} {recruiterProfile.cognome}
-                    </div>
-                    <div className="text-gray-600">
-                      {recruiterProfile.email}
-                    </div>
-                    {recruiterProfile.azienda && (
-                      <div className="text-gray-500 text-xs mt-1">
-                        {recruiterProfile.azienda}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="font-medium text-gray-900">
-                      {proposal.recruiter_name || 'Recruiter'}
-                    </div>
-                    <div className="text-gray-600">
-                      {proposal.recruiter_email}
-                    </div>
-                  </>
-                )}
+                <div className="font-medium text-gray-900">
+                  {proposal.recruiter_name || 'Recruiter'}
+                </div>
+                <div className="text-gray-600">
+                  {proposal.recruiter_email}
+                </div>
               </div>
             </div>
           )}
@@ -246,11 +216,12 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
       </Card>
 
       {/* Modal Profilo Recruiter */}
-      <RecruiterProfileViewModal
-        open={showRecruiterProfile}
-        onOpenChange={setShowRecruiterProfile}
-        profile={recruiterProfile}
-      />
+      {showRecruiterProfile && proposal.recruiter_email && (
+        <RecruiterDashboardView
+          recruiterEmail={proposal.recruiter_email}
+          onClose={() => setShowRecruiterProfile(false)}
+        />
+      )}
     </>
   );
 }

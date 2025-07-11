@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Euro, Calendar, User, Phone, Linkedin, UserCircle } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterDashboardView from "../recruiter/RecruiterDashboardView";
+import CVViewer from "../cv/CVViewer";
 
 interface ProposalCardProps {
   proposal: {
@@ -139,9 +140,15 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
             </div>
           )}
 
-          {/* Contatti Candidato */}
+          {/* Contatti Candidato e CV */}
           <div>
-            <h4 className="font-medium mb-2">Contatti Candidato:</h4>
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="font-medium">Contatti Candidato:</h4>
+              <CVViewer 
+                cvUrl={proposal.candidate_cv_url} 
+                candidateName={proposal.candidate_name}
+              />
+            </div>
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-sm">
                 <User className="h-4 w-4" />

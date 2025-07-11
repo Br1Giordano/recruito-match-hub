@@ -8,10 +8,11 @@ import { useAuth } from "@/hooks/useAuth";
 import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
-import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut } from "lucide-react";
+import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut, Settings } from "lucide-react";
 import JobOffersBoard from "./JobOffersBoard";
 import { useToast } from "@/components/ui/use-toast";
 import RecruiterProfileButton from "./recruiter/RecruiterProfileButton";
+import DeleteAccountDialog from "./account/DeleteAccountDialog";
 
 interface DashboardNavigationProps {
   onBack?: () => void;
@@ -192,7 +193,14 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
                 <h1 className="text-xl font-semibold">Dashboard Recruiter</h1>
               </div>
             </div>
-            <RecruiterProfileButton />
+            <div className="flex items-center gap-2">
+              <RecruiterProfileButton />
+              <DeleteAccountDialog trigger={
+                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              } />
+            </div>
           </div>
         </div>
       </div>
@@ -243,10 +251,17 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
                 <h1 className="text-xl font-semibold">Dashboard Azienda</h1>
               </div>
             </div>
-            <Button variant="ghost" onClick={onSignOut} className="flex items-center gap-2">
-              <LogOut className="h-4 w-4" />
-              Esci
-            </Button>
+            <div className="flex items-center gap-2">
+              <DeleteAccountDialog trigger={
+                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+                  <Settings className="h-4 w-4" />
+                </Button>
+              } />
+              <Button variant="ghost" onClick={onSignOut} className="flex items-center gap-2">
+                <LogOut className="h-4 w-4" />
+                Esci
+              </Button>
+            </div>
           </div>
         </div>
       </div>

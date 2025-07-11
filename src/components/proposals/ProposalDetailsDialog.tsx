@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Eye, Euro, Calendar, User, Building2, Phone, Linkedin, UserCircle } from "lucide-react";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import RecruiterProfileViewModal from "../recruiter/RecruiterProfileViewModal";
+import CVViewer from "../cv/CVViewer";
 
 interface ProposalDetailsDialogProps {
   proposal: {
@@ -14,6 +15,7 @@ interface ProposalDetailsDialogProps {
     candidate_email: string;
     candidate_phone?: string;
     candidate_linkedin?: string;
+    candidate_cv_url?: string;
     proposal_description: string;
     years_experience?: number;
     expected_salary?: number;
@@ -150,7 +152,13 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
 
             {/* Candidate Details */}
             <div>
-              <h3 className="text-lg font-semibold mb-3">Dettagli Candidato</h3>
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="text-lg font-semibold">Dettagli Candidato</h3>
+                <CVViewer 
+                  cvUrl={proposal.candidate_cv_url} 
+                  candidateName={proposal.candidate_name}
+                />
+              </div>
               <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />

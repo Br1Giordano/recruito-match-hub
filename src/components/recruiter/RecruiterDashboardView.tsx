@@ -178,6 +178,9 @@ export default function RecruiterDashboardView({ recruiterEmail, onClose }: Recr
             <div className="flex-1">
               <h3 className="font-semibold text-lg">{profile.nome} {profile.cognome}</h3>
               <p className="text-sm text-gray-600">{profile.email}</p>
+              {profile.azienda && (
+                <p className="text-sm text-blue-600 font-medium">{profile.azienda}</p>
+              )}
               {profile.location && (
                 <div className="flex items-center gap-1 text-sm text-gray-600 mt-1">
                   <MapPin className="h-3 w-3" />
@@ -233,19 +236,44 @@ export default function RecruiterDashboardView({ recruiterEmail, onClose }: Recr
             </CardContent>
           </Card>
 
-          {/* Biography */}
-          {profile.bio && (
+          {/* Biography - show both bio and messaggio */}
+          {(profile.bio || profile.messaggio) && (
             <div>
               <h4 className="font-semibold text-sm mb-2">Biografia</h4>
-              <p className="text-sm text-gray-700">{profile.bio}</p>
+              <p className="text-sm text-gray-700">{profile.bio || profile.messaggio}</p>
             </div>
           )}
 
-          {/* Experience */}
-          {profile.esperienza && (
+          {/* Experience - show both numerical years and text description */}
+          {(profile.esperienza || profile.years_of_experience) && (
             <div>
               <h4 className="font-semibold text-sm mb-2">Esperienza</h4>
-              <p className="text-sm text-gray-700">{profile.esperienza}</p>
+              <div className="text-sm text-gray-700">
+                {profile.years_of_experience && (
+                  <div className="font-medium text-blue-600 mb-1">
+                    {profile.years_of_experience} anni nel recruiting
+                  </div>
+                )}
+                {profile.esperienza && (
+                  <p>{profile.esperienza}</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Company */}
+          {profile.azienda && (
+            <div>
+              <h4 className="font-semibold text-sm mb-2">Azienda</h4>
+              <p className="text-sm text-gray-700">{profile.azienda}</p>
+            </div>
+          )}
+
+          {/* Sectors - show settori field */}
+          {profile.settori && (
+            <div>
+              <h4 className="font-semibold text-sm mb-2">Settori di competenza</h4>
+              <p className="text-sm text-gray-700">{profile.settori}</p>
             </div>
           )}
 
@@ -263,14 +291,26 @@ export default function RecruiterDashboardView({ recruiterEmail, onClose }: Recr
             </div>
           )}
 
-          {/* LinkedIn */}
-          {profile.linkedin_url && (
-            <Button variant="outline" size="sm" asChild className="w-full">
-              <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
-                <Linkedin className="h-3 w-3 mr-2" />
-                LinkedIn
-              </a>
-            </Button>
+          {/* Social Links */}
+          {(profile.linkedin_url || profile.website_url) && (
+            <div className="space-y-2">
+              {profile.linkedin_url && (
+                <Button variant="outline" size="sm" asChild className="w-full">
+                  <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
+                    <Linkedin className="h-3 w-3 mr-2" />
+                    LinkedIn
+                  </a>
+                </Button>
+              )}
+              {profile.website_url && (
+                <Button variant="outline" size="sm" asChild className="w-full">
+                  <a href={profile.website_url} target="_blank" rel="noopener noreferrer">
+                    <TrendingUp className="h-3 w-3 mr-2" />
+                    Sito Web
+                  </a>
+                </Button>
+              )}
+            </div>
           )}
 
           {/* Reviews */}

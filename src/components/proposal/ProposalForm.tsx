@@ -1,9 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useRecruiterProfile } from "@/hooks/useRecruiterProfile";
 import { Loader2 } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 import ProposalFormFields from "./ProposalFormFields";
@@ -22,6 +24,8 @@ interface ProposalFormProps {
 }
 
 export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalFormProps) {
+  const { user } = useAuth();
+  const { profile } = useRecruiterProfile();
   const [formData, setFormData] = useState({
     candidate_name: "",
     candidate_email: "",
@@ -36,10 +40,28 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
     recruiter_name: "",
     recruiter_email: "",
     recruiter_phone: "",
-    candidate_cv_url: "", // Aggiunto campo per l'URL del CV
+    candidate_cv_url: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+
+  // Autocompila i campi del recruiter quando il profilo è disponibile
+  useEffect(() => {
+    if (profile && user) {
+      setFormData(prev => ({
+        ...prev,
+        recruiter_name: `${profile.nome} ${profile.cognome}`,
+        recruiter_email: profile.email,
+        recruiter_phone: profile.telefono || "",
+      }));
+    } else if (user && !profile) {
+      // Se abbiamo l'utente ma non il profilo, usa almeno l'email
+      setFormData(prev => ({
+        ...prev,
+        recruiter_email: user.email || "",
+      }));
+    }
+  }, [profile, user]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));

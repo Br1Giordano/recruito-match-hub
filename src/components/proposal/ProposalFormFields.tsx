@@ -201,8 +201,10 @@ export default function ProposalFormFields({ formData, onInputChange }: Proposal
               id="recruiter_name"
               value={formData.recruiter_name}
               onChange={(e) => onInputChange('recruiter_name', e.target.value)}
-              placeholder="Mario Verdi"
+              placeholder="Nome e Cognome"
               required
+              readOnly
+              className="bg-gray-50"
             />
           </div>
 
@@ -213,8 +215,10 @@ export default function ProposalFormFields({ formData, onInputChange }: Proposal
               type="email"
               value={formData.recruiter_email}
               onChange={(e) => onInputChange('recruiter_email', e.target.value)}
-              placeholder="mario.verdi@recruiter.com"
+              placeholder="email@recruiter.com"
               required
+              readOnly
+              className="bg-gray-50"
             />
           </div>
         </div>
@@ -226,6 +230,8 @@ export default function ProposalFormFields({ formData, onInputChange }: Proposal
             value={formData.recruiter_phone}
             onChange={(e) => onInputChange('recruiter_phone', e.target.value)}
             placeholder="+39 123 456 7890"
+            readOnly
+            className="bg-gray-50"
           />
         </div>
       </div>

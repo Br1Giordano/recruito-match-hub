@@ -42,9 +42,11 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          employee_count_range: string | null
           id: string
           messaggio: string | null
           nome_azienda: string
+          sede: string | null
           settore: string | null
           status: string | null
           telefono: string | null
@@ -52,9 +54,11 @@ export type Database = {
         Insert: {
           created_at?: string
           email: string
+          employee_count_range?: string | null
           id?: string
           messaggio?: string | null
           nome_azienda: string
+          sede?: string | null
           settore?: string | null
           status?: string | null
           telefono?: string | null
@@ -62,9 +66,11 @@ export type Database = {
         Update: {
           created_at?: string
           email?: string
+          employee_count_range?: string | null
           id?: string
           messaggio?: string | null
           nome_azienda?: string
+          sede?: string | null
           settore?: string | null
           status?: string | null
           telefono?: string | null

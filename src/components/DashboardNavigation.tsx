@@ -8,11 +8,19 @@ import { useAuth } from "@/hooks/useAuth";
 import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
-import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut, Settings } from "lucide-react";
+import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut, Settings, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import JobOffersBoard from "./JobOffersBoard";
 import { useToast } from "@/components/ui/use-toast";
 import RecruiterProfileButton from "./recruiter/RecruiterProfileButton";
 import DeleteAccountDialog from "./account/DeleteAccountDialog";
+import CompanyProfileModal from "./company/CompanyProfileModal";
 
 interface DashboardNavigationProps {
   onBack?: () => void;

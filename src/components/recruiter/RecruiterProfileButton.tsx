@@ -11,6 +11,7 @@ import {
 import { User, Settings, LogOut, ChevronDown } from 'lucide-react';
 import RecruiterAvatar from './RecruiterAvatar';
 import RecruiterProfileModal from './RecruiterProfileModal';
+import DeleteAccountDialog from '../account/DeleteAccountDialog';
 import { useRecruiterProfile } from '@/hooks/useRecruiterProfile';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -75,11 +76,23 @@ export default function RecruiterProfileButton() {
           
           <DropdownMenuItem 
             onClick={handleSignOut} 
-            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+            className="cursor-pointer hover:bg-gray-50"
           >
             <LogOut className="mr-2 h-4 w-4" />
             Esci dall'account
           </DropdownMenuItem>
+          
+          <DropdownMenuSeparator />
+          
+          <DeleteAccountDialog trigger={
+            <DropdownMenuItem 
+              className="cursor-pointer hover:bg-red-50 text-red-600 focus:text-red-600"
+              onSelect={(e) => e.preventDefault()}
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              Gestione account
+            </DropdownMenuItem>
+          } />
         </DropdownMenuContent>
       </DropdownMenu>
 

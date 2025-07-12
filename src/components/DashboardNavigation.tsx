@@ -264,7 +264,7 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
             <div className="flex items-center gap-2 ml-auto">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="flex items-center gap-2">
+                  <Button variant="outline" className="flex items-center gap-2 border-gray-200 hover:border-gray-300">
                     <div className="w-8 h-8 bg-recruito-teal rounded-lg flex items-center justify-center">
                       <Building2 className="h-4 w-4 text-white" />
                     </div>

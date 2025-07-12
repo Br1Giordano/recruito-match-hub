@@ -43,7 +43,7 @@ export default function RecruiterProfileButton() {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex items-center gap-2 h-auto p-2">
+          <Button variant="outline" className="flex items-center gap-2 h-auto p-2 border-gray-200 hover:border-gray-300">
             <RecruiterAvatar
               avatarUrl={profile?.avatar_url}
               name={displayName}

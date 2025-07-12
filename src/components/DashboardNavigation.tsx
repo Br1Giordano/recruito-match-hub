@@ -279,11 +279,26 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
                     <User className="h-4 w-4 mr-2" />
                     Il mio profilo
                   </DropdownMenuItem>
+                  
                   <DropdownMenuSeparator />
+                  
+                  <DropdownMenuItem 
+                    onClick={onSignOut}
+                    className="cursor-pointer hover:bg-gray-50"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Esci dall'account
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuSeparator />
+                  
                   <DeleteAccountDialog trigger={
-                    <DropdownMenuItem className="cursor-pointer hover:bg-red-50 text-red-600">
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Esci dall'account
+                    <DropdownMenuItem 
+                      className="cursor-pointer hover:bg-red-50 text-red-600 focus:text-red-600"
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <Settings className="h-4 w-4 mr-2" />
+                      Gestione account
                     </DropdownMenuItem>
                   } />
                 </DropdownMenuContent>

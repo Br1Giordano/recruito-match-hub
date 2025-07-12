@@ -201,7 +201,7 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
                 <h1 className="text-xl font-semibold">Dashboard Recruiter</h1>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-auto">
               <RecruiterProfileButton />
               <DeleteAccountDialog trigger={
                 <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700 hover:bg-red-50">
@@ -261,7 +261,7 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
                 <h1 className="text-xl font-semibold">Dashboard Azienda</h1>
               </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 ml-auto">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2">

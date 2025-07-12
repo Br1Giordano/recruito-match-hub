@@ -67,11 +67,6 @@ export default function RecruiterProfileButton() {
             Il mio profilo
           </DropdownMenuItem>
           
-          <DropdownMenuItem disabled>
-            <Settings className="mr-2 h-4 w-4" />
-            Impostazioni
-          </DropdownMenuItem>
-          
           <DropdownMenuSeparator />
           
           <DropdownMenuItem 

@@ -12,14 +12,31 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { MapPin, Briefcase, Globe, Linkedin, X, Plus } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { MapPin, Briefcase, Globe, Linkedin, X, Plus, Star, Users, CheckCircle, Clock, Award } from 'lucide-react';
 import RecruiterAvatar from './RecruiterAvatar';
 import { useRecruiterProfile } from '@/hooks/useRecruiterProfile';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 
 interface RecruiterProfileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+}
+
+interface RecruiterStats {
+  totalProposals: number;
+  underReview: number;
+  approved: number;
+  averageRating: number;
+}
+
+interface Review {
+  id: string;
+  rating: number;
+  review_text: string | null;
+  created_at: string;
+  company_email: string;
 }
 
 export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterProfileModalProps) {
@@ -27,6 +44,9 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [newSpecialization, setNewSpecialization] = useState('');
+  const [stats, setStats] = useState<RecruiterStats>({ totalProposals: 0, underReview: 0, approved: 0, averageRating: 0 });
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loadingStats, setLoadingStats] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     cognome: '',
@@ -38,6 +58,14 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
     website_url: '',
     specializations: [] as string[]
   });
+
+  // Fetch stats and reviews when modal opens
+  useEffect(() => {
+    if (open && profile?.email) {
+      fetchStats();
+      fetchReviews();
+    }
+  }, [open, profile?.email]);
 
   // Se non c'è profilo, inizia in modalità editing
   useEffect(() => {
@@ -62,6 +90,66 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
       setIsEditing(false);
     }
   }, [profile, open, user?.email]);
+
+  const fetchStats = async () => {
+    if (!profile?.email) return;
+    
+    setLoadingStats(true);
+    try {
+      // Fetch proposals stats
+      const { data: proposals, error: proposalsError } = await supabase
+        .from('proposals')
+        .select('status')
+        .eq('recruiter_email', profile.email);
+
+      if (proposalsError) throw proposalsError;
+
+      const totalProposals = proposals?.length || 0;
+      const underReview = proposals?.filter(p => p.status === 'pending')?.length || 0;
+      const approved = proposals?.filter(p => p.status === 'approved')?.length || 0;
+
+      // Fetch average rating
+      const { data: ratingsData, error: ratingsError } = await supabase
+        .from('recruiter_reviews')
+        .select('rating')
+        .eq('recruiter_email', profile.email);
+
+      if (ratingsError) throw ratingsError;
+
+      const averageRating = ratingsData?.length > 0 
+        ? ratingsData.reduce((sum, r) => sum + r.rating, 0) / ratingsData.length 
+        : 0;
+
+      setStats({
+        totalProposals,
+        underReview,
+        approved,
+        averageRating: Math.round(averageRating * 10) / 10
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    if (!profile?.email) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('recruiter_reviews')
+        .select('*')
+        .eq('recruiter_email', profile.email)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (error) throw error;
+      setReviews(data || []);
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    }
+  };
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -115,12 +203,71 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
     avatar_url: null
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('it-IT', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  const renderStars = (rating: number) => {
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            className={`h-4 w-4 ${
+              star <= rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+            }`}
+          />
+        ))}
+      </div>
+    );
+  };
+
+  if (loadingStats) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="flex items-center justify-center h-64">
+            <div className="text-lg">Caricamento profilo...</div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (!profile && !isEditing) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Profilo non trovato</DialogTitle>
+          </DialogHeader>
+          <div className="text-center py-8">
+            <p className="text-gray-600 mb-4">Non è stato trovato un profilo per questo recruiter.</p>
+            <Button onClick={() => setIsEditing(true)}>
+              Crea il tuo profilo
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>
-            {profile ? 'Profilo Recruiter' : 'Crea il tuo Profilo Recruiter'}
+          <DialogTitle className="flex items-center justify-between">
+            <span>{isEditing ? 'Modifica Profilo Recruiter' : 'Profilo Recruiter'}</span>
+            {profile && (
+              <div className="flex items-center gap-2">
+                <Star className="h-5 w-5 text-yellow-500" />
+                <span className="text-lg font-bold">{stats.averageRating}</span>
+              </div>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -179,39 +326,83 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
                       <span>{displayProfile.location}</span>
                     </div>
                   )}
-                  {displayProfile.years_of_experience && (
-                    <div className="flex items-center gap-1 text-gray-500 mt-1">
-                      <Briefcase className="h-4 w-4" />
-                      <span>{displayProfile.years_of_experience} anni di esperienza</span>
-                    </div>
-                  )}
                 </div>
               )}
             </div>
+
+            <div className="flex items-center gap-4 text-sm text-gray-600">
+              <div className="flex items-center gap-1">
+                <Users className="h-4 w-4" />
+                <span>{stats.totalProposals} interessati</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Star className="h-4 w-4 text-yellow-500" />
+                <span>{reviews.length} recensioni</span>
+              </div>
+            </div>
           </div>
+
+          {/* Statistiche Performance */}
+          {profile && !isEditing && (
+            <Card>
+              <CardContent className="pt-6">
+                <h3 className="text-lg font-semibold mb-4 text-blue-600">Statistiche Performance</h3>
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{stats.totalProposals}</div>
+                    <div className="text-sm text-gray-600">Proposte Totali</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">{stats.underReview}</div>
+                    <div className="text-sm text-gray-600">Prese in interesse</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{stats.approved}</div>
+                    <div className="text-sm text-gray-600">Approvate</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-yellow-600 flex items-center justify-center gap-1">
+                      <Star className="h-5 w-5" />
+                      {stats.averageRating}
+                    </div>
+                    <div className="text-sm text-gray-600">Rating Medio</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Separator />
 
           {/* Bio */}
           <div>
-            <Label>Bio</Label>
+            <h3 className="text-lg font-semibold mb-3">Biografia</h3>
             {isEditing ? (
               <Textarea
                 value={formData.bio}
                 onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                 placeholder="Racconta qualcosa di te..."
                 rows={4}
-                className="mt-2"
               />
             ) : (
-              <p className="mt-2 text-gray-700">
+              <p className="text-gray-700">
                 {displayProfile.bio || "Nessuna bio disponibile"}
               </p>
             )}
           </div>
 
+          {/* Esperienza */}
+          {!isEditing && displayProfile.years_of_experience && (
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Esperienza</h3>
+              <p className="text-blue-600 font-medium">
+                {displayProfile.years_of_experience} anni nel recruiting
+              </p>
+            </div>
+          )}
+
           {/* Dettagli professionali */}
-          {isEditing ? (
+          {isEditing && (
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="location">Località</Label>
@@ -233,59 +424,13 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
                 />
               </div>
             </div>
-          ) : null}
-
-          {/* Link social */}
-          <div>
-            <Label>Link professionali</Label>
-            {isEditing ? (
-              <div className="space-y-3 mt-2">
-                <div>
-                  <Label htmlFor="linkedin">LinkedIn</Label>
-                  <Input
-                    id="linkedin"
-                    value={formData.linkedin_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, linkedin_url: e.target.value }))}
-                    placeholder="https://linkedin.com/in/..."
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="website">Sito web</Label>
-                  <Input
-                    id="website"
-                    value={formData.website_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
-                    placeholder="https://..."
-                  />
-                </div>
-              </div>
-            ) : (
-              <div className="flex gap-3 mt-2">
-                {displayProfile.linkedin_url && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={displayProfile.linkedin_url} target="_blank" rel="noopener noreferrer">
-                      <Linkedin className="h-4 w-4 mr-2" />
-                      LinkedIn
-                    </a>
-                  </Button>
-                )}
-                {displayProfile.website_url && (
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={displayProfile.website_url} target="_blank" rel="noopener noreferrer">
-                      <Globe className="h-4 w-4 mr-2" />
-                      Sito web
-                    </a>
-                  </Button>
-                )}
-              </div>
-            )}
-          </div>
+          )}
 
           {/* Specializzazioni */}
           <div>
-            <Label>Specializzazioni</Label>
+            <h3 className="text-lg font-semibold mb-3">Specializzazioni</h3>
             {isEditing ? (
-              <div className="mt-2 space-y-3">
+              <div className="space-y-3">
                 <div className="flex gap-2">
                   <Input
                     value={newSpecialization}
@@ -310,15 +455,85 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
                 </div>
               </div>
             ) : (
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap gap-2">
                 {displayProfile.specializations?.map((spec, index) => (
-                  <Badge key={index} variant="secondary">
+                  <Badge key={index} className="bg-gray-100 text-gray-800 hover:bg-gray-200">
                     {spec}
                   </Badge>
                 )) || <span className="text-gray-500">Nessuna specializzazione</span>}
               </div>
             )}
           </div>
+
+          {/* Link social */}
+          <div>
+            <h3 className="text-lg font-semibold mb-3">Link professionali</h3>
+            {isEditing ? (
+              <div className="space-y-3">
+                <div>
+                  <Label htmlFor="linkedin">LinkedIn</Label>
+                  <Input
+                    id="linkedin"
+                    value={formData.linkedin_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, linkedin_url: e.target.value }))}
+                    placeholder="https://linkedin.com/in/..."
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="website">Sito web</Label>
+                  <Input
+                    id="website"
+                    value={formData.website_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, website_url: e.target.value }))}
+                    placeholder="https://..."
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                {displayProfile.linkedin_url && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={displayProfile.linkedin_url} target="_blank" rel="noopener noreferrer">
+                      <Linkedin className="h-4 w-4 mr-2" />
+                      LinkedIn
+                    </a>
+                  </Button>
+                )}
+                {displayProfile.website_url && (
+                  <Button variant="outline" size="sm" asChild>
+                    <a href={displayProfile.website_url} target="_blank" rel="noopener noreferrer">
+                      <Globe className="h-4 w-4 mr-2" />
+                      Sito web
+                    </a>
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Recensioni */}
+          {profile && !isEditing && reviews.length > 0 && (
+            <div>
+              <h3 className="text-lg font-semibold mb-4">Recensioni ({reviews.length})</h3>
+              <div className="space-y-4 max-h-60 overflow-y-auto">
+                {reviews.map((review) => (
+                  <Card key={review.id}>
+                    <CardContent className="pt-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          {renderStars(review.rating)}
+                          <span className="text-sm text-gray-600">{formatDate(review.created_at)}</span>
+                        </div>
+                      </div>
+                      {review.review_text && (
+                        <p className="text-gray-700 text-sm">{review.review_text}</p>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Azioni */}
           <div className="flex justify-end gap-3 pt-6 border-t">

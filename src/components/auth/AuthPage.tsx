@@ -63,34 +63,44 @@ export default function AuthPage({ onBack, onAuthSuccess }: AuthPageProps) {
 
     const redirectUrl = `${window.location.origin}/`;
 
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim(),
-      password,
-      options: {
-        emailRedirectTo: redirectUrl,
-        data: {
-          user_type: userType
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+          emailRedirectTo: redirectUrl,
+          data: {
+            user_type: userType
+          }
+        }
+      });
+
+      if (error) {
+        console.error('Signup error:', error);
+        setError(error.message);
+        setIsLoading(false);
+      } else if (data.user) {
+        if (data.session) {
+          // User is automatically confirmed, redirect to dashboard
+          toast({
+            title: "Registrazione completata",
+            description: "Account creato con successo!",
+          });
+          setIsLoading(false);
+          if (onAuthSuccess) onAuthSuccess();
+        } else {
+          // User needs email confirmation
+          toast({
+            title: "Conferma email richiesta", 
+            description: "Controlla la tua email per confermare l'account. Se non ricevi l'email, contatta il supporto.",
+          });
+          setIsLoading(false);
         }
       }
-    });
-
-    if (error) {
-      setError(error.message);
+    } catch (error: any) {
+      console.error('Unexpected signup error:', error);
+      setError('Errore durante la registrazione. Riprova più tardi.');
       setIsLoading(false);
-    } else if (data.user && !data.session) {
-      toast({
-        title: "Conferma email richiesta",
-        description: "Controlla la tua email per confermare l'account.",
-      });
-      setIsLoading(false);
-    } else {
-      toast({
-        title: "Registrazione completata",
-        description: "Account creato con successo!",
-      });
-      setIsLoading(false);
-      // Redirect to dashboard after successful signup
-      if (onAuthSuccess) onAuthSuccess();
     }
   };
 

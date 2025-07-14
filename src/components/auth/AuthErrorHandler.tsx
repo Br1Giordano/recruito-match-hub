@@ -17,6 +17,10 @@ export default function AuthErrorHandler({ error }: AuthErrorHandlerProps) {
       return 'Email o password non corretti. Riprova.';
     }
     
+    if (lowerError.includes('error sending confirmation email')) {
+      return 'Problema con l\'invio dell\'email di conferma. L\'account è stato creato ma devi contattare l\'amministratore per attivarlo.';
+    }
+    
     if (lowerError.includes('email not confirmed')) {
       return 'Email non confermata. Controlla la tua casella di posta.';
     }

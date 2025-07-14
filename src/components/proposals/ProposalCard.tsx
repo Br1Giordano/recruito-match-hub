@@ -6,6 +6,7 @@ import { Euro, Calendar, User, Phone, Linkedin, UserCircle } from "lucide-react"
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterDashboardView from "../recruiter/RecruiterDashboardView";
 import CVViewer from "../cv/CVViewer";
+import RecruiterReviewDialog from "./RecruiterReviewDialog";
 
 interface ProposalCardProps {
   proposal: {
@@ -207,8 +208,70 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
           </div>
 
           {/* Pulsanti azione */}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex flex-wrap justify-end gap-2 pt-2">
+            {/* Pulsanti per proposte in attesa */}
+            {proposal.status === "pending" && onStatusUpdate && (
+              <>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "under_review")}
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
+                >
+                  Procedi alla Valutazione
+                </Button>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "accepted")}
+                  variant="default"
+                  size="sm"
+                  className="gap-2 bg-green-600 hover:bg-green-700"
+                >
+                  Approva
+                </Button>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "rejected")}
+                  variant="destructive"
+                  size="sm"
+                  className="gap-2"
+                >
+                  Rifiuta
+                </Button>
+              </>
+            )}
+
+            {/* Pulsanti per proposte in valutazione */}
+            {proposal.status === "under_review" && onStatusUpdate && (
+              <>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "accepted")}
+                  variant="default"
+                  size="sm"
+                  className="gap-2 bg-green-600 hover:bg-green-700"
+                >
+                  Approva
+                </Button>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "rejected")}
+                  variant="destructive"
+                  size="sm"
+                  className="gap-2"
+                >
+                  Rifiuta
+                </Button>
+              </>
+            )}
+
+            {/* Pulsante recensione per proposte approvate */}
+            {proposal.status === "accepted" && proposal.recruiter_email && (
+              <RecruiterReviewDialog
+                proposalId={proposal.id}
+                recruiterEmail={proposal.recruiter_email}
+                recruiterName={proposal.recruiter_name}
+              />
+            )}
+
             <ProposalDetailsDialog proposal={proposal} />
+            
             {onDelete && (
               <Button
                 onClick={() => onDelete(proposal.id)}

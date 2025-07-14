@@ -1,1 +1,7 @@
 project_id = "xwemjiljadhpvxwhgvid"
+
+[functions.send-confirmation-email]
+verify_jwt = false
+
+[functions.send-proposal-notification]
+verify_jwt = false

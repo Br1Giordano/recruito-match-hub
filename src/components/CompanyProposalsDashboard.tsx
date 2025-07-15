@@ -22,8 +22,8 @@ export default function CompanyProposalsDashboard() {
   // Raggruppa le proposte per stato
   const pendingProposals = proposals.filter(p => p.status === "pending");
   const evaluatingProposals = proposals.filter(p => p.status === "under_review");
-  const approvedProposals = proposals.filter(p => p.status === "accepted");
-  const otherProposals = proposals.filter(p => !["pending", "under_review", "accepted"].includes(p.status));
+  const approvedProposals = proposals.filter(p => p.status === "approved");
+  const otherProposals = proposals.filter(p => !["pending", "under_review", "approved"].includes(p.status));
 
   useEffect(() => {
     let currentProposals = [];

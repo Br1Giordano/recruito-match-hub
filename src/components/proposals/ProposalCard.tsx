@@ -221,7 +221,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                   Procedi alla Valutazione
                 </Button>
                 <Button
-                  onClick={() => onStatusUpdate(proposal.id, "accepted")}
+                  onClick={() => onStatusUpdate(proposal.id, "approved")}
                   variant="default"
                   size="sm"
                   className="gap-2 bg-green-600 hover:bg-green-700"
@@ -243,7 +243,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
             {proposal.status === "under_review" && onStatusUpdate && (
               <>
                 <Button
-                  onClick={() => onStatusUpdate(proposal.id, "accepted")}
+                  onClick={() => onStatusUpdate(proposal.id, "approved")}
                   variant="default"
                   size="sm"
                   className="gap-2 bg-green-600 hover:bg-green-700"
@@ -262,7 +262,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
             )}
 
             {/* Pulsante recensione per proposte approvate */}
-            {proposal.status === "accepted" && proposal.recruiter_email && (
+            {proposal.status === "approved" && proposal.recruiter_email && (
               <RecruiterReviewDialog
                 proposalId={proposal.id}
                 recruiterEmail={proposal.recruiter_email}

@@ -445,6 +445,10 @@ export type Database = {
         Args: { p_registration_id: string; p_user_type: string }
         Returns: boolean
       }
+      test_email_system: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never

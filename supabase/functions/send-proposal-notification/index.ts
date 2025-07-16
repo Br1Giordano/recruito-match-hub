@@ -16,6 +16,7 @@ interface ProposalNotificationRequest {
   proposal_id: string;
   candidate_name: string;
   new_status: string;
+  old_status?: string;
   proposal_description?: string;
 }
 
@@ -34,6 +35,7 @@ const handler = async (req: Request): Promise<Response> => {
       proposal_id,
       candidate_name,
       new_status,
+      old_status,
       proposal_description
     }: ProposalNotificationRequest = await req.json();
 
@@ -48,7 +50,52 @@ const handler = async (req: Request): Promise<Response> => {
     let subject = "";
     let emailContent = "";
 
-    if (new_status === "under_review") {
+    if (new_status === "pending" || (!old_status && new_status)) {
+      subject = `📝 Nuova proposta ricevuta per ${candidate_name} - ${company_name}`;
+      emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+          <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h1 style="color: #0284FF; text-align: center; margin-bottom: 30px;">
+              📝 Nuova Proposta Candidato
+            </h1>
+            
+            <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+              Ciao <strong>${recruiter_name}</strong>,
+            </p>
+            
+            <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; border-left: 4px solid #0284FF; margin: 20px 0;">
+              <p style="margin: 0; font-size: 16px; color: #0369a1;">
+                <strong>Perfetto!</strong> La tua proposta per il candidato <strong>${candidate_name}</strong> è stata <strong>inviata con successo</strong> a <strong>${company_name}</strong>.
+              </p>
+            </div>
+            
+            <div style="margin: 25px 0;">
+              <h3 style="color: #374151; margin-bottom: 10px;">📋 Dettagli della proposta inviata:</h3>
+              <ul style="color: #6b7280; line-height: 1.6;">
+                <li><strong>Candidato:</strong> ${candidate_name}</li>
+                <li><strong>Azienda:</strong> ${company_name}</li>
+                <li><strong>Status:</strong> In attesa di valutazione</li>
+                ${proposal_description ? `<li><strong>Descrizione:</strong> ${proposal_description}</li>` : ''}
+              </ul>
+            </div>
+            
+            <div style="background-color: #fefce8; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="color: #ca8a04; margin-top: 0;">⏳ Cosa succede ora?</h3>
+              <p style="color: #a16207; margin-bottom: 0;">
+                L'azienda riceverà la tua proposta e inizierà il processo di valutazione. 
+                Ti terremo aggiornato su eventuali sviluppi!
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <p style="color: #6b7280; font-size: 14px;">
+                Ricevi questa email perché hai inviato una proposta tramite Recruito
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (new_status === "under_review") {
       subject = `🔍 La tua proposta per ${candidate_name} è in valutazione - ${company_name}`;
       emailContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
@@ -128,6 +175,89 @@ const handler = async (req: Request): Promise<Response> => {
                 L'azienda potrebbe contattarti presto per organizzare colloqui o discutere i dettagli. 
                 Preparati a coordinare il processo di selezione con ${company_name}.
               </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <p style="color: #6b7280; font-size: 14px;">
+                Ricevi questa email perché hai inviato una proposta tramite Recruito
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (new_status === "rejected") {
+      subject = `❌ Aggiornamento proposta per ${candidate_name} - ${company_name}`;
+      emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+          <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h1 style="color: #dc2626; text-align: center; margin-bottom: 30px;">
+              📋 Aggiornamento Proposta
+            </h1>
+            
+            <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+              Ciao <strong>${recruiter_name}</strong>,
+            </p>
+            
+            <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; border-left: 4px solid #dc2626; margin: 20px 0;">
+              <p style="margin: 0; font-size: 16px; color: #dc2626;">
+                Purtroppo la tua proposta per il candidato <strong>${candidate_name}</strong> non è stata selezionata da <strong>${company_name}</strong> per questa posizione.
+              </p>
+            </div>
+            
+            <div style="margin: 25px 0;">
+              <h3 style="color: #374151; margin-bottom: 10px;">📋 Dettagli della proposta:</h3>
+              <ul style="color: #6b7280; line-height: 1.6;">
+                <li><strong>Candidato:</strong> ${candidate_name}</li>
+                <li><strong>Azienda:</strong> ${company_name}</li>
+                <li><strong>Status:</strong> ❌ Non selezionata</li>
+                ${proposal_description ? `<li><strong>Descrizione:</strong> ${proposal_description}</li>` : ''}
+              </ul>
+            </div>
+            
+            <div style="background-color: #f0f9ff; padding: 20px; border-radius: 8px; margin: 20px 0;">
+              <h3 style="color: #0ea5e9; margin-top: 0;">💪 Non demordere!</h3>
+              <p style="color: #0284c7; margin-bottom: 0;">
+                Ogni esperienza è un'opportunità per crescere. Continua a proporre i tuoi migliori candidati - 
+                il prossimo match potrebbe essere quello giusto!
+              </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+              <p style="color: #6b7280; font-size: 14px;">
+                Ricevi questa email perché hai inviato una proposta tramite Recruito
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      // Fallback for any other status
+      subject = `📋 Aggiornamento proposta per ${candidate_name} - ${company_name}`;
+      emailContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+          <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <h1 style="color: #6b7280; text-align: center; margin-bottom: 30px;">
+              📋 Aggiornamento Proposta
+            </h1>
+            
+            <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+              Ciao <strong>${recruiter_name}</strong>,
+            </p>
+            
+            <div style="background-color: #f9fafb; padding: 20px; border-radius: 8px; border-left: 4px solid #6b7280; margin: 20px 0;">
+              <p style="margin: 0; font-size: 16px; color: #374151;">
+                C'è stato un aggiornamento per la tua proposta del candidato <strong>${candidate_name}</strong> presso <strong>${company_name}</strong>.
+              </p>
+            </div>
+            
+            <div style="margin: 25px 0;">
+              <h3 style="color: #374151; margin-bottom: 10px;">📋 Dettagli della proposta:</h3>
+              <ul style="color: #6b7280; line-height: 1.6;">
+                <li><strong>Candidato:</strong> ${candidate_name}</li>
+                <li><strong>Azienda:</strong> ${company_name}</li>
+                <li><strong>Status:</strong> ${new_status}</li>
+                ${proposal_description ? `<li><strong>Descrizione:</strong> ${proposal_description}</li>` : ''}
+              </ul>
             </div>
             
             <div style="text-align: center; margin-top: 30px;">

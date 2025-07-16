@@ -27,7 +27,7 @@ const handler = async (req: Request): Promise<Response> => {
     const userTypeText = userType === 'recruiter' ? 'Recruiter' : 'Azienda';
     
     const emailResponse = await resend.emails.send({
-      from: "Recruito <noreply@recruito.com>",
+      from: "Recruito <noreply@recruito.app>",
       to: [email],
       subject: "Conferma la tua Registrazione a Recruito",
       html: `

@@ -141,7 +141,7 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
                     disabled={loadingRecruiter}
                     variant="default"
                     size="sm"
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    className="w-full"
                   >
                     <UserCircle className="h-4 w-4 mr-2" />
                     {loadingRecruiter ? "Caricamento..." : "Visualizza Profilo Recruiter"}

@@ -8,12 +8,12 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "gradient-primary text-white shadow-sm",
-        approved: "bg-status-approved/10 text-status-approved border border-status-approved/20",
-        pending: "bg-status-pending/10 text-status-pending border border-status-pending/20", 
-        rejected: "bg-status-rejected/10 text-status-rejected border border-status-rejected/20",
-        secondary: "bg-gray-100 text-navy border border-gray-200",
-        outline: "border border-gray-200 text-foreground bg-background hover:bg-gray-50",
+        default: "bg-navy text-white shadow-sm",
+        approved: "bg-green-100 text-green-800 border border-green-200",
+        pending: "bg-blue-100 text-blue-800 border border-blue-200", 
+        rejected: "bg-red-100 text-red-800 border border-red-200",
+        secondary: "bg-gray-100 text-gray-800 border border-gray-200",
+        outline: "border border-gray-300 text-gray-700 bg-white hover:bg-gray-50",
       },
     },
     defaultVariants: {

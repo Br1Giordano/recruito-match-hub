@@ -111,6 +111,42 @@ export function useProposals() {
         return false;
       } else {
         console.log('Proposal status updated successfully');
+        
+        // Send notification email after successful update
+        if (data && data.length > 0) {
+          const updatedProposal = data[0];
+          
+          // Get company data
+          const { data: companyData } = await supabase
+            .from("company_registrations")
+            .select("nome_azienda, email")
+            .eq("email", updatedProposal.company_id)
+            .single();
+
+          // Send notification to recruiter
+          if (updatedProposal.recruiter_email) {
+            try {
+              await supabase.functions.invoke('send-proposal-notification', {
+                body: {
+                  recipient_type: 'recruiter',
+                  recruiter_email: updatedProposal.recruiter_email,
+                  recruiter_name: updatedProposal.recruiter_name || 'Recruiter',
+                  company_name: companyData?.nome_azienda || 'Azienda',
+                  company_email: companyData?.email || updatedProposal.company_id,
+                  proposal_id: updatedProposal.id,
+                  candidate_name: updatedProposal.candidate_name,
+                  new_status: newStatus,
+                  old_status: updatedProposal.status,
+                  proposal_description: updatedProposal.proposal_description
+                }
+              });
+              console.log('Notification email sent to recruiter');
+            } catch (emailError) {
+              console.error('Error sending notification email:', emailError);
+            }
+          }
+        }
+        
         toast({
           title: "Successo",
           description: "Stato della proposta aggiornato",

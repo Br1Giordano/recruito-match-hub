@@ -1,0 +1,8 @@
+-- Set the service role key for HTTP requests
+SELECT set_config('app.settings.service_role_key', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3ZW1qaWxqYWRocHZ4d2hndmlkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDg1MjM3MCwiZXhwIjoyMDY2NDI4MzcwfQ.6eKYGlbmDTaOZGdyiZyVKXEhA-tL7YnTGtKUGcZfq4Q', false);
+
+-- Create a persistent setting for the service role key
+ALTER DATABASE postgres SET app.settings.service_role_key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3ZW1qaWxqYWRocHZ4d2hndmlkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1MDg1MjM3MCwiZXhwIjoyMDY2NDI4MzcwfQ.6eKYGlbmDTaOZGdyiZyVKXEhA-tL7YnTGtKUGcZfq4Q';
+
+-- Test the setting
+SELECT current_setting('app.settings.service_role_key', true) AS service_role_key_test;

@@ -112,25 +112,20 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
                   size="md"
                 />
                 <div className="flex-1">
+                  <div className="font-medium text-gray-900">
+                    {recruiterProfile.nome} {recruiterProfile.cognome}
+                  </div>
                   <div className="flex items-center gap-2">
-                    <div className="font-medium text-gray-900">
-                      {recruiterProfile.nome} {recruiterProfile.cognome}
+                    <div className="text-sm text-gray-600">
+                      {recruiterProfile.email}
                     </div>
                     <StarRating 
                       rating={rating.averageRating} 
                       totalReviews={rating.totalReviews}
-                      showNumber={false}
-                      size={14}
+                      showNumber={rating.totalReviews > 0}
+                      size={12}
                     />
                   </div>
-                  <div className="text-sm text-gray-600">
-                    {recruiterProfile.email}
-                  </div>
-                  {rating.totalReviews > 0 && (
-                    <div className="text-xs text-muted-foreground">
-                      ⭐ {rating.averageRating.toFixed(1)} ({rating.totalReviews} recensioni)
-                    </div>
-                  )}
                   {recruiterProfile.azienda && (
                     <div className="flex items-center gap-1 text-sm text-gray-500">
                       <Building2 className="h-3 w-3" />

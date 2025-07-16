@@ -10,34 +10,48 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 210 20% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 210 20% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 210 20% 20%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary gradient colors - Blu #0284FF al Verde #00C853 */
+    --primary-start: 210 100% 51%; /* #0284FF */
+    --primary-end: 125 100% 39%; /* #00C853 */
+    --primary: 210 100% 51%; /* Default primary */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Dark Navy per titoli */
+    --navy: 213 100% 20%; /* #003366 */
+    --navy-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Neutral grays */
+    --gray-50: 210 20% 98%;
+    --gray-100: 210 20% 95%;
+    --gray-200: 210 16% 88%;
+    --gray-300: 210 14% 83%;
+    
+    --secondary: 210 20% 95%;
+    --secondary-foreground: 213 100% 20%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 20% 95%;
+    --muted-foreground: 210 10% 46%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --accent: 210 20% 95%;
+    --accent-foreground: 213 100% 20%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Error/Alert - Rosso #FF3B30 */
+    --destructive: 4 100% 59%; /* #FF3B30 */
+    --destructive-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    --border: 210 16% 88%;
+    --input: 210 16% 88%;
+    --ring: 210 100% 51%;
+
+    --radius: 1rem; /* 16px border radius */
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -48,10 +62,14 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
-    /* Recruito brand colors */
-    --recruito-blue: 210 100% 50%;
-    --recruito-teal: 180 100% 40%;
-    --recruito-green: 120 100% 50%;
+    /* Status colors */
+    --status-approved: 125 100% 39%; /* Verde per approvato */
+    --status-pending: 210 100% 51%; /* Blu per in valutazione */
+    --status-rejected: 4 100% 59%; /* Rosso per rifiutato */
+
+    /* Shadows */
+    --shadow-startup: 0 8px 16px -4px rgba(0,0,0,0.08);
+    --shadow-hover: 0 16px 32px -8px rgba(0,0,0,0.12);
   }
 
   .dark {
@@ -97,29 +115,72 @@
 }
 
 @layer utilities {
-  .gradient-recruito {
-    background: linear-gradient(135deg, hsl(var(--recruito-blue)) 0%, hsl(var(--recruito-teal)) 50%, hsl(var(--recruito-green)) 100%);
+  /* Primary gradient - 45° dal Blu #0284FF al Verde #00C853 */
+  .gradient-primary {
+    background: linear-gradient(45deg, hsl(var(--primary-start)) 0%, hsl(var(--primary-end)) 100%);
   }
   
   .text-gradient {
-    background: linear-gradient(135deg, hsl(var(--recruito-blue)) 0%, hsl(var(--recruito-teal)) 50%, hsl(var(--recruito-green)) 100%);
+    background: linear-gradient(45deg, hsl(var(--primary-start)) 0%, hsl(var(--primary-end)) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   
-  .hover-lift {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Card shadows startup style */
+  .shadow-startup {
+    box-shadow: var(--shadow-startup);
   }
   
-  .hover-lift:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  .shadow-startup-hover {
+    box-shadow: var(--shadow-hover);
+  }
+  
+  /* Hover effects con micro-interazioni */
+  .hover-startup {
+    transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .hover-startup:hover {
+    transform: scale(1.03);
+    box-shadow: var(--shadow-hover);
+  }
+  
+  /* Ripple effect per CTA */
+  .ripple {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s, height 0.3s;
+  }
+  
+  .ripple:active::before {
+    width: 300px;
+    height: 300px;
   }
 
-  .bg-grid-pattern {
-    background-image: radial-gradient(circle, rgba(0,0,0,0.1) 1px, transparent 1px);
-    background-size: 20px 20px;
+  /* Layout utilities */
+  .container-startup {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    .container-startup {
+      padding: 0 2rem;
+    }
   }
 }
 

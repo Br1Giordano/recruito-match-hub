@@ -6,6 +6,7 @@ import { MapPin, Linkedin, Star, X, Heart, Check, TrendingUp } from 'lucide-reac
 import { useRecruiterProfileByEmail } from '@/hooks/useRecruiterProfileByEmail';
 import { supabase } from '@/integrations/supabase/client';
 import RecruiterAvatar from './RecruiterAvatar';
+import { ensureHttpsProtocol } from '@/utils/urlUtils';
 
 interface RecruiterDashboardViewProps {
   recruiterEmail: string;
@@ -296,7 +297,7 @@ export default function RecruiterDashboardView({ recruiterEmail, onClose }: Recr
             <div className="space-y-2">
               {profile.linkedin_url && (
                 <Button variant="outline" size="sm" asChild className="w-full">
-                  <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
+                  <a href={ensureHttpsProtocol(profile.linkedin_url)} target="_blank" rel="noopener noreferrer">
                     <Linkedin className="h-3 w-3 mr-2" />
                     LinkedIn
                   </a>
@@ -304,7 +305,7 @@ export default function RecruiterDashboardView({ recruiterEmail, onClose }: Recr
               )}
               {profile.website_url && (
                 <Button variant="outline" size="sm" asChild className="w-full">
-                  <a href={profile.website_url} target="_blank" rel="noopener noreferrer">
+                  <a href={ensureHttpsProtocol(profile.website_url)} target="_blank" rel="noopener noreferrer">
                     <TrendingUp className="h-3 w-3 mr-2" />
                     Sito Web
                   </a>

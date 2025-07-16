@@ -18,6 +18,7 @@ import RecruiterAvatar from './RecruiterAvatar';
 import { useRecruiterProfile } from '@/hooks/useRecruiterProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { ensureHttpsProtocol } from '@/utils/urlUtils';
 
 interface RecruiterProfileModalProps {
   open: boolean;
@@ -493,7 +494,7 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
               <div className="flex gap-3">
                 {displayProfile.linkedin_url && (
                   <Button variant="outline" size="sm" asChild>
-                    <a href={displayProfile.linkedin_url} target="_blank" rel="noopener noreferrer">
+                    <a href={ensureHttpsProtocol(displayProfile.linkedin_url)} target="_blank" rel="noopener noreferrer">
                       <Linkedin className="h-4 w-4 mr-2" />
                       LinkedIn
                     </a>
@@ -501,7 +502,7 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
                 )}
                 {displayProfile.website_url && (
                   <Button variant="outline" size="sm" asChild>
-                    <a href={displayProfile.website_url} target="_blank" rel="noopener noreferrer">
+                    <a href={ensureHttpsProtocol(displayProfile.website_url)} target="_blank" rel="noopener noreferrer">
                       <Globe className="h-4 w-4 mr-2" />
                       Sito web
                     </a>

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Briefcase, Globe, Linkedin, Phone, Mail, Building2, User, Star, Calendar } from 'lucide-react';
 import RecruiterAvatar from './RecruiterAvatar';
+import { ensureHttpsProtocol } from '@/utils/urlUtils';
 
 interface RecruiterProfile {
   id: string;
@@ -208,7 +209,7 @@ export default function RecruiterProfileViewModal({
                       asChild 
                       className="hover:bg-blue-50 border-blue-300 text-blue-700"
                     >
-                      <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
+                      <a href={ensureHttpsProtocol(profile.linkedin_url)} target="_blank" rel="noopener noreferrer">
                         <Linkedin className="h-4 w-4 mr-2" />
                         LinkedIn
                       </a>
@@ -221,7 +222,7 @@ export default function RecruiterProfileViewModal({
                       asChild 
                       className="hover:bg-green-50 border-green-300 text-green-700"
                     >
-                      <a href={profile.website_url} target="_blank" rel="noopener noreferrer">
+                      <a href={ensureHttpsProtocol(profile.website_url)} target="_blank" rel="noopener noreferrer">
                         <Globe className="h-4 w-4 mr-2" />
                         Sito Web
                       </a>

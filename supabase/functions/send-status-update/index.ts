@@ -147,7 +147,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
               
               <div style="text-align: center; margin: 30px 0;">
-                <a href="mailto:support@recruito.app" 
+                <a href="mailto:support@recruito.eu" 
                    style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
                           color: white; 
                           padding: 15px 30px; 
@@ -220,7 +220,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email
     const emailResponse = await resend.emails.send({
-      from: "Recruito <noreply@recruito.app>",
+      from: "Recruito <noreply@recruito.eu>",
       to: email,
       subject: subject,
       html: emailContent,

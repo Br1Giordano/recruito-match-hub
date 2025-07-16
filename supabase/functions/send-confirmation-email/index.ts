@@ -27,7 +27,7 @@ const handler = async (req: Request): Promise<Response> => {
     const userTypeText = userType === 'recruiter' ? 'Recruiter' : 'Azienda';
     
     const emailResponse = await resend.emails.send({
-      from: "Recruito <noreply@recruito.app>",
+      from: "Recruito <noreply@recruito.eu>",
       to: [email],
       subject: "Conferma la tua Registrazione a Recruito",
       html: `
@@ -100,7 +100,7 @@ const handler = async (req: Request): Promise<Response> => {
             <p>Questo messaggio è stato inviato da <strong>Recruito</strong></p>
             <p>La piattaforma italiana per il recruiting di qualità</p>
             <p style="margin-top: 15px;">
-              🌐 <a href="https://recruito.com" style="color: #0891b2; text-decoration: none;">www.recruito.com</a>
+              🌐 <a href="https://recruito.eu" style="color: #0891b2; text-decoration: none;">www.recruito.eu</a>
             </p>
           </div>
 

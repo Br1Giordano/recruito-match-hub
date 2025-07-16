@@ -5,6 +5,8 @@ import { Euro, Calendar, User, Phone, Linkedin, MapPin, Building2 } from "lucide
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterAvatar from "../recruiter/RecruiterAvatar";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
+import { useRecruiterRating } from "@/hooks/useRecruiterRating";
+import { StarRating } from "@/components/ui/star-rating";
 
 interface RecruiterProposalCardProps {
   proposal: {
@@ -32,13 +34,15 @@ interface RecruiterProposalCardProps {
 
 export default function RecruiterProposalCard({ proposal }: RecruiterProposalCardProps) {
   const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
+  const { rating, fetchRatingByEmail } = useRecruiterRating();
 
   // Carica il profilo del recruiter solo una volta quando il componente viene montato
   useEffect(() => {
     if (proposal.recruiter_email && !recruiterProfile) {
       fetchProfileByEmail(proposal.recruiter_email);
+      fetchRatingByEmail(proposal.recruiter_email);
     }
-  }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile]);
+  }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile, fetchRatingByEmail]);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -108,12 +112,25 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
                   size="md"
                 />
                 <div className="flex-1">
-                  <div className="font-medium text-gray-900">
-                    {recruiterProfile.nome} {recruiterProfile.cognome}
+                  <div className="flex items-center gap-2">
+                    <div className="font-medium text-gray-900">
+                      {recruiterProfile.nome} {recruiterProfile.cognome}
+                    </div>
+                    <StarRating 
+                      rating={rating.averageRating} 
+                      totalReviews={rating.totalReviews}
+                      showNumber={false}
+                      size={14}
+                    />
                   </div>
                   <div className="text-sm text-gray-600">
                     {recruiterProfile.email}
                   </div>
+                  {rating.totalReviews > 0 && (
+                    <div className="text-xs text-muted-foreground">
+                      ⭐ {rating.averageRating.toFixed(1)} ({rating.totalReviews} recensioni)
+                    </div>
+                  )}
                   {recruiterProfile.azienda && (
                     <div className="flex items-center gap-1 text-sm text-gray-500">
                       <Building2 className="h-3 w-3" />

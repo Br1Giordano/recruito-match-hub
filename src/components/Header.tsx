@@ -143,14 +143,20 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
                 </Button>
               </>
             )}
-            <div className="flex items-center ml-4">
-              <Building2 className="h-8 w-8 text-gray-600" />
-            </div>
+            {/* Icona azienda solo per utenti di tipo company */}
+            {user && userProfile?.user_type === 'company' && (
+              <div className="flex items-center ml-4">
+                <Building2 className="h-8 w-8 text-gray-600" />
+              </div>
+            )}
           </div>
         </nav>
 
         <div className="flex items-center space-x-2">
-          <Building2 className="h-8 w-8 text-gray-600 md:hidden" />
+          {/* Icona azienda mobile solo per utenti di tipo company */}
+          {user && userProfile?.user_type === 'company' && (
+            <Building2 className="h-8 w-8 text-gray-600 md:hidden" />
+          )}
           <MobileMenu />
         </div>
       </div>

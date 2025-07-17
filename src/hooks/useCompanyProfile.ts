@@ -94,13 +94,46 @@ export function useCompanyProfile() {
     try {
       console.log('Creating profile with data:', profileData);
       
-      const { data, error } = await supabase
+      // Prima controlliamo se esiste già un profilo con questa email
+      const { data: existingProfile, error: checkError } = await supabase
         .from('company_registrations')
-        .insert([profileData])
-        .select()
-        .single();
+        .select('*')
+        .eq('email', profileData.email)
+        .maybeSingle();
 
-      console.log('Insert result:', { data, error });
+      if (checkError) {
+        console.error('Error checking existing profile:', checkError);
+        throw checkError;
+      }
+
+      let data, error;
+
+      if (existingProfile) {
+        // Se esiste già, aggiorniamo il profilo esistente
+        console.log('Updating existing profile:', existingProfile.id);
+        const result = await supabase
+          .from('company_registrations')
+          .update(profileData)
+          .eq('id', existingProfile.id)
+          .select()
+          .single();
+        
+        data = result.data;
+        error = result.error;
+      } else {
+        // Se non esiste, ne creiamo uno nuovo
+        console.log('Creating new profile');
+        const result = await supabase
+          .from('company_registrations')
+          .insert([profileData])
+          .select()
+          .single();
+        
+        data = result.data;
+        error = result.error;
+      }
+
+      console.log('Insert/Update result:', { data, error });
 
       if (error) {
         console.error('Supabase error:', error);

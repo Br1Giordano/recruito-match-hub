@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileMenu from "./MobileMenu";
 import RecruiterProfileButton from "./recruiter/RecruiterProfileButton";
+import { Building2 } from "lucide-react";
 
 interface HeaderProps {
   onShowAuth?: () => void;
@@ -142,10 +143,14 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
                 </Button>
               </>
             )}
+            <div className="flex items-center ml-4">
+              <Building2 className="h-6 w-6 text-primary" />
+            </div>
           </div>
         </nav>
 
-        <div className="flex items-center">
+        <div className="flex items-center space-x-2">
+          <Building2 className="h-6 w-6 text-primary md:hidden" />
           <MobileMenu />
         </div>
       </div>

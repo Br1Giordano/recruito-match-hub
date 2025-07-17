@@ -118,8 +118,9 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
                   <Button
                     onClick={onShowDashboard}
                     size="sm"
-                    className="gradient-recruito text-white border-0 hover:opacity-90"
+                    className="gradient-recruito text-white border-0 hover:opacity-90 flex items-center gap-2"
                   >
+                    <Building2 className="h-4 w-4" />
                     Dashboard Azienda
                   </Button>
                 )}
@@ -143,20 +144,10 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
                 </Button>
               </>
             )}
-            {/* Icona azienda solo per utenti di tipo company */}
-            {user && userProfile?.user_type === 'company' && (
-              <div className="flex items-center ml-4">
-                <Building2 className="h-8 w-8 text-gray-600" />
-              </div>
-            )}
           </div>
         </nav>
 
         <div className="flex items-center space-x-2">
-          {/* Icona azienda mobile solo per utenti di tipo company */}
-          {user && userProfile?.user_type === 'company' && (
-            <Building2 className="h-8 w-8 text-gray-600 md:hidden" />
-          )}
           <MobileMenu />
         </div>
       </div>

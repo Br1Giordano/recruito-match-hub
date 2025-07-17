@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,7 @@ import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
+import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 import { ArrowLeft, Save } from "lucide-react";
 
 const jobOfferSchema = z.object({
@@ -38,6 +39,7 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const { profile } = useCompanyProfile();
 
   const form = useForm<JobOfferFormData>({
     resolver: zodResolver(jobOfferSchema),
@@ -54,6 +56,13 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
       status: "active",
     },
   });
+
+  // Precompila il nome dell'azienda quando il profilo è disponibile
+  useEffect(() => {
+    if (profile?.nome_azienda) {
+      form.setValue('company_name', profile.nome_azienda);
+    }
+  }, [profile, form]);
 
   const onSubmit = async (data: JobOfferFormData) => {
     setIsSubmitting(true);

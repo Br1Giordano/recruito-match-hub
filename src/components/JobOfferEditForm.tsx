@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 import { ArrowLeft, Save } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
@@ -40,6 +41,7 @@ interface JobOfferEditFormProps {
 export default function JobOfferEditForm({ offer, onBack, onSuccess }: JobOfferEditFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { profile } = useCompanyProfile();
 
   const form = useForm<JobOfferFormData>({
     resolver: zodResolver(jobOfferSchema),
@@ -56,6 +58,13 @@ export default function JobOfferEditForm({ offer, onBack, onSuccess }: JobOfferE
       status: offer.status || "active",
     },
   });
+
+  // Precompila il nome dell'azienda con il profilo aziendale se disponibile
+  useEffect(() => {
+    if (profile?.nome_azienda && !offer.company_name) {
+      form.setValue('company_name', profile.nome_azienda);
+    }
+  }, [profile, offer.company_name, form]);
 
   const onSubmit = async (data: JobOfferFormData) => {
     setIsSubmitting(true);

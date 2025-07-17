@@ -144,13 +144,13 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
               </>
             )}
             <div className="flex items-center ml-4">
-              <Building2 className="h-6 w-6 text-primary" />
+              <Building2 className="h-8 w-8 text-gray-600" />
             </div>
           </div>
         </nav>
 
         <div className="flex items-center space-x-2">
-          <Building2 className="h-6 w-6 text-primary md:hidden" />
+          <Building2 className="h-8 w-8 text-gray-600 md:hidden" />
           <MobileMenu />
         </div>
       </div>

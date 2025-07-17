@@ -149,13 +149,18 @@ export default function CompanyProfileModal({ open, onOpenChange }: CompanyProfi
   };
 
   const handleSave = async () => {
+    console.log('handleSave called with formData:', formData);
+    console.log('profile exists:', !!profile);
+    
     let success = false;
     if (profile) {
       success = await updateProfile(formData);
     } else {
+      console.log('Creating profile with formData:', formData);
       success = await createProfile(formData);
     }
     
+    console.log('Save result:', success);
     if (success) {
       setIsEditing(false);
     }

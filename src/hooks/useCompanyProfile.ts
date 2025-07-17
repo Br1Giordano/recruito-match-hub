@@ -92,13 +92,18 @@ export function useCompanyProfile() {
 
   const createProfile = async (profileData: Omit<CompanyProfile, 'id' | 'created_at' | 'status'>) => {
     try {
+      console.log('Creating profile with data:', profileData);
+      
       const { data, error } = await supabase
         .from('company_registrations')
         .insert([profileData])
         .select()
         .single();
 
+      console.log('Insert result:', { data, error });
+
       if (error) {
+        console.error('Supabase error:', error);
         toast({
           title: "Errore",
           description: "Non è stato possibile creare il profilo.",
@@ -109,7 +114,9 @@ export function useCompanyProfile() {
 
       // Link the profile to the user
       if (user && data) {
-        await linkToRegistration(data.id, 'company');
+        console.log('Linking profile to user:', { userId: user.id, profileId: data.id });
+        const linkResult = await linkToRegistration(data.id, 'company');
+        console.log('Link result:', linkResult);
       }
 
       await fetchProfile();

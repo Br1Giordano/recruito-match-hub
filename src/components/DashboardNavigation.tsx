@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
+import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
@@ -21,6 +22,7 @@ import { useToast } from "@/components/ui/use-toast";
 import RecruiterProfileButton from "./recruiter/RecruiterProfileButton";
 import DeleteAccountDialog from "./account/DeleteAccountDialog";
 import CompanyProfileModal from "./company/CompanyProfileModal";
+import CompanyAvatar from "./company/CompanyAvatar";
 
 interface DashboardNavigationProps {
   onBack?: () => void;
@@ -236,6 +238,7 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
 
 function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; onSignOut: () => void }) {
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const { profile } = useCompanyProfile();
 
   return (
     <>
@@ -250,18 +253,30 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
                 </Button>
               )}
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-recruito-teal rounded-lg flex items-center justify-center">
-                  <Building2 className="h-6 w-6 text-white" />
-                </div>
+                <CompanyAvatar
+                  logoUrl={profile?.logo_url}
+                  companyName={profile?.nome_azienda || 'Dashboard Azienda'}
+                  size="md"
+                />
                 <h1 className="text-xl font-semibold">Dashboard Azienda</h1>
               </div>
             </div>
             <div className="flex items-center gap-2 ml-auto">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="flex items-center gap-2 border-gray-200 hover:border-gray-300">
-                    <div className="w-10 h-10 bg-recruito-teal rounded-lg flex items-center justify-center">
-                      <Building2 className="h-6 w-6 text-white" />
+                  <Button variant="outline" className="flex items-center gap-2 border-gray-200 hover:border-gray-300 h-auto p-2">
+                    <CompanyAvatar
+                      logoUrl={profile?.logo_url}
+                      companyName={profile?.nome_azienda || 'Azienda'}
+                      size="md"
+                    />
+                    <div className="hidden md:block text-left">
+                      <div className="text-sm font-medium">
+                        {profile?.nome_azienda || 'Azienda'}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {profile?.settore || 'Account Azienda'}
+                      </div>
                     </div>
                     <ChevronDown className="h-4 w-4" />
                   </Button>

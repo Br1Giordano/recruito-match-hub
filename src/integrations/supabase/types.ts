@@ -44,6 +44,7 @@ export type Database = {
           email: string
           employee_count_range: string | null
           id: string
+          logo_url: string | null
           messaggio: string | null
           nome_azienda: string
           sede: string | null
@@ -56,6 +57,7 @@ export type Database = {
           email: string
           employee_count_range?: string | null
           id?: string
+          logo_url?: string | null
           messaggio?: string | null
           nome_azienda: string
           sede?: string | null
@@ -68,6 +70,7 @@ export type Database = {
           email?: string
           employee_count_range?: string | null
           id?: string
+          logo_url?: string | null
           messaggio?: string | null
           nome_azienda?: string
           sede?: string | null

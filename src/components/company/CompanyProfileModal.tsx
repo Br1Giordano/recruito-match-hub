@@ -11,9 +11,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Building2, MapPin, Users, Mail, Phone } from 'lucide-react';
+import { Building2, MapPin, Users, Mail, Phone, Upload, X } from 'lucide-react';
 import { useCompanyProfile } from '@/hooks/useCompanyProfile';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import CompanyAvatar from './CompanyAvatar';
 
 interface CompanyProfileModalProps {
   open: boolean;
@@ -32,7 +35,9 @@ const employeeRanges = [
 export default function CompanyProfileModal({ open, onOpenChange }: CompanyProfileModalProps) {
   const { profile, updateProfile, createProfile } = useCompanyProfile();
   const { user } = useAuth();
+  const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [formData, setFormData] = useState({
     nome_azienda: '',
     settore: '',
@@ -40,7 +45,8 @@ export default function CompanyProfileModal({ open, onOpenChange }: CompanyProfi
     telefono: '',
     sede: '',
     employee_count_range: '',
-    messaggio: ''
+    messaggio: '',
+    logo_url: null as string | null
   });
 
   // Se non c'è profilo, inizia in modalità editing
@@ -59,11 +65,84 @@ export default function CompanyProfileModal({ open, onOpenChange }: CompanyProfi
         telefono: profile.telefono || '',
         sede: profile.sede || '',
         employee_count_range: profile.employee_count_range || '',
-        messaggio: profile.messaggio || ''
+        messaggio: profile.messaggio || '',
+        logo_url: profile.logo_url || null
       });
       setIsEditing(false);
     }
   }, [profile, open, user?.email]);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Errore",
+        description: "Per favore seleziona un file immagine valido",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Errore",
+        description: "L'immagine deve essere inferiore a 5MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('company-logos')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data } = supabase.storage
+        .from('company-logos')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({
+        ...prev,
+        logo_url: data.publicUrl
+      }));
+
+      toast({
+        title: "Successo",
+        description: "Logo caricato con successo!",
+      });
+
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        title: "Errore",
+        description: "Non è stato possibile caricare l'immagine",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData(prev => ({
+      ...prev,
+      logo_url: null
+    }));
+  };
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -89,7 +168,8 @@ export default function CompanyProfileModal({ open, onOpenChange }: CompanyProfi
     telefono: formData.telefono,
     sede: formData.sede,
     employee_count_range: formData.employee_count_range,
-    messaggio: formData.messaggio
+    messaggio: formData.messaggio,
+    logo_url: formData.logo_url
   };
 
   return (
@@ -104,8 +184,54 @@ export default function CompanyProfileModal({ open, onOpenChange }: CompanyProfi
         <div className="space-y-6">
           {/* Header con info base */}
           <div className="flex items-start gap-6">
-            <div className="w-16 h-16 bg-recruito-teal rounded-lg flex items-center justify-center flex-shrink-0">
-              <Building2 className="h-8 w-8 text-white" />
+            <div className="flex-shrink-0">
+              <CompanyAvatar
+                logoUrl={displayProfile.logo_url}
+                companyName={displayProfile.nome_azienda || 'Azienda'}
+                size="lg"
+              />
+              {isEditing && (
+                <div className="mt-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="logo-upload"
+                    />
+                    <label htmlFor="logo-upload">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="cursor-pointer"
+                        disabled={isUploading}
+                        asChild
+                      >
+                        <span>
+                          <Upload className="h-4 w-4 mr-2" />
+                          {isUploading ? 'Caricamento...' : 'Carica logo'}
+                        </span>
+                      </Button>
+                    </label>
+                    {formData.logo_url && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRemoveImage}
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Formati supportati: JPG, PNG, GIF. Max 5MB
+                  </p>
+                </div>
+              )}
             </div>
             
             <div className="flex-1">

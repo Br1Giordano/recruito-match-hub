@@ -12,6 +12,7 @@ interface CompanyProfile {
   messaggio: string | null;
   sede: string | null;
   employee_count_range: string | null;
+  logo_url: string | null;
   created_at: string;
   status: string | null;
 }

@@ -20,7 +20,7 @@ interface CompanyProfile {
 export function useCompanyProfile() {
   const [profile, setProfile] = useState<CompanyProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, linkToRegistration } = useAuth();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -109,7 +109,6 @@ export function useCompanyProfile() {
 
       // Link the profile to the user
       if (user && data) {
-        const { linkToRegistration } = useAuth();
         await linkToRegistration(data.id, 'company');
       }
 

@@ -250,8 +250,8 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
                 </Button>
               )}
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-recruito-teal rounded-lg flex items-center justify-center">
-                  <Building2 className="h-4 w-4 text-white" />
+                <div className="w-10 h-10 bg-recruito-teal rounded-lg flex items-center justify-center">
+                  <Building2 className="h-6 w-6 text-white" />
                 </div>
                 <h1 className="text-xl font-semibold">Dashboard Azienda</h1>
               </div>
@@ -260,8 +260,8 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="flex items-center gap-2 border-gray-200 hover:border-gray-300">
-                    <div className="w-8 h-8 bg-recruito-teal rounded-lg flex items-center justify-center">
-                      <Building2 className="h-4 w-4 text-white" />
+                    <div className="w-10 h-10 bg-recruito-teal rounded-lg flex items-center justify-center">
+                      <Building2 className="h-6 w-6 text-white" />
                     </div>
                     <ChevronDown className="h-4 w-4" />
                   </Button>

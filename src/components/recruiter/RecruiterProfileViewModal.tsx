@@ -64,13 +64,14 @@ export default function RecruiterProfileViewModal({
   profile,
   defaultTab = 'profile'
 }: RecruiterProfileViewModalProps) {
+  // Move the null check before any hooks
+  if (!profile) return null;
+
   const [stats, setStats] = useState<ProposalStats>({ total: 0, pending: 0, approved: 0, rejected: 0 });
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingStats, setLoadingStats] = useState(false);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const { rating, fetchRatingByEmail } = useRecruiterRating();
-
-  if (!profile) return null;
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return null;

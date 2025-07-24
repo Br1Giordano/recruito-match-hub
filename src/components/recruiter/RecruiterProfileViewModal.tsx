@@ -390,37 +390,139 @@ export default function RecruiterProfileViewModal({
             {/* Recensioni */}
             <Card>
               <CardContent className="p-6">
-                <h3 className="font-bold text-lg mb-4 flex items-center gap-2 text-gray-800">
-                  <MessageSquare className="h-5 w-5 text-purple-600" />
-                  Recensioni delle Aziende
-                </h3>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="font-bold text-lg flex items-center gap-2 text-gray-800">
+                    <MessageSquare className="h-5 w-5 text-purple-600" />
+                    Recensioni delle Aziende
+                  </h3>
+                  
+                  {/* Media delle stelle prominente */}
+                  {rating.totalReviews > 0 && (
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 px-4 py-2 rounded-lg border border-yellow-200">
+                      <div className="flex items-center gap-3">
+                        <div className="text-center">
+                          <div className="text-2xl font-bold text-yellow-600">
+                            {Number(rating.averageRating).toFixed(1)}
+                          </div>
+                          <div className="text-xs text-yellow-700">Media</div>
+                        </div>
+                        <div className="flex flex-col items-center gap-1">
+                          <StarRating 
+                            rating={Number(rating.averageRating)} 
+                            size={20}
+                            showNumber={false}
+                          />
+                          <div className="text-xs text-gray-600">
+                            {rating.totalReviews} recensioni
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 
                 {loadingReviews ? (
-                  <div className="text-center py-4">
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
                     <p className="text-gray-500">Caricamento recensioni...</p>
                   </div>
                 ) : reviews.length === 0 ? (
-                  <div className="text-center py-8">
-                    <MessageSquare className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Nessuna recensione disponibile</p>
+                  <div className="text-center py-12">
+                    <MessageSquare className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                    <p className="text-gray-500 text-lg font-medium mb-2">Nessuna recensione disponibile</p>
+                    <p className="text-gray-400 text-sm">Le recensioni delle aziende appariranno qui una volta ricevute</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {reviews.map((review) => (
-                      <div key={review.id} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <div className="flex items-center justify-between mb-3">
-                          <StarRating rating={Number(review.rating)} size={16} />
-                          <span className="text-sm text-gray-500">
-                            {new Date(review.created_at).toLocaleDateString('it-IT')}
-                          </span>
+                      <div key={review.id} className="bg-gradient-to-r from-gray-50 to-blue-50 p-5 rounded-xl border border-gray-200 hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-white p-2 rounded-lg border border-yellow-200">
+                              <StarRating 
+                                rating={Number(review.rating)} 
+                                size={18}
+                                showNumber={false}
+                              />
+                            </div>
+                            <div>
+                              <div className="font-semibold text-gray-800">
+                                {Number(review.rating).toFixed(1)} stelle
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                Valutazione aziendale
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-medium text-gray-700">
+                              {new Date(review.created_at).toLocaleDateString('it-IT', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                              })}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {new Date(review.created_at).toLocaleTimeString('it-IT', {
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </div>
+                          </div>
                         </div>
-                        {review.review_text && (
-                          <p className="text-gray-700 text-sm leading-relaxed">
-                            {review.review_text}
-                          </p>
+                        {review.review_text && review.review_text.trim() !== '' ? (
+                          <div className="bg-white p-4 rounded-lg border border-gray-100">
+                            <p className="text-gray-700 leading-relaxed italic">
+                              "{review.review_text}"
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="bg-white p-3 rounded-lg border border-gray-100">
+                            <p className="text-gray-500 text-sm italic">
+                              L'azienda ha lasciato solo una valutazione stellare
+                            </p>
+                          </div>
                         )}
                       </div>
                     ))}
+                    
+                    {/* Riepilogo statistiche recensioni */}
+                    {reviews.length > 0 && (
+                      <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+                          <div>
+                            <div className="text-lg font-bold text-blue-600">
+                              {reviews.filter(r => r.rating === 5).length}
+                            </div>
+                            <div className="text-xs text-blue-700">5 stelle</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-green-600">
+                              {reviews.filter(r => r.rating === 4).length}
+                            </div>
+                            <div className="text-xs text-green-700">4 stelle</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-yellow-600">
+                              {reviews.filter(r => r.rating === 3).length}
+                            </div>
+                            <div className="text-xs text-yellow-700">3 stelle</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-orange-600">
+                              {reviews.filter(r => r.rating === 2).length}
+                            </div>
+                            <div className="text-xs text-orange-700">2 stelle</div>
+                          </div>
+                          <div>
+                            <div className="text-lg font-bold text-red-600">
+                              {reviews.filter(r => r.rating === 1).length}
+                            </div>
+                            <div className="text-xs text-red-700">1 stella</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>

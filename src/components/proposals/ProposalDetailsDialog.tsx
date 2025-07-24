@@ -243,6 +243,7 @@ export default function ProposalDetailsDialog({ proposal }: ProposalDetailsDialo
         open={showRecruiterProfile}
         onOpenChange={setShowRecruiterProfile}
         profile={recruiterProfile}
+        defaultTab="reviews"
       />
     </>
   );

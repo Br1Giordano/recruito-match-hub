@@ -61,42 +61,42 @@ export default function AuthPage({ onBack, onAuthSuccess }: AuthPageProps) {
       return;
     }
 
-    const redirectUrl = `${window.location.origin}/`;
-
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            user_type: userType
-          }
+      // Use edge function for conditional signup
+      const { data, error } = await supabase.functions.invoke('conditional-signup', {
+        body: {
+          email: email.trim(),
+          password,
+          userType
         }
       });
 
       if (error) {
-        console.error('Signup error:', error);
-        setError(error.message);
+        console.error('Edge function error:', error);
+        setError(error.message || 'Errore durante la registrazione');
         setIsLoading(false);
-      } else if (data.user) {
-        if (data.session) {
-          // User is automatically confirmed, redirect to dashboard
-          toast({
-            title: "Registrazione completata",
-            description: "Account creato con successo!",
-          });
-          setIsLoading(false);
-          if (onAuthSuccess) onAuthSuccess();
-        } else {
-          // User needs email confirmation
-          toast({
-            title: "Conferma email richiesta", 
-            description: "Controlla la tua email per confermare l'account. Se non ricevi l'email, contatta il supporto.",
-          });
-          setIsLoading(false);
-        }
+        return;
       }
+
+      if (data.error) {
+        console.error('Signup error from edge function:', data.error);
+        if (data.error.includes('already registered') || data.error.includes('già registrato')) {
+          setError('Questo indirizzo email è già registrato. Prova ad accedere invece.');
+        } else {
+          setError(data.error);
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      toast({
+        title: "Registrazione completata",
+        description: data.message || "Account creato con successo.",
+      });
+      
+      setIsLoading(false);
+      if (onAuthSuccess) onAuthSuccess();
+
     } catch (error: any) {
       console.error('Unexpected signup error:', error);
       setError('Errore durante la registrazione. Riprova più tardi.');

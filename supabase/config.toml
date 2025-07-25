@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.send-proposal-notification]
 verify_jwt = false
+
+[functions.conditional-signup]
+verify_jwt = false

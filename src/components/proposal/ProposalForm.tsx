@@ -93,7 +93,7 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         candidate_email: formData.candidate_email,
         candidate_phone: formData.candidate_phone || null,
         candidate_linkedin: formData.candidate_linkedin || null,
-        candidate_cv_url: formData.candidate_cv_url || null, // Aggiunto campo CV
+        candidate_cv_url: formData.candidate_cv_url || null,
         years_experience: formData.years_experience ? parseInt(formData.years_experience) : null,
         current_salary: formData.current_salary ? parseInt(formData.current_salary) : null,
         expected_salary: formData.expected_salary ? parseInt(formData.expected_salary) : null,
@@ -103,7 +103,8 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         recruiter_name: formData.recruiter_name,
         recruiter_email: formData.recruiter_email,
         recruiter_phone: formData.recruiter_phone || null,
-        submitted_by_user_id: null,
+        user_id: user?.id || null,
+        submitted_by_user_id: user?.id || null,
         recruiter_id: null,
       };
 

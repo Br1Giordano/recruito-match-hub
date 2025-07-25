@@ -435,7 +435,6 @@ export default function CompanyOffersDashboard() {
 
                   {(offer.salary_min || offer.salary_max) && (
                     <div className="flex items-center gap-2">
-                      <Euro className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm font-medium">
                         {offer.salary_min && offer.salary_max
                           ? `€${offer.salary_min.toLocaleString()} - €${offer.salary_max.toLocaleString()}`

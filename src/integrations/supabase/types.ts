@@ -51,6 +51,7 @@ export type Database = {
           settore: string | null
           status: string | null
           telefono: string | null
+          user_id: string | null
         }
         Insert: {
           created_at?: string
@@ -64,6 +65,7 @@ export type Database = {
           settore?: string | null
           status?: string | null
           telefono?: string | null
+          user_id?: string | null
         }
         Update: {
           created_at?: string
@@ -77,6 +79,7 @@ export type Database = {
           settore?: string | null
           status?: string | null
           telefono?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -97,6 +100,7 @@ export type Database = {
           status: string | null
           title: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           benefits?: string | null
@@ -114,6 +118,7 @@ export type Database = {
           status?: string | null
           title: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           benefits?: string | null
@@ -131,6 +136,7 @@ export type Database = {
           status?: string | null
           title?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -233,6 +239,7 @@ export type Database = {
           status: string | null
           submitted_by_user_id: string | null
           updated_at: string
+          user_id: string | null
           years_experience: number | null
         }
         Insert: {
@@ -257,6 +264,7 @@ export type Database = {
           status?: string | null
           submitted_by_user_id?: string | null
           updated_at?: string
+          user_id?: string | null
           years_experience?: number | null
         }
         Update: {
@@ -281,6 +289,7 @@ export type Database = {
           status?: string | null
           submitted_by_user_id?: string | null
           updated_at?: string
+          user_id?: string | null
           years_experience?: number | null
         }
         Relationships: [
@@ -318,6 +327,7 @@ export type Database = {
           specializations: string[] | null
           status: string | null
           telefono: string | null
+          user_id: string | null
           website_url: string | null
           years_of_experience: number | null
         }
@@ -338,6 +348,7 @@ export type Database = {
           specializations?: string[] | null
           status?: string | null
           telefono?: string | null
+          user_id?: string | null
           website_url?: string | null
           years_of_experience?: number | null
         }
@@ -358,6 +369,7 @@ export type Database = {
           specializations?: string[] | null
           status?: string | null
           telefono?: string | null
+          user_id?: string | null
           website_url?: string | null
           years_of_experience?: number | null
         }
@@ -440,6 +452,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      get_current_user_registration_id: {
+        Args: { table_name: string }
+        Returns: string
+      }
       is_admin: {
         Args: { user_email: string }
         Returns: boolean
@@ -447,6 +463,10 @@ export type Database = {
       link_user_to_registration: {
         Args: { p_registration_id: string; p_user_type: string }
         Returns: boolean
+      }
+      populate_user_ids: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       test_email_system: {
         Args: Record<PropertyKey, never>

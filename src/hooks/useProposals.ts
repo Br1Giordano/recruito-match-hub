@@ -36,45 +36,58 @@ export function useProposals() {
   const fetchProposals = async () => {
     setIsLoading(true);
     
-    console.log('Fetching all proposals');
+    console.log('Fetching all proposals for user:', user?.id);
 
     try {
-      const { data: proposalsData, error: proposalsError } = await supabase
+      // Build the query - use user_id if available, fallback to email filtering
+      let query = supabase
         .from("proposals")
         .select(`
           *,
-          job_offers(title, contact_email)
+          job_offers(title, contact_email, user_id)
         `)
         .order("created_at", { ascending: false });
 
-      if (proposalsError) {
-        console.error('Error fetching proposals:', proposalsError);
-        toast({
-          title: "Errore",
-          description: `Errore nel caricamento delle proposte: ${proposalsError.message}`,
-          variant: "destructive",
-        });
-        return;
-      }
+      // If user is logged in, filter proposals for this user
+      if (user?.id) {
+        // Use RLS-safe filtering - get proposals where job_offers belong to this user
+        const { data: proposalsData, error: proposalsError } = await query;
 
-      console.log('All proposals fetched:', proposalsData?.length);
-      
-      // Se l'utente è loggato, filtra per email
-      let filteredProposals = proposalsData || [];
-      if (user?.email) {
-        filteredProposals = proposalsData?.filter(proposal => 
-          proposal.job_offers?.contact_email === user.email
-        ) || [];
+        if (proposalsError) {
+          console.error('Error fetching proposals:', proposalsError);
+          toast({
+            title: "Errore",
+            description: `Errore nel caricamento delle proposte: ${proposalsError.message}`,
+            variant: "destructive",
+          });
+          return;
+        }
+
+        console.log('All proposals fetched:', proposalsData?.length);
+        
+        // Filter for user's job offers - use user_id first, fallback to email
+        let filteredProposals = proposalsData?.filter(proposal => {
+          if (proposal.job_offers?.user_id === user.id) {
+            return true; // User ID match (new system)
+          }
+          if (proposal.job_offers?.contact_email === user.email) {
+            return true; // Email match (fallback for old data)
+          }
+          return false;
+        }) || [];
+        
         console.log('Filtered user proposals:', filteredProposals.length);
-      }
-      
-      setProposals(filteredProposals);
-      
-      if (filteredProposals.length > 0) {
-        toast({
-          title: "Successo",
-          description: `Trovate ${filteredProposals.length} proposte`,
-        });
+        setProposals(filteredProposals);
+        
+        if (filteredProposals.length > 0) {
+          toast({
+            title: "Successo",
+            description: `Trovate ${filteredProposals.length} proposte`,
+          });
+        }
+      } else {
+        // No user logged in, return empty array
+        setProposals([]);
       }
     } catch (error) {
       console.error('Unexpected error:', error);

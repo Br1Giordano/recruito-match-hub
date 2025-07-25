@@ -46,8 +46,8 @@ export const useRecruiterProfile = () => {
       const { data, error } = await supabase
         .from('recruiter_registrations')
         .select('*')
-        .eq('id', userProfile.registration_id)
-        .maybeSingle(); // Usa maybeSingle invece di single per evitare errori quando non ci sono risultati
+        .or(`id.eq.${userProfile.registration_id},user_id.eq.${userProfile.auth_user_id}`)
+        .maybeSingle();
 
       if (error) {
         console.error('Error fetching profile:', error);

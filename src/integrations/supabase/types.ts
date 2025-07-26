@@ -309,6 +309,77 @@ export type Database = {
           },
         ]
       }
+      recruiter_achievements: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          progress: number | null
+          recruiter_email: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          progress?: number | null
+          recruiter_email: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          progress?: number | null
+          recruiter_email?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recruiter_achievements_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "recruiter_badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recruiter_badges: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          icon: string
+          id: string
+          name: string
+          points: number
+          rarity: string
+          requirement_type: string
+          requirement_value: number
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          icon: string
+          id?: string
+          name: string
+          points?: number
+          rarity?: string
+          requirement_type: string
+          requirement_value: number
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          icon?: string
+          id?: string
+          name?: string
+          points?: number
+          rarity?: string
+          requirement_type?: string
+          requirement_value?: number
+        }
+        Relationships: []
+      }
       recruiter_registrations: {
         Row: {
           avatar_url: string | null
@@ -416,6 +487,48 @@ export type Database = {
           },
         ]
       }
+      recruiter_stats: {
+        Row: {
+          accepted_proposals: number
+          best_streak: number
+          created_at: string
+          current_streak: number
+          id: string
+          last_proposal_date: string | null
+          level: number
+          recruiter_email: string
+          total_points: number
+          total_proposals: number
+          updated_at: string
+        }
+        Insert: {
+          accepted_proposals?: number
+          best_streak?: number
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_proposal_date?: string | null
+          level?: number
+          recruiter_email: string
+          total_points?: number
+          total_proposals?: number
+          updated_at?: string
+        }
+        Update: {
+          accepted_proposals?: number
+          best_streak?: number
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_proposal_date?: string | null
+          level?: number
+          recruiter_email?: string
+          total_points?: number
+          total_proposals?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           auth_user_id: string | null
@@ -448,6 +561,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_level_from_points: {
+        Args: { total_points: number }
+        Returns: number
+      }
+      check_and_award_badges: {
+        Args: { recruiter_email_param: string }
+        Returns: undefined
+      }
       cleanup_old_login_attempts: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -475,6 +596,10 @@ export type Database = {
       test_email_system: {
         Args: Record<PropertyKey, never>
         Returns: Json
+      }
+      update_recruiter_stats: {
+        Args: { recruiter_email_param: string }
+        Returns: undefined
       }
     }
     Enums: {

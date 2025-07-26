@@ -56,15 +56,26 @@ export function useCompanyProfile() {
   };
 
   const updateProfile = async (updates: Partial<CompanyProfile>) => {
+    console.log('🔄 updateProfile called with:', updates);
+    console.log('📋 current profile:', profile);
+    
     try {
-      if (!profile) return false;
+      if (!profile) {
+        console.error('❌ No profile found');
+        return false;
+      }
 
-      const { error } = await supabase
+      console.log('📤 Sending update to database...');
+      const { data, error } = await supabase
         .from('company_registrations')
         .update(updates)
-        .eq('id', profile.id);
+        .eq('id', profile.id)
+        .select();
+
+      console.log('📊 Database response:', { data, error });
 
       if (error) {
+        console.error('❌ Database error:', error);
         toast({
           title: "Errore",
           description: "Non è stato possibile aggiornare il profilo.",
@@ -73,6 +84,7 @@ export function useCompanyProfile() {
         return false;
       }
 
+      console.log('✅ Update successful, refetching profile...');
       await fetchProfile();
       toast({
         title: "Successo",
@@ -80,7 +92,7 @@ export function useCompanyProfile() {
       });
       return true;
     } catch (error) {
-      console.error('Error updating company profile:', error);
+      console.error('❌ Error updating company profile:', error);
       toast({
         title: "Errore",
         description: "Si è verificato un errore imprevisto.",

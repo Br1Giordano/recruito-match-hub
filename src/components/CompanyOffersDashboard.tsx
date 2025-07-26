@@ -180,16 +180,7 @@ export default function CompanyOffersDashboard() {
   };
 
   const handleDeleteOffer = async (offerId: string, offerTitle: string) => {
-    if (!isAdmin) {
-      toast({
-        title: "Errore",
-        description: "Solo gli amministratori possono eliminare le offerte",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const confirmed = window.confirm(`Sei sicuro di voler eliminare l'offerta "${offerTitle}"? Questa azione non può essere annullata.`);
+    const confirmed = window.confirm(`Sei sicuro di voler eliminare l'offerta "${offerTitle}"? Questa azione non può essere annullata e verranno rimosse anche tutte le proposte associate.`);
     
     if (!confirmed) return;
 
@@ -500,17 +491,15 @@ export default function CompanyOffersDashboard() {
                           Riattiva
                         </Button>
                       )}
-                      {isAdmin && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleDeleteOffer(offer.id, offer.title)}
-                          className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Elimina
-                        </Button>
-                      )}
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleDeleteOffer(offer.id, offer.title)}
+                        className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Elimina
+                      </Button>
                     </div>
                   </div>
                 </div>

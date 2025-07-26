@@ -38,17 +38,22 @@ export default function CompanyOffersDashboard() {
     }
 
     console.log('Fetching job offers for user:', user.email);
+    console.log('isAdmin:', isAdmin);
+    console.log('userProfile:', userProfile);
 
     // Query aggiornata per cercare offerte sia tramite company_id che contact_email
     let query = supabase.from("job_offers").select("*");
 
     // Se l'utente è admin, mostra tutte le offerte
     if (isAdmin) {
+      console.log('Admin user - fetching all job offers');
       // Admin vede tutte le offerte
       query = query.order("created_at", { ascending: false });
     } else if (userProfile && userProfile.user_type === 'company') {
+      console.log('Company user - fetching company job offers');
       query = query.or(`company_id.eq.${userProfile.registration_id},contact_email.eq.${user.email}`);
     } else {
+      console.log('Regular user - fetching by email');
       // Altrimenti cerca solo per email
       query = query.eq("contact_email", user.email);
     }
@@ -57,13 +62,15 @@ export default function CompanyOffersDashboard() {
 
     if (error) {
       console.error('Error fetching job offers:', error);
+      console.error('Error details:', error.message, error.details, error.hint);
       toast({
         title: "Errore",
-        description: "Impossibile caricare le offerte di lavoro",
+        description: `Impossibile caricare le offerte di lavoro: ${error.message}`,
         variant: "destructive",
       });
     } else {
-      console.log('Job offers fetched:', data);
+      console.log('Job offers fetched successfully:', data);
+      console.log('Number of offers:', data?.length || 0);
       setJobOffers(data || []);
       setFilteredOffers(data || []);
     }

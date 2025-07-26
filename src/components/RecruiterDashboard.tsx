@@ -6,6 +6,9 @@ import { useRecruiterProposals } from "@/hooks/useRecruiterProposals";
 import ProposalFilters from "./proposals/ProposalFilters";
 import RecruiterProposalCard from "./proposals/RecruiterProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import RecruiterGamificationDashboard from "./gamification/RecruiterGamificationDashboard";
+import { Target, Trophy, Send } from "lucide-react";
 
 export default function RecruiterDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -52,32 +55,51 @@ export default function RecruiterDashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Le Mie Candidature</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard Recruiter</h1>
         <p className="text-muted-foreground">
-          Gestisci e monitora le proposte che hai inviato alle aziende
+          Gestisci le tue candidature e monitora i tuoi progressi
         </p>
       </div>
 
-      <Card>
-        <CardContent className="pt-6">
-          <ProposalFilters
-            searchTerm={searchTerm}
-            statusFilter={statusFilter}
-            onSearchChange={setSearchTerm}
-            onStatusChange={setStatusFilter}
-          />
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="proposals" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="proposals" className="flex items-center gap-2">
+            <Send className="h-4 w-4" />
+            Le Mie Candidature
+          </TabsTrigger>
+          <TabsTrigger value="gamification" className="flex items-center gap-2">
+            <Trophy className="h-4 w-4" />
+            Livelli & Badge
+          </TabsTrigger>
+        </TabsList>
 
-      <div className="grid gap-6">
-        {filteredProposals.length === 0 ? (
-          <EmptyProposalsState type="recruiter" hasProposals={proposals.length > 0} />
-        ) : (
-          filteredProposals.map((proposal) => (
-            <RecruiterProposalCard key={proposal.id} proposal={proposal} />
-          ))
-        )}
-      </div>
+        <TabsContent value="proposals" className="space-y-6">
+          <Card>
+            <CardContent className="pt-6">
+              <ProposalFilters
+                searchTerm={searchTerm}
+                statusFilter={statusFilter}
+                onSearchChange={setSearchTerm}
+                onStatusChange={setStatusFilter}
+              />
+            </CardContent>
+          </Card>
+
+          <div className="grid gap-6">
+            {filteredProposals.length === 0 ? (
+              <EmptyProposalsState type="recruiter" hasProposals={proposals.length > 0} />
+            ) : (
+              filteredProposals.map((proposal) => (
+                <RecruiterProposalCard key={proposal.id} proposal={proposal} />
+              ))
+            )}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="gamification">
+          <RecruiterGamificationDashboard />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

@@ -191,6 +191,13 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
     }));
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      await uploadAvatar(file);
+    }
+  };
+
   const displayProfile = profile || {
     nome: formData.nome,
     cognome: formData.cognome,
@@ -275,11 +282,31 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
         <div className="space-y-6">
           {/* Header con avatar e info base */}
           <div className="flex items-start gap-6">
-            <RecruiterAvatar
-              avatarUrl={displayProfile.avatar_url}
-              name={`${displayProfile.nome} ${displayProfile.cognome}`}
-              size="lg"
-            />
+            <div className="flex flex-col items-center gap-3">
+              <RecruiterAvatar
+                avatarUrl={displayProfile.avatar_url}
+                name={`${displayProfile.nome} ${displayProfile.cognome}`}
+                size="lg"
+              />
+              {isEditing && (
+                <div className="flex flex-col items-center gap-2">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                    id="avatar-upload"
+                    disabled={isUploading}
+                  />
+                  <label
+                    htmlFor="avatar-upload"
+                    className="cursor-pointer text-xs text-blue-600 hover:text-blue-800 underline"
+                  >
+                    {isUploading ? 'Caricamento...' : 'Cambia foto'}
+                  </label>
+                </div>
+              )}
+            </div>
             
             <div className="flex-1">
               {isEditing ? (

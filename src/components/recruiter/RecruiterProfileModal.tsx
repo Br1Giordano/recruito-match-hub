@@ -157,17 +157,27 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
   };
 
   const handleSave = async () => {
+    console.log('🔄 RecruiterProfileModal - handleSave called');
+    console.log('📝 formData:', formData);
+    console.log('👤 current profile:', profile);
+    
     const updates = {
       ...formData,
       years_of_experience: formData.years_of_experience ? parseInt(formData.years_of_experience) : null
     };
     
+    console.log('📦 updates to send:', updates);
+    
     let success = false;
     if (profile) {
+      console.log('🔄 Updating existing profile...');
       success = await updateProfile(updates);
     } else {
+      console.log('➕ Creating new profile...');
       success = await createProfile(updates);
     }
+    
+    console.log('✅ Operation success:', success);
     
     if (success) {
       setIsEditing(false);

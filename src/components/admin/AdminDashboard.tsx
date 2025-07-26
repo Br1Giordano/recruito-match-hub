@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Building2, FileText, TrendingUp, Search, Filter, Eye, Shield } from "lucide-react";
+import { Users, Building2, FileText, TrendingUp, Search, Filter, Eye, Shield, Mail, MapPin, Calendar, User, Phone, Globe, Briefcase } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
@@ -32,6 +33,39 @@ interface UserRecord {
   location?: string;
 }
 
+interface RecruiterDetails {
+  id: string;
+  email: string;
+  nome: string;
+  cognome: string;
+  telefono?: string;
+  linkedin_url?: string;
+  sito_web?: string;
+  bio?: string;
+  settori?: string;
+  azienda?: string;
+  location?: string;
+  years_of_experience?: number;
+  status: string;
+  created_at: string;
+}
+
+interface CompanyDetails {
+  id: string;
+  email: string;
+  nome_azienda: string;
+  nome_contatto?: string;
+  cognome_contatto?: string;
+  telefono?: string;
+  sito_web?: string;
+  descrizione?: string;
+  settore?: string;
+  sede?: string;
+  numero_dipendenti?: number;
+  status: string;
+  created_at: string;
+}
+
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState<AdminMetrics>({
     totalRecruiters: 0,
@@ -47,6 +81,10 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [selectedRecruiter, setSelectedRecruiter] = useState<RecruiterDetails | null>(null);
+  const [selectedCompany, setSelectedCompany] = useState<CompanyDetails | null>(null);
+  const [isRecruiterModalOpen, setIsRecruiterModalOpen] = useState(false);
+  const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -199,6 +237,50 @@ export default function AdminDashboard() {
       
       return matchesSearch && matchesStatus;
     });
+  };
+
+  const handleViewRecruiterDetails = async (recruiterId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('recruiter_registrations')
+        .select('*')
+        .eq('id', recruiterId)
+        .single();
+
+      if (error) throw error;
+
+      setSelectedRecruiter(data);
+      setIsRecruiterModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching recruiter details:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare i dettagli del recruiter",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleViewCompanyDetails = async (companyId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('company_registrations')
+        .select('*')
+        .eq('id', companyId)
+        .single();
+
+      if (error) throw error;
+
+      setSelectedCompany(data);
+      setIsCompanyModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching company details:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare i dettagli dell'azienda",
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
@@ -372,7 +454,11 @@ export default function AdminDashboard() {
                         Registrato: {format(new Date(recruiter.created_at), 'dd/MM/yyyy', { locale: it })}
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewRecruiterDetails(recruiter.id)}
+                    >
                       <Eye className="h-4 w-4 mr-2" />
                       Dettagli
                     </Button>
@@ -404,7 +490,11 @@ export default function AdminDashboard() {
                         Registrata: {format(new Date(company.created_at), 'dd/MM/yyyy', { locale: it })}
                       </div>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewCompanyDetails(company.id)}
+                    >
                       <Eye className="h-4 w-4 mr-2" />
                       Dettagli
                     </Button>
@@ -415,6 +505,249 @@ export default function AdminDashboard() {
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Recruiter Details Modal */}
+      <Dialog open={isRecruiterModalOpen} onOpenChange={setIsRecruiterModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-blue-600" />
+              Dettagli Recruiter
+            </DialogTitle>
+            <DialogDescription>
+              Informazioni complete del profilo recruiter
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedRecruiter && (
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Nome Completo:</span>
+                    <span>{selectedRecruiter.nome} {selectedRecruiter.cognome}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Email:</span>
+                    <span>{selectedRecruiter.email}</span>
+                  </div>
+
+                  {selectedRecruiter.telefono && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Telefono:</span>
+                      <span>{selectedRecruiter.telefono}</span>
+                    </div>
+                  )}
+
+                  {selectedRecruiter.location && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Località:</span>
+                      <span>{selectedRecruiter.location}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Registrato:</span>
+                    <span>{format(new Date(selectedRecruiter.created_at), 'dd/MM/yyyy', { locale: it })}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Stato:</span>
+                    {getStatusBadge(selectedRecruiter.status)}
+                  </div>
+
+                  {selectedRecruiter.years_of_experience && (
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Esperienza:</span>
+                      <span>{selectedRecruiter.years_of_experience} anni</span>
+                    </div>
+                  )}
+
+                  {selectedRecruiter.azienda && (
+                    <div className="flex items-center gap-2">
+                      <Building2 className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Azienda:</span>
+                      <span>{selectedRecruiter.azienda}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Professional Links */}
+              {(selectedRecruiter.linkedin_url || selectedRecruiter.sito_web) && (
+                <div className="space-y-3">
+                  <h4 className="font-medium text-sm">Collegamenti Professionali</h4>
+                  {selectedRecruiter.linkedin_url && (
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">LinkedIn:</span>
+                      <a href={selectedRecruiter.linkedin_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        {selectedRecruiter.linkedin_url}
+                      </a>
+                    </div>
+                  )}
+                  {selectedRecruiter.sito_web && (
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Sito Web:</span>
+                      <a href={selectedRecruiter.sito_web} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                        {selectedRecruiter.sito_web}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Bio */}
+              {selectedRecruiter.bio && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Biografia</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {selectedRecruiter.bio}
+                  </p>
+                </div>
+              )}
+
+              {/* Sectors */}
+              {selectedRecruiter.settori && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Settori di Specializzazione</h4>
+                  <div className="flex flex-wrap gap-2">
+                    <Badge variant="secondary">
+                      {selectedRecruiter.settori}
+                    </Badge>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Company Details Modal */}
+      <Dialog open={isCompanyModalOpen} onOpenChange={setIsCompanyModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-green-600" />
+              Dettagli Azienda
+            </DialogTitle>
+            <DialogDescription>
+              Informazioni complete del profilo aziendale
+            </DialogDescription>
+          </DialogHeader>
+
+          {selectedCompany && (
+            <div className="space-y-6">
+              {/* Basic Info */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Nome Azienda:</span>
+                    <span>{selectedCompany.nome_azienda}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Email:</span>
+                    <span>{selectedCompany.email}</span>
+                  </div>
+
+                  {selectedCompany.telefono && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Telefono:</span>
+                      <span>{selectedCompany.telefono}</span>
+                    </div>
+                  )}
+
+                  {selectedCompany.sede && (
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Sede:</span>
+                      <span>{selectedCompany.sede}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Registrata:</span>
+                    <span>{format(new Date(selectedCompany.created_at), 'dd/MM/yyyy', { locale: it })}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Stato:</span>
+                    {getStatusBadge(selectedCompany.status)}
+                  </div>
+
+                  {selectedCompany.settore && (
+                    <div className="flex items-center gap-2">
+                      <Briefcase className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Settore:</span>
+                      <span>{selectedCompany.settore}</span>
+                    </div>
+                  )}
+
+                  {selectedCompany.numero_dipendenti && (
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span className="font-medium">Dipendenti:</span>
+                      <span>{selectedCompany.numero_dipendenti}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Contact Person */}
+              {(selectedCompany.nome_contatto || selectedCompany.cognome_contatto) && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Persona di Contatto</h4>
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span>{selectedCompany.nome_contatto} {selectedCompany.cognome_contatto}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Website */}
+              {selectedCompany.sito_web && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Sito Web</h4>
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    <a href={selectedCompany.sito_web} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                      {selectedCompany.sito_web}
+                    </a>
+                  </div>
+                </div>
+              )}
+
+              {/* Description */}
+              {selectedCompany.descrizione && (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Descrizione Azienda</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {selectedCompany.descrizione}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

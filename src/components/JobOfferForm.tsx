@@ -255,10 +255,16 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="tempo-indeterminato">Tempo Indeterminato</SelectItem>
+                          <SelectItem value="tempo-determinato">Tempo Determinato</SelectItem>
                           <SelectItem value="full-time">Tempo Pieno</SelectItem>
                           <SelectItem value="part-time">Part-time</SelectItem>
-                          <SelectItem value="contract">Contratto</SelectItem>
-                          <SelectItem value="internship">Stage</SelectItem>
+                          <SelectItem value="contratto-progetto">Contratto a Progetto</SelectItem>
+                          <SelectItem value="partita-iva">Partita IVA</SelectItem>
+                          <SelectItem value="stage">Stage</SelectItem>
+                          <SelectItem value="tirocinio">Tirocinio</SelectItem>
+                          <SelectItem value="apprendistato">Apprendistato</SelectItem>
+                          <SelectItem value="consulenza">Consulenza</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

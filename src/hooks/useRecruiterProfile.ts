@@ -27,7 +27,7 @@ interface RecruiterProfile {
 export const useRecruiterProfile = () => {
   const [profile, setProfile] = useState<RecruiterProfile | null>(null);
   const [loading, setLoading] = useState(true);
-  const { userProfile } = useAuth();
+  const { user, userProfile } = useAuth();
   const { toast } = useToast();
   const { uploadFile, deleteFile, isUploading } = useFileUpload();
 
@@ -74,6 +74,17 @@ export const useRecruiterProfile = () => {
   const updateProfile = async (updates: Partial<RecruiterProfile>) => {
     console.log('🔄 updateProfile called with:', updates);
     console.log('📋 userProfile.registration_id:', userProfile?.registration_id);
+    
+    // Verifica se l'email termina con .recruito@gmail.com
+    if (!user?.email?.endsWith('.recruito@gmail.com')) {
+      console.log('❌ Email non autorizzata per il salvataggio:', user?.email);
+      toast({
+        title: "Accesso negato",
+        description: "Il salvataggio è disponibile solo per account di test.",
+        variant: "destructive",
+      });
+      return false;
+    }
     
     if (!userProfile?.registration_id) {
       console.error('❌ No registration_id found');

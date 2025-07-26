@@ -59,6 +59,17 @@ export function useCompanyProfile() {
     console.log('🔄 updateProfile called with:', updates);
     console.log('📋 current profile:', profile);
     
+    // Verifica se l'email termina con .recruito@gmail.com
+    if (!user?.email?.endsWith('.recruito@gmail.com')) {
+      console.log('❌ Email non autorizzata per il salvataggio:', user?.email);
+      toast({
+        title: "Accesso negato",
+        description: "Il salvataggio è disponibile solo per account di test.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
     try {
       if (!profile) {
         console.error('❌ No profile found');

@@ -61,6 +61,47 @@ const handler = async (req: Request): Promise<Response> => {
 
       console.log('Test user created and auto-confirmed:', authData.user?.id);
 
+      // Create registration record for test user
+      if (authData.user?.id) {
+        try {
+          if (userType === 'recruiter') {
+            const { error: regError } = await supabaseAdmin
+              .from('recruiter_registrations')
+              .insert({
+                user_id: authData.user.id,
+                nome: 'Test',
+                cognome: 'Recruiter',
+                email: email,
+                status: 'pending'
+              });
+            
+            if (regError) {
+              console.error('Error creating test recruiter registration:', regError);
+            } else {
+              console.log('Test recruiter registration created');
+            }
+          } else if (userType === 'company') {
+            const { error: regError } = await supabaseAdmin
+              .from('company_registrations')
+              .insert({
+                user_id: authData.user.id,
+                nome_azienda: 'Test Company',
+                email: email,
+                status: 'pending'
+              });
+            
+            if (regError) {
+              console.error('Error creating test company registration:', regError);
+            } else {
+              console.log('Test company registration created');
+            }
+          }
+        } catch (regError) {
+          console.error('Error creating test registration:', regError);
+          // Don't fail the signup if registration creation fails
+        }
+      }
+
       return new Response(
         JSON.stringify({ 
           success: true, 

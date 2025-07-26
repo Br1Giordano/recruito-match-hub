@@ -452,6 +452,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
+      fix_test_users_profiles: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_current_user_registration_id: {
         Args: { table_name: string }
         Returns: string

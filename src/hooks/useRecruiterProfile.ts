@@ -82,7 +82,9 @@ export const useRecruiterProfile = () => {
 
       if (error) throw error;
 
-      setProfile(prev => prev ? { ...prev, ...updates } : null);
+      // Ricarica il profilo dal database per assicurarsi che i dati siano persistiti
+      await fetchProfile();
+      
       toast({
         title: "Successo",
         description: "Profilo aggiornato con successo",

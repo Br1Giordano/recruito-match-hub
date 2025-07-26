@@ -72,16 +72,27 @@ export const useRecruiterProfile = () => {
   };
 
   const updateProfile = async (updates: Partial<RecruiterProfile>) => {
-    if (!userProfile?.registration_id) return false;
+    console.log('🔄 updateProfile called with:', updates);
+    console.log('📋 userProfile.registration_id:', userProfile?.registration_id);
+    
+    if (!userProfile?.registration_id) {
+      console.error('❌ No registration_id found');
+      return false;
+    }
 
     try {
-      const { error } = await supabase
+      console.log('📤 Sending update to database...');
+      const { data, error } = await supabase
         .from('recruiter_registrations')
         .update(updates)
-        .eq('id', userProfile.registration_id);
+        .eq('id', userProfile.registration_id)
+        .select();
+
+      console.log('📊 Database response:', { data, error });
 
       if (error) throw error;
 
+      console.log('✅ Update successful, refetching profile...');
       // Ricarica il profilo dal database per assicurarsi che i dati siano persistiti
       await fetchProfile();
       
@@ -91,7 +102,7 @@ export const useRecruiterProfile = () => {
       });
       return true;
     } catch (error) {
-      console.error('Error updating profile:', error);
+      console.error('❌ Error updating profile:', error);
       toast({
         title: "Errore",
         description: "Errore nell'aggiornamento del profilo",

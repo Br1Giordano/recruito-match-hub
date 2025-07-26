@@ -181,6 +181,18 @@ export default function RecruiterProfileModal({ open, onOpenChange }: RecruiterP
     
     if (success) {
       setIsEditing(false);
+      // Aggiorna i dati del form con i nuovi valori per riflettere immediatamente le modifiche
+      setFormData({
+        nome: updates.nome || '',
+        cognome: updates.cognome || '',
+        email: updates.email || '',
+        bio: updates.bio || '',
+        location: updates.location || '',
+        years_of_experience: updates.years_of_experience?.toString() || '',
+        linkedin_url: updates.linkedin_url || '',
+        website_url: updates.website_url || '',
+        specializations: updates.specializations || []
+      });
     }
   };
 

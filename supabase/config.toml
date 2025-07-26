@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.conditional-signup]
 verify_jwt = false
+
+[functions.send-job-offer-confirmation]
+verify_jwt = false

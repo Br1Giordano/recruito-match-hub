@@ -118,9 +118,26 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
         return;
       }
 
+      // Invia email di conferma all'azienda
+      try {
+        await supabase.functions.invoke('send-job-offer-confirmation', {
+          body: {
+            company_email: user.email,
+            company_name: data.company_name,
+            job_title: data.title,
+            job_location: data.location || 'Non specificata',
+            employment_type: data.employment_type
+          }
+        });
+        console.log("Confirmation email sent successfully");
+      } catch (emailError) {
+        console.error("Error sending confirmation email:", emailError);
+        // Non bloccare il processo se l'email fallisce
+      }
+
       toast({
         title: "Successo",
-        description: "Offerta di lavoro creata con successo",
+        description: "Offerta di lavoro creata con successo. Riceverai una email di conferma.",
       });
 
       onSuccess();

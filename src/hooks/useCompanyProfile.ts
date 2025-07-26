@@ -71,7 +71,7 @@ export function useCompanyProfile() {
         .update(updates)
         .eq('id', profile.id)
         .select()
-        .single();
+        .maybeSingle();
 
       console.log('📊 Database response:', { data, error });
 

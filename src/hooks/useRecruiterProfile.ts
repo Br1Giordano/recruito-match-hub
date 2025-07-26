@@ -87,7 +87,7 @@ export const useRecruiterProfile = () => {
         .update(updates)
         .eq('id', userProfile.registration_id)
         .select()
-        .single();
+        .maybeSingle();
 
       console.log('📊 Database response:', { data, error });
 

@@ -34,19 +34,19 @@ export const useRecruiterProfile = () => {
   const fetchProfile = async () => {
     console.log('fetchProfile called with userProfile:', userProfile);
     
-    if (!userProfile?.registration_id) {
-      console.log('No registration_id found');
+    if (!userProfile?.auth_user_id) {
+      console.log('No auth_user_id found');
       setLoading(false);
       return;
     }
 
     try {
-      console.log('Fetching profile for registration_id:', userProfile.registration_id);
+      console.log('Fetching profile for auth_user_id:', userProfile.auth_user_id);
       
       const { data, error } = await supabase
         .from('recruiter_registrations')
         .select('*')
-        .or(`id.eq.${userProfile.registration_id},user_id.eq.${userProfile.auth_user_id}`)
+        .eq('user_id', userProfile.auth_user_id)
         .maybeSingle();
 
       if (error) {
@@ -73,19 +73,38 @@ export const useRecruiterProfile = () => {
 
   const updateProfile = async (updates: Partial<RecruiterProfile>) => {
     console.log('🔄 updateProfile called with:', updates);
-    console.log('📋 userProfile.registration_id:', userProfile?.registration_id);
+    console.log('📋 userProfile:', userProfile);
     
-    if (!userProfile?.registration_id) {
-      console.error('❌ No registration_id found');
+    if (!userProfile?.auth_user_id) {
+      console.error('❌ No auth_user_id found');
       return false;
     }
 
     try {
       console.log('📤 Sending update to database...');
+      // Prima trova il record corretto usando user_id
+      const { data: existingProfile, error: findError } = await supabase
+        .from('recruiter_registrations')
+        .select('id')
+        .eq('user_id', userProfile.auth_user_id)
+        .maybeSingle();
+
+      if (findError) {
+        console.error('❌ Error finding profile:', findError);
+        throw findError;
+      }
+
+      if (!existingProfile) {
+        console.error('❌ Profile not found for user_id:', userProfile.auth_user_id);
+        // Se non esiste, crea un nuovo profilo
+        return await createProfile(updates);
+      }
+
+      // Ora aggiorna usando l'ID corretto
       const { data, error } = await supabase
         .from('recruiter_registrations')
         .update(updates)
-        .eq('id', userProfile.registration_id)
+        .eq('id', existingProfile.id)
         .select()
         .maybeSingle();
 
@@ -95,7 +114,6 @@ export const useRecruiterProfile = () => {
 
       if (data) {
         console.log('✅ Update successful, updating local state...');
-        // Aggiorna immediatamente lo stato locale con i dati dal database
         setProfile(data as RecruiterProfile);
       }
       
@@ -116,13 +134,13 @@ export const useRecruiterProfile = () => {
   };
 
   const createProfile = async (profileData: Partial<RecruiterProfile>) => {
-    if (!userProfile?.registration_id) return false;
+    if (!userProfile?.auth_user_id) return false;
 
     try {
       const { data, error } = await supabase
         .from('recruiter_registrations')
         .insert([{
-          id: userProfile.registration_id,
+          user_id: userProfile.auth_user_id,
           nome: profileData.nome || '',
           cognome: profileData.cognome || '',
           email: profileData.email || '',
@@ -169,7 +187,7 @@ export const useRecruiterProfile = () => {
 
   useEffect(() => {
     fetchProfile();
-  }, [userProfile?.registration_id]);
+  }, [userProfile?.auth_user_id]);
 
   return {
     profile,

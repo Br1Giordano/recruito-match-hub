@@ -8,8 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase, Trash2, Shield } from "lucide-react";
+import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase, Trash2, Shield, Eye } from "lucide-react";
 import ProposalFormModal from "./ProposalFormModal";
+import JobOfferDetailsDialog from "./JobOfferDetailsDialog";
 import { Database } from "@/integrations/supabase/types";
 
 type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
@@ -28,6 +29,8 @@ export default function JobOffersBoard() {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<JobOfferWithCompany | null>(null);
   const [showProposalModal, setShowProposalModal] = useState(false);
+  const [selectedOfferForDetails, setSelectedOfferForDetails] = useState<JobOfferWithCompany | null>(null);
+  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const { toast } = useToast();
   const { userProfile } = useAuth();
   const { isAdmin } = useAdminCheck();
@@ -116,6 +119,11 @@ export default function JobOffersBoard() {
       title: "Successo",
       description: "Proposta inviata con successo!",
     });
+  };
+
+  const handleShowDetails = (offer: JobOfferWithCompany) => {
+    setSelectedOfferForDetails(offer);
+    setShowDetailsDialog(true);
   };
 
   const handleDeleteOffer = async (offerId: string, offerTitle: string) => {
@@ -341,6 +349,13 @@ export default function JobOffersBoard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Button 
+                        variant="outline"
+                        onClick={() => handleShowDetails(offer)}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Vedi Dettagli
+                      </Button>
+                      <Button 
                         onClick={() => handleSendProposal(offer)}
                         disabled={!userProfile || userProfile.user_type !== 'recruiter'}
                         className="bg-recruito-blue hover:bg-recruito-blue/90"
@@ -378,6 +393,20 @@ export default function JobOffersBoard() {
           }}
           onSuccess={handleProposalSuccess}
           jobOffer={selectedOffer}
+        />
+      )}
+
+      {/* Details Dialog */}
+      {showDetailsDialog && selectedOfferForDetails && (
+        <JobOfferDetailsDialog
+          isOpen={showDetailsDialog}
+          onClose={() => {
+            setShowDetailsDialog(false);
+            setSelectedOfferForDetails(null);
+          }}
+          jobOffer={selectedOfferForDetails}
+          onSendProposal={handleSendProposal}
+          canSendProposal={userProfile?.user_type === 'recruiter'}
         />
       )}
     </div>

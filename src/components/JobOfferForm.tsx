@@ -88,6 +88,7 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
       const jobOfferData = {
         company_name: data.company_name,
         contact_email: user.email,
+        user_id: user.id, // Aggiunto per soddisfare la policy RLS
         title: data.title,
         description: data.description || null,
         location: data.location || null,

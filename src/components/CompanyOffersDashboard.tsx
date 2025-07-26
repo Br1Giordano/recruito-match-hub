@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2, Pause, Play } from "lucide-react";
+import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2, Pause, Play, Shield } from "lucide-react";
 import JobOfferForm from "./JobOfferForm";
 import JobOfferEditForm from "./JobOfferEditForm";
 import { Database } from "@/integrations/supabase/types";
@@ -394,8 +394,9 @@ export default function CompanyOffersDashboard() {
                       <Briefcase className="h-5 w-5" />
                       {offer.title}
                       {isAdmin && (
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                          Admin View
+                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-medium">
+                          <Shield className="w-3 h-3 mr-1" />
+                          Admin
                         </Badge>
                       )}
                     </CardTitle>

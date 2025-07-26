@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
-import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut, Settings, ChevronDown } from "lucide-react";
+import AdminDashboard from "./admin/AdminDashboard";
+import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut, Settings, ChevronDown, Shield } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -30,6 +32,7 @@ interface DashboardNavigationProps {
 
 export default function DashboardNavigation({ onBack }: DashboardNavigationProps) {
   const { user, userProfile, signOut, loading, createUserProfile } = useAuth();
+  const { isAdmin } = useAdminCheck();
   const { toast } = useToast();
 
   console.log('DashboardNavigation render - user:', !!user, 'userProfile:', userProfile, 'loading:', loading);
@@ -86,6 +89,8 @@ export default function DashboardNavigation({ onBack }: DashboardNavigationProps
             onBack={onBack} 
             onSignOut={handleSignOut}
           />
+        ) : isAdmin ? (
+          <AdminDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
         ) : userProfile.user_type === "recruiter" ? (
           <RecruiterDashboardLayout onBack={onBack} onSignOut={handleSignOut} />
         ) : (
@@ -344,6 +349,63 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
             <CompanyOffersDashboard />
           </TabsContent>
         </Tabs>
+      </div>
+    </>
+  );
+}
+
+// Admin Dashboard Layout
+function AdminDashboardLayout({ 
+  onBack, 
+  onSignOut 
+}: { 
+  onBack?: () => void; 
+  onSignOut: () => void; 
+}) {
+  return (
+    <>
+      {/* Navigation Header */}
+      <div className="border-b bg-white/80 backdrop-blur-sm shadow-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              {onBack && (
+                <Button variant="ghost" onClick={onBack} className="flex items-center gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Torna al Sito
+                </Button>
+              )}
+              <div className="flex items-center gap-2">
+                <Shield className="h-6 w-6 text-blue-600" />
+                <span className="font-semibold text-lg">Admin Panel</span>
+              </div>
+            </div>
+            
+            {/* Admin Actions */}
+            <div className="flex items-center gap-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Amministratore
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={onSignOut}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="container mx-auto px-4 py-8">
+        <AdminDashboard />
       </div>
     </>
   );

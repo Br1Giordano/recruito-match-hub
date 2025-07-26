@@ -11,6 +11,7 @@ import { Users, Building2, FileText, TrendingUp, Search, Filter, Eye, Shield, Ma
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
+import AdminJobOffersManagement from "./AdminJobOffersManagement";
 
 interface AdminMetrics {
   totalRecruiters: number;
@@ -481,14 +482,17 @@ export default function AdminDashboard() {
         </CardContent>
       </Card>
 
-      {/* Users Management */}
+      {/* Management Tabs */}
       <Card>
         <CardHeader>
-          <CardTitle>Gestione Utenti</CardTitle>
+          <CardTitle>Gestione Piattaforma</CardTitle>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="recruiters" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+          <Tabs defaultValue="users" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="users">
+                Utenti ({filterUsers([...recruiters, ...companies]).length})
+              </TabsTrigger>
               <TabsTrigger value="recruiters">
                 Recruiter ({filterUsers(recruiters).length})
               </TabsTrigger>
@@ -496,6 +500,50 @@ export default function AdminDashboard() {
                 Aziende ({filterUsers(companies).length})
               </TabsTrigger>
             </TabsList>
+
+            <TabsContent value="users" className="space-y-4">
+              <div className="space-y-2">
+                {filterUsers([...recruiters, ...companies])
+                  .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+                  .map((user) => (
+                  <div
+                    key={user.id}
+                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                  >
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        {getRoleBadge(user.user_type)}
+                        {getStatusBadge(user.status)}
+                      </div>
+                      <div className="font-medium">
+                        {user.user_type === 'company' ? user.company_name : user.name} 
+                        {!user.name && !user.company_name && user.email}
+                      </div>
+                      <div className="text-sm text-muted-foreground">{user.email}</div>
+                      {user.location && (
+                        <div className="text-sm text-muted-foreground">
+                          {user.user_type === 'company' ? 'Sede' : 'Località'}: {user.location}
+                        </div>
+                      )}
+                      <div className="text-xs text-muted-foreground">
+                        Registrato: {format(new Date(user.created_at), 'dd/MM/yyyy', { locale: it })}
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => user.user_type === 'recruiter' 
+                        ? handleViewRecruiterDetails(user.id) 
+                        : handleViewCompanyDetails(user.id)
+                      }
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Dettagli
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </TabsContent>
 
             <TabsContent value="recruiters" className="space-y-4">
               <div className="space-y-2">
@@ -574,6 +622,19 @@ export default function AdminDashboard() {
               </div>
             </TabsContent>
           </Tabs>
+        </CardContent>
+      </Card>
+
+      {/* Job Offers Management */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Briefcase className="h-5 w-5 text-red-600" />
+            Gestione Offerte di Lavoro
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AdminJobOffersManagement />
         </CardContent>
       </Card>
 

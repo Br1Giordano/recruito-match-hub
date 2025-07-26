@@ -348,12 +348,19 @@ export default function AdminDashboard() {
   };
 
   if (loading) {
+    console.log("AdminDashboard: Loading state");
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Caricamento dashboard admin...</div>
       </div>
     );
   }
+
+  console.log("AdminDashboard: Rendering with data", { 
+    recruitersCount: recruiters.length, 
+    companiesCount: companies.length,
+    metrics 
+  });
 
   return (
     <div className="space-y-6">

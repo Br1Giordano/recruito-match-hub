@@ -86,15 +86,18 @@ export const useRecruiterProfile = () => {
         .from('recruiter_registrations')
         .update(updates)
         .eq('id', userProfile.registration_id)
-        .select();
+        .select()
+        .single();
 
       console.log('📊 Database response:', { data, error });
 
       if (error) throw error;
 
-      console.log('✅ Update successful, refetching profile...');
-      // Ricarica il profilo dal database per assicurarsi che i dati siano persistiti
-      await fetchProfile();
+      if (data) {
+        console.log('✅ Update successful, updating local state...');
+        // Aggiorna immediatamente lo stato locale con i dati dal database
+        setProfile(data as RecruiterProfile);
+      }
       
       toast({
         title: "Successo",

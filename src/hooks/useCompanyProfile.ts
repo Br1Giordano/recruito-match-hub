@@ -70,7 +70,8 @@ export function useCompanyProfile() {
         .from('company_registrations')
         .update(updates)
         .eq('id', profile.id)
-        .select();
+        .select()
+        .single();
 
       console.log('📊 Database response:', { data, error });
 
@@ -84,8 +85,12 @@ export function useCompanyProfile() {
         return false;
       }
 
-      console.log('✅ Update successful, refetching profile...');
-      await fetchProfile();
+      if (data) {
+        console.log('✅ Update successful, updating local state...');
+        // Aggiorna immediatamente lo stato locale con i dati dal database
+        setProfile(data as CompanyProfile);
+      }
+
       toast({
         title: "Successo",
         description: "Profilo aggiornato con successo!",

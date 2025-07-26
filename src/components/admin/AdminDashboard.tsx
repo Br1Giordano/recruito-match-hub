@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Building2, FileText, TrendingUp, Search, Filter, Eye, Shield, Mail, MapPin, Calendar, User, Phone, Globe, Briefcase } from "lucide-react";
+import { Users, Building2, FileText, TrendingUp, Search, Filter, Eye, Shield, Mail, MapPin, Calendar, User, Phone, Globe, Briefcase, Check, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
@@ -278,6 +278,70 @@ export default function AdminDashboard() {
       toast({
         title: "Errore",
         description: "Impossibile caricare i dettagli dell'azienda",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateRecruiterStatus = async (recruiterId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('recruiter_registrations')
+        .update({ status: newStatus })
+        .eq('id', recruiterId);
+
+      if (error) throw error;
+
+      // Update local state
+      setSelectedRecruiter(prev => prev ? { ...prev, status: newStatus } : null);
+      setRecruiters(prev => prev.map(r => 
+        r.id === recruiterId ? { ...r, status: newStatus } : r
+      ));
+
+      toast({
+        title: "Successo",
+        description: `Recruiter ${newStatus === 'approved' ? 'approvato' : 'rifiutato'} con successo`,
+      });
+
+      // Refresh metrics
+      fetchMetrics();
+    } catch (error) {
+      console.error('Error updating recruiter status:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiornare lo stato del recruiter",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateCompanyStatus = async (companyId: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('company_registrations')
+        .update({ status: newStatus })
+        .eq('id', companyId);
+
+      if (error) throw error;
+
+      // Update local state
+      setSelectedCompany(prev => prev ? { ...prev, status: newStatus } : null);
+      setCompanies(prev => prev.map(c => 
+        c.id === companyId ? { ...c, status: newStatus } : c
+      ));
+
+      toast({
+        title: "Successo",
+        description: `Azienda ${newStatus === 'approved' ? 'approvata' : 'rifiutata'} con successo`,
+      });
+
+      // Refresh metrics
+      fetchMetrics();
+    } catch (error) {
+      console.error('Error updating company status:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile aggiornare lo stato dell'azienda",
         variant: "destructive",
       });
     }
@@ -631,6 +695,27 @@ export default function AdminDashboard() {
               )}
             </div>
           )}
+
+          {/* Action Buttons for Pending Recruiters */}
+          {selectedRecruiter && selectedRecruiter.status === 'pending' && (
+            <div className="flex gap-3 pt-4 border-t">
+              <Button
+                onClick={() => handleUpdateRecruiterStatus(selectedRecruiter.id, 'approved')}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Approva Recruiter
+              </Button>
+              <Button
+                onClick={() => handleUpdateRecruiterStatus(selectedRecruiter.id, 'rejected')}
+                variant="destructive"
+                className="flex-1"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Rifiuta Recruiter
+              </Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -744,6 +829,27 @@ export default function AdminDashboard() {
                   </p>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Action Buttons for Pending Companies */}
+          {selectedCompany && selectedCompany.status === 'pending' && (
+            <div className="flex gap-3 pt-4 border-t">
+              <Button
+                onClick={() => handleUpdateCompanyStatus(selectedCompany.id, 'approved')}
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Approva Azienda
+              </Button>
+              <Button
+                onClick={() => handleUpdateCompanyStatus(selectedCompany.id, 'rejected')}
+                variant="destructive"
+                className="flex-1"
+              >
+                <X className="h-4 w-4 mr-2" />
+                Rifiuta Azienda
+              </Button>
             </div>
           )}
         </DialogContent>

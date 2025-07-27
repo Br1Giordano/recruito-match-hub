@@ -131,11 +131,17 @@ export const RecruiterMessagesSection: React.FC = () => {
                     
                     <div className="flex-1 min-w-0 space-y-1">
                       <div className="flex items-center justify-between">
-                        <p className={`font-medium truncate ${
-                          isUnread ? 'text-foreground font-semibold' : 'text-foreground'
-                        }`}>
-                          {conversation.company_email?.split('@')[0] || 'Azienda'}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200 text-xs px-2 py-0.5">
+                            <Building2 className="h-3 w-3 mr-1" />
+                            Azienda
+                          </Badge>
+                          <p className={`font-medium truncate ${
+                            isUnread ? 'text-foreground font-semibold' : 'text-foreground'
+                          }`}>
+                            {conversation.company_email?.split('@')[0] || 'Azienda Non Specificata'}
+                          </p>
+                        </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Clock className="h-3 w-3" />
@@ -162,12 +168,16 @@ export const RecruiterMessagesSection: React.FC = () => {
                         </div>
                       )}
                       
-                      <p className="text-sm text-muted-foreground">
-                        Conversazione riguardo la proposta per{' '}
-                        <span className="font-medium text-foreground">
-                          {conversation.proposal_title || 'il candidato'}
-                        </span>
-                      </p>
+                      <div className="flex items-start gap-2 text-sm">
+                        <User className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                        <p className="text-muted-foreground">
+                          L'azienda <span className="font-medium text-foreground">{conversation.company_email?.split('@')[0]}</span> 
+                          {' '}è interessata alla tua proposta per{' '}
+                          <span className="font-medium text-foreground">
+                            {conversation.proposal_title || 'il candidato'}
+                          </span>
+                        </p>
+                      </div>
                     </div>
                   </div>
                   

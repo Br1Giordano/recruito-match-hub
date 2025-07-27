@@ -55,8 +55,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
-  const otherPartyName = conversation.other_party_name?.split('@')[0] || 'Utente';
-  const isRecruiterConversation = conversation.recruiter_email === conversation.other_party_name;
+  const otherPartyEmail = conversation.company_email || conversation.recruiter_email;
+  const otherPartyName = otherPartyEmail?.split('@')[0] || 'Utente';
+  const isCompanyConversation = conversation.company_email && user?.email === conversation.recruiter_email;
+  const userType = isCompanyConversation ? 'company' : 'recruiter';
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -72,26 +74,51 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         </Button>
         
         <div className="relative">
-          <Avatar className="h-10 w-10 border-2 border-primary/20">
-            <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+          <Avatar className={`h-10 w-10 border-2 ${
+            userType === 'company' ? 'border-blue-200 bg-blue-50' : 'border-green-200 bg-green-50'
+          }`}>
+            <AvatarFallback className={`font-semibold ${
+              userType === 'company' ? 'bg-blue-50 text-blue-600' : 'bg-green-50 text-green-600'
+            }`}>
               {otherPartyName.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1 border border-primary/20">
-            {isRecruiterConversation ? (
-              <User className="h-3 w-3 text-primary" />
+          <div className={`absolute -bottom-1 -right-1 bg-background rounded-full p-1 border ${
+            userType === 'company' ? 'border-blue-200' : 'border-green-200'
+          }`}>
+            {userType === 'company' ? (
+              <Building2 className="h-3 w-3 text-blue-600" />
             ) : (
-              <Building2 className="h-3 w-3 text-primary" />
+              <User className="h-3 w-3 text-green-600" />
             )}
           </div>
         </div>
         
         <div className="flex-1">
-          <h3 className="font-semibold text-foreground">{otherPartyName}</h3>
+          <div className="flex items-center gap-2 mb-1">
+            <Badge variant="secondary" className={`text-xs px-2 py-0.5 ${
+              userType === 'company' 
+                ? 'bg-blue-50 text-blue-700 border-blue-200' 
+                : 'bg-green-50 text-green-700 border-green-200'
+            }`}>
+              {userType === 'company' ? (
+                <>
+                  <Building2 className="h-3 w-3 mr-1" />
+                  Azienda
+                </>
+              ) : (
+                <>
+                  <User className="h-3 w-3 mr-1" />
+                  Recruiter
+                </>
+              )}
+            </Badge>
+            <h3 className="font-semibold text-foreground">{otherPartyName}</h3>
+          </div>
           {conversation.proposal_title && (
-            <div className="flex items-center gap-1 mt-1">
-              <Badge variant="outline" className="text-xs px-2 py-0">
-                {conversation.proposal_title}
+            <div className="flex items-center gap-1">
+              <Badge variant="outline" className="text-xs px-2 py-0 border-primary/20">
+                📋 {conversation.proposal_title}
               </Badge>
             </div>
           )}

@@ -78,20 +78,31 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                 <div className="flex items-center space-x-4">
                   <div className="relative">
                     <Avatar className={`h-12 w-12 border-2 ${
-                      isUnread ? 'border-primary/30' : 'border-muted-foreground/20'
+                      conversation.recruiter_email.includes('@') && 
+                      conversation.other_party_name === conversation.recruiter_email
+                        ? isUnread ? 'border-green-300' : 'border-green-200'
+                        : isUnread ? 'border-blue-300' : 'border-blue-200'
                     }`}>
                       <AvatarFallback className={`font-semibold ${
-                        isUnread ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                        conversation.recruiter_email.includes('@') && 
+                        conversation.other_party_name === conversation.recruiter_email
+                          ? isUnread ? 'bg-green-50 text-green-600' : 'bg-green-50 text-green-500'
+                          : isUnread ? 'bg-blue-50 text-blue-600' : 'bg-blue-50 text-blue-500'
                       }`}>
                         {otherPartyInitials}
                       </AvatarFallback>
                     </Avatar>
-                    <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1 border border-primary/20">
+                    <div className={`absolute -bottom-1 -right-1 bg-background rounded-full p-1 border ${
+                      conversation.recruiter_email.includes('@') && 
+                      conversation.other_party_name === conversation.recruiter_email
+                        ? 'border-green-200'
+                        : 'border-blue-200'
+                    }`}>
                       {conversation.recruiter_email.includes('@') && 
                        conversation.other_party_name === conversation.recruiter_email ? (
-                        <User className="h-3 w-3 text-primary" />
+                        <User className="h-3 w-3 text-green-600" />
                       ) : (
-                        <Building2 className="h-3 w-3 text-primary" />
+                        <Building2 className="h-3 w-3 text-blue-600" />
                       )}
                     </div>
                     {isUnread && (
@@ -101,11 +112,32 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <p className={`text-sm font-medium truncate ${
-                        isUnread ? 'text-foreground font-semibold' : 'text-foreground'
-                      }`}>
-                        {conversation.other_party_name?.split('@')[0] || 'Utente'}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className={`text-xs px-2 py-0.5 ${
+                          conversation.recruiter_email.includes('@') && 
+                          conversation.other_party_name === conversation.recruiter_email
+                            ? 'bg-green-50 text-green-700 border-green-200'
+                            : 'bg-blue-50 text-blue-700 border-blue-200'
+                        }`}>
+                          {conversation.recruiter_email.includes('@') && 
+                           conversation.other_party_name === conversation.recruiter_email ? (
+                            <>
+                              <User className="h-3 w-3 mr-1" />
+                              Recruiter
+                            </>
+                          ) : (
+                            <>
+                              <Building2 className="h-3 w-3 mr-1" />
+                              Azienda
+                            </>
+                          )}
+                        </Badge>
+                        <p className={`text-sm font-medium truncate ${
+                          isUnread ? 'text-foreground font-semibold' : 'text-foreground'
+                        }`}>
+                          {conversation.other_party_name?.split('@')[0] || 'Utente'}
+                        </p>
+                      </div>
                       <div className="flex items-center gap-2 flex-shrink-0">
                         <div className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Clock className="h-3 w-3" />

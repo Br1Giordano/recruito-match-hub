@@ -7,6 +7,8 @@ import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterDashboardView from "../recruiter/RecruiterDashboardView";
 import CVViewer from "../cv/CVViewer";
 import RecruiterReviewDialog from "./RecruiterReviewDialog";
+import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
+import { Crown } from "lucide-react";
 
 interface ProposalCardProps {
   proposal: {
@@ -37,6 +39,7 @@ interface ProposalCardProps {
 
 export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
+  const { rankingInfo } = useRecruiterRanking(proposal.recruiter_email);
 
   const handleShowRecruiterProfile = () => {
     setShowRecruiterProfile(true);
@@ -101,7 +104,15 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
           {proposal.recruiter_email && (
             <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
               <div className="flex justify-between items-center mb-2">
-                <h4 className="font-medium text-blue-900">Recruiter</h4>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-medium text-blue-900">Recruiter</h4>
+                  {rankingInfo.ranking_label && (
+                    <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 flex items-center gap-1">
+                      <Crown className="h-3 w-3" />
+                      {rankingInfo.ranking_label}
+                    </Badge>
+                  )}
+                </div>
                 <Button
                   onClick={handleShowRecruiterProfile}
                   disabled={!proposal.recruiter_email}

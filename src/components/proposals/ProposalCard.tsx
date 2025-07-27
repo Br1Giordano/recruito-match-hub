@@ -9,6 +9,7 @@ import CVViewer from "../cv/CVViewer";
 import RecruiterReviewDialog from "./RecruiterReviewDialog";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
 import { Crown } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ProposalCardProps {
   proposal: {
@@ -80,7 +81,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
   };
 
   return (
-    <>
+    <TooltipProvider>
       <Card className="w-full">
         <CardHeader>
           <div className="flex justify-between items-start">
@@ -107,10 +108,29 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                 <div className="flex items-center gap-2">
                   <h4 className="font-medium text-blue-900">Recruiter</h4>
                   {rankingInfo.ranking_label && (
-                    <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 flex items-center gap-1">
-                      <Crown className="h-3 w-3" />
-                      {rankingInfo.ranking_label}
-                    </Badge>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 flex items-center gap-1 cursor-help">
+                          <Crown className="h-3 w-3" />
+                          {rankingInfo.ranking_label}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <div className="text-sm max-w-xs">
+                          <p className="font-medium mb-1">Ranking Recruiter</p>
+                          <p>
+                            Questo recruiter è classificato tra i migliori {rankingInfo.ranking_label === 'Top 5' ? '5' : rankingInfo.ranking_label === 'Top 10' ? '10' : '25'} 
+                            {' '}recruiter sulla piattaforma in base a:
+                          </p>
+                          <ul className="mt-2 space-y-1 text-xs">
+                            <li>• Numero di proposte inviate</li>
+                            <li>• Tasso di accettazione</li>
+                            <li>• Qualità delle candidature</li>
+                            <li>• Recensioni positive ricevute</li>
+                          </ul>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
                   )}
                 </div>
                 <Button
@@ -303,6 +323,6 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
           onClose={() => setShowRecruiterProfile(false)}
         />
       )}
-    </>
+    </TooltipProvider>
   );
 }

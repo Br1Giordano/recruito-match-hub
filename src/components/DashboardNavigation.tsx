@@ -10,6 +10,7 @@ import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
+import { CompanyMessagesSection } from "./messaging/CompanyMessagesSection";
 import AdminDashboard from "./admin/AdminDashboard";
 import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut, Settings, ChevronDown, Shield } from "lucide-react";
 import {
@@ -330,10 +331,14 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
 
       <div className="container mx-auto p-4">
         <Tabs defaultValue="proposals" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="proposals" className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4" />
+              <FileText className="h-4 w-4" />
               Proposte Ricevute
+            </TabsTrigger>
+            <TabsTrigger value="messages" className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              Messaggi
             </TabsTrigger>
             <TabsTrigger value="offers" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
@@ -343,6 +348,10 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
           
           <TabsContent value="proposals">
             <CompanyProposalsDashboard />
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <CompanyMessagesSection />
           </TabsContent>
           
           <TabsContent value="offers">

@@ -115,20 +115,11 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                           {rankingInfo.ranking_label}
                         </Badge>
                       </TooltipTrigger>
-                      <TooltipContent>
-                        <div className="text-sm max-w-xs">
-                          <p className="font-medium mb-1">Ranking Recruiter</p>
-                          <p>
-                            Questo recruiter è classificato tra i migliori {rankingInfo.ranking_label === 'Top 5' ? '5' : rankingInfo.ranking_label === 'Top 10' ? '10' : '25'} 
-                            {' '}recruiter sulla piattaforma in base a:
-                          </p>
-                          <ul className="mt-2 space-y-1 text-xs">
-                            <li>• Numero di proposte inviate</li>
-                            <li>• Tasso di accettazione</li>
-                            <li>• Qualità delle candidature</li>
-                            <li>• Recensioni positive ricevute</li>
-                          </ul>
-                        </div>
+                      <TooltipContent side="top" className="text-xs max-w-[200px]">
+                        <p>
+                          Tra i migliori {rankingInfo.ranking_label === 'Top 5' ? '5' : rankingInfo.ranking_label === 'Top 10' ? '10' : '25'} recruiter 
+                          per qualità e successo delle candidature
+                        </p>
                       </TooltipContent>
                     </Tooltip>
                   )}

@@ -115,7 +115,7 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                           {rankingInfo.ranking_label}
                         </Badge>
                       </TooltipTrigger>
-                      <TooltipContent side="top" align="center" sideOffset={5} className="text-xs max-w-[200px]">
+                      <TooltipContent side="bottom" align="center" sideOffset={2} className="text-xs max-w-[200px]">
                         <p>
                           Tra i migliori {rankingInfo.ranking_label === 'Top 5' ? '5' : rankingInfo.ranking_label === 'Top 10' ? '10' : '25'} recruiter 
                           per qualità e successo delle candidature

@@ -52,30 +52,6 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
     }
   }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile, fetchRatingByEmail]);
 
-  const handleStartConversation = async () => {
-    if (!user?.email || !proposal.recruiter_email) {
-      toast({
-        title: "Errore",
-        description: "Impossibile avviare la conversazione",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const conversationId = await createConversation(
-      proposal.id,
-      proposal.recruiter_email,
-      user.email
-    );
-
-    if (conversationId) {
-      setShowMessageCenter(true);
-      toast({
-        title: "Conversazione avviata",
-        description: "Ora puoi chattare con il recruiter",
-      });
-    }
-  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -291,16 +267,6 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
 
         {/* Pulsanti azioni */}
         <div className="flex justify-end gap-2 pt-2">
-          <Button
-            onClick={handleStartConversation}
-            disabled={!proposal.recruiter_email}
-            variant="outline"
-            size="sm"
-            className="text-green-600 border-green-300 hover:bg-green-100"
-          >
-            <MessageCircle className="h-4 w-4 mr-2" />
-            Messaggio
-          </Button>
           <ProposalDetailsDialog proposal={proposal} />
         </div>
       </CardContent>

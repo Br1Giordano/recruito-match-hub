@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { ArrowLeft, Send, Building2, User } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowLeft, Send, Building2, User, CheckCheck, Clock } from 'lucide-react';
 import { Conversation, Message } from '@/hooks/useMessages';
 import { useAuth } from '@/hooks/useAuth';
 import { formatDistanceToNow } from 'date-fns';
@@ -58,25 +59,25 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   const isRecruiterConversation = conversation.recruiter_email === conversation.other_party_name;
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center gap-3 p-4 border-b bg-muted/30">
+    <div className="flex flex-col h-full bg-background">
+      {/* Header migliorato */}
+      <div className="flex items-center gap-4 p-4 border-b bg-gradient-to-r from-primary/5 to-primary/10 backdrop-blur-sm">
         <Button
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="p-2"
+          className="p-2 hover:bg-background/80 rounded-full"
         >
           <ArrowLeft className="h-4 w-4" />
         </Button>
         
         <div className="relative">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-secondary text-xs">
+          <Avatar className="h-10 w-10 border-2 border-primary/20">
+            <AvatarFallback className="bg-primary/10 text-primary font-semibold">
               {otherPartyName.slice(0, 2).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5">
+          <div className="absolute -bottom-1 -right-1 bg-background rounded-full p-1 border border-primary/20">
             {isRecruiterConversation ? (
               <User className="h-3 w-3 text-primary" />
             ) : (
@@ -86,54 +87,74 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
         
         <div className="flex-1">
-          <h3 className="font-medium text-sm">{otherPartyName}</h3>
+          <h3 className="font-semibold text-foreground">{otherPartyName}</h3>
           {conversation.proposal_title && (
-            <p className="text-xs text-muted-foreground">
-              {conversation.proposal_title}
-            </p>
+            <div className="flex items-center gap-1 mt-1">
+              <Badge variant="outline" className="text-xs px-2 py-0">
+                {conversation.proposal_title}
+              </Badge>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Messages */}
+      {/* Messages con design migliorato */}
       <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4">
+        <div className="space-y-3">
           {messages.length === 0 ? (
-            <div className="text-center text-muted-foreground text-sm py-8">
-              Inizia una conversazione inviando un messaggio
+            <div className="text-center text-muted-foreground py-16">
+              <div className="bg-muted/50 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                <Send className="h-8 w-8" />
+              </div>
+              <p className="font-medium text-lg mb-2">Inizia la conversazione</p>
+              <p className="text-sm">Scrivi il primo messaggio per iniziare a chattare</p>
             </div>
           ) : (
-            messages.map((message) => {
+            messages.map((message, index) => {
               const isOwnMessage = message.sender_email === user?.email;
+              const showTimestamp = index === 0 || 
+                new Date(messages[index - 1].created_at).getTime() - new Date(message.created_at).getTime() > 300000; // 5 minuti
               
               return (
-                <div
-                  key={message.id}
-                  className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div className={`max-w-[70%] ${isOwnMessage ? 'order-1' : 'order-2'}`}>
-                    <div
-                      className={`rounded-lg px-3 py-2 text-sm ${
-                        isOwnMessage
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted text-foreground'
-                      }`}
-                    >
-                      <p className="whitespace-pre-wrap">{message.message_content}</p>
+                <div key={message.id} className="space-y-1">
+                  {showTimestamp && (
+                    <div className="text-center">
+                      <span className="text-xs text-muted-foreground bg-muted/50 px-3 py-1 rounded-full">
+                        {formatDistanceToNow(new Date(message.created_at), {
+                          addSuffix: true,
+                          locale: it
+                        })}
+                      </span>
                     </div>
-                    <p
-                      className={`text-xs text-muted-foreground mt-1 ${
-                        isOwnMessage ? 'text-right' : 'text-left'
+                  )}
+                  <div className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className={`max-w-[80%] p-3 shadow-sm ${
+                        isOwnMessage
+                          ? 'bg-primary text-primary-foreground rounded-2xl rounded-tr-md ml-8'
+                          : 'bg-muted text-foreground rounded-2xl rounded-tl-md mr-8'
                       }`}
                     >
-                      {formatDistanceToNow(new Date(message.created_at), {
-                        addSuffix: true,
-                        locale: it
-                      })}
-                      {message.read_at && isOwnMessage && (
-                        <span className="ml-1">✓</span>
-                      )}
-                    </p>
+                      <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.message_content}</p>
+                      <div className={`flex items-center gap-2 mt-2 ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                        <div className="flex items-center gap-1">
+                          <Clock className={`h-3 w-3 ${isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'}`} />
+                          <span
+                            className={`text-xs ${
+                              isOwnMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                            }`}
+                          >
+                            {new Date(message.created_at).toLocaleTimeString('it-IT', {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        {isOwnMessage && message.read_at && (
+                          <CheckCheck className="h-3 w-3 text-primary-foreground/70" />
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
@@ -143,26 +164,31 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
         </div>
       </ScrollArea>
 
-      {/* Message Input */}
-      <form onSubmit={handleSendMessage} className="p-4 border-t bg-background">
-        <div className="flex gap-2">
-          <Textarea
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Scrivi un messaggio..."
-            className="flex-1 min-h-[40px] max-h-[120px] resize-none"
-            disabled={isSending}
-          />
+      {/* Input area migliorata */}
+      <form onSubmit={handleSendMessage} className="p-4 border-t bg-gradient-to-r from-muted/30 to-muted/20 backdrop-blur-sm">
+        <div className="flex gap-3 items-end">
+          <div className="flex-1">
+            <Textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Scrivi un messaggio..."
+              className="min-h-[44px] max-h-[120px] resize-none bg-background border-muted-foreground/20 focus:border-primary transition-all duration-200 rounded-xl"
+              disabled={isSending}
+            />
+          </div>
           <Button
             type="submit"
-            size="icon"
+            size="sm"
             disabled={!newMessage.trim() || isSending}
-            className="self-end"
+            className="h-[44px] w-[44px] p-0 rounded-full shadow-md hover:shadow-lg transition-all duration-200"
           >
             <Send className="h-4 w-4" />
           </Button>
         </div>
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          Premi <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Invio</kbd> per inviare • <kbd className="px-1 py-0.5 bg-muted rounded text-xs">Shift+Invio</kbd> per andare a capo
+        </p>
       </form>
     </div>
   );

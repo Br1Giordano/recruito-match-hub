@@ -147,14 +147,55 @@ export const useMessages = () => {
     if (!user?.email || !content.trim()) return false;
 
     try {
-      // Determine sender type based on user profile
-      const { data: userProfile } = await supabase
-        .from('user_profiles')
-        .select('user_type')
-        .eq('auth_user_id', user.id)
-        .single();
+      // Get conversation details and user profile
+      const [conversationResponse, userProfileResponse] = await Promise.all([
+        supabase
+          .from('conversations')
+          .select('*')
+          .eq('id', conversationId)
+          .single(),
+        supabase
+          .from('user_profiles')
+          .select('user_type')
+          .eq('auth_user_id', user.id)
+          .single()
+      ]);
 
+      if (conversationResponse.error || userProfileResponse.error) {
+        throw new Error('Failed to get conversation or user details');
+      }
+
+      const conversation = conversationResponse.data;
+      const userProfile = userProfileResponse.data;
       const senderType = userProfile?.user_type === 'recruiter' ? 'recruiter' : 'company';
+
+      // Check if recruiter is trying to send the first message
+      if (senderType === 'recruiter') {
+        const { data: existingMessages } = await supabase
+          .from('messages')
+          .select('id')
+          .eq('conversation_id', conversationId)
+          .limit(1);
+
+        if (!existingMessages || existingMessages.length === 0) {
+          toast({
+            title: "Azione non consentita",
+            description: "Puoi rispondere solo dopo che l'azienda ti ha contattato",
+            variant: "destructive",
+          });
+          return false;
+        }
+      }
+
+      // Check if this is the first message from company to send notification
+      const { data: existingMessages } = await supabase
+        .from('messages')
+        .select('id, sender_type')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
+
+      const isFirstMessage = !existingMessages || existingMessages.length === 0;
+      const isFirstCompanyMessage = isFirstMessage && senderType === 'company';
 
       const { error } = await supabase
         .from('messages')
@@ -166,6 +207,23 @@ export const useMessages = () => {
         });
 
       if (error) throw error;
+
+      // Send notification only for first company message
+      if (isFirstCompanyMessage) {
+        try {
+          await supabase.functions.invoke('send-proposal-notification', {
+            body: {
+              type: 'first_message',
+              recruiter_email: conversation.recruiter_email,
+              company_email: conversation.company_email,
+              conversation_id: conversationId,
+              message_content: content.trim()
+            }
+          });
+        } catch (notificationError) {
+          console.warn('Failed to send notification:', notificationError);
+        }
+      }
 
       // Refresh messages for this conversation
       await fetchMessages(conversationId);
@@ -200,6 +258,22 @@ export const useMessages = () => {
 
       if (existing) {
         return existing.id;
+      }
+
+      // Verify user is a company (only companies can create conversations)
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('user_type')
+        .eq('auth_user_id', user.id)
+        .single();
+
+      if (userProfile?.user_type !== 'company') {
+        toast({
+          title: "Accesso negato",
+          description: "Solo le aziende possono avviare conversazioni",
+          variant: "destructive",
+        });
+        return null;
       }
 
       // Create new conversation

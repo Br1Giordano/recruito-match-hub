@@ -26,21 +26,26 @@ export const MessageCenter: React.FC<MessageCenterProps> = ({ isOpen, onClose })
     setSelectedConversationId(null);
   };
 
+  const totalUnread = conversations.reduce((total, conv) => total + (conv.unread_count || 0), 0);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[600px] p-0">
-        <DialogHeader className="p-6 pb-4">
-          <DialogTitle className="flex items-center gap-2">
-            Messaggi
-            {conversations.length > 0 && (
-              <Badge variant="secondary">
-                {conversations.reduce((total, conv) => total + (conv.unread_count || 0), 0)} non letti
+      <DialogContent className="max-w-5xl h-[85vh] p-0 gap-0">
+        <DialogHeader className="p-6 pb-4 border-b bg-gradient-to-r from-primary/5 to-primary/10">
+          <DialogTitle className="text-xl font-semibold flex items-center gap-2">
+            Centro Messaggi
+            {totalUnread > 0 && (
+              <Badge variant="default" className="bg-primary text-primary-foreground">
+                {totalUnread} non lett{totalUnread === 1 ? 'o' : 'i'}
               </Badge>
             )}
           </DialogTitle>
+          <p className="text-sm text-muted-foreground mt-1">
+            {selectedConversationId ? 'Conversazione in corso' : `${conversations.length} conversazion${conversations.length !== 1 ? 'i' : 'e'} totali`}
+          </p>
         </DialogHeader>
         
-        <div className="flex h-[500px]">
+        <div className="flex h-[calc(85vh-120px)] bg-muted/20">
           {!selectedConversationId ? (
             <div className="w-full">
               <ConversationList

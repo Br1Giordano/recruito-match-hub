@@ -2,14 +2,18 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Euro, Calendar, User, Phone, Linkedin, UserCircle } from "lucide-react";
+import { Euro, Calendar, User, Phone, Linkedin, UserCircle, MessageCircle } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterDashboardView from "../recruiter/RecruiterDashboardView";
 import CVViewer from "../cv/CVViewer";
 import RecruiterReviewDialog from "./RecruiterReviewDialog";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
+import { useMessages } from "@/hooks/useMessages";
+import { useAuth } from "@/hooks/useAuth";
 import { Crown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { MessageCenter } from "../messaging/MessageCenter";
+import { toast } from "@/hooks/use-toast";
 
 interface ProposalCardProps {
   proposal: {
@@ -40,10 +44,38 @@ interface ProposalCardProps {
 
 export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
+  const [showMessageCenter, setShowMessageCenter] = useState(false);
   const { rankingInfo } = useRecruiterRanking(proposal.recruiter_email);
+  const { createConversation } = useMessages();
+  const { user } = useAuth();
 
   const handleShowRecruiterProfile = () => {
     setShowRecruiterProfile(true);
+  };
+
+  const handleStartConversation = async () => {
+    if (!user?.email || !proposal.recruiter_email) {
+      toast({
+        title: "Errore",
+        description: "Impossibile avviare la conversazione",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const conversationId = await createConversation(
+      proposal.id,
+      proposal.recruiter_email,
+      user.email
+    );
+
+    if (conversationId) {
+      setShowMessageCenter(true);
+      toast({
+        title: "Conversazione avviata",
+        description: "Ora puoi chattare con il recruiter",
+      });
+    }
   };
 
   const getStatusColor = (status: string) => {
@@ -124,16 +156,28 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
                     </Tooltip>
                   )}
                 </div>
-                <Button
-                  onClick={handleShowRecruiterProfile}
-                  disabled={!proposal.recruiter_email}
-                  variant="outline"
-                  size="sm"
-                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
-                >
-                  <UserCircle className="h-4 w-4 mr-2" />
-                  Visualizza Profilo
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={handleStartConversation}
+                    disabled={!proposal.recruiter_email}
+                    variant="outline"
+                    size="sm"
+                    className="text-green-600 border-green-300 hover:bg-green-100"
+                  >
+                    <MessageCircle className="h-4 w-4 mr-2" />
+                    Messaggio
+                  </Button>
+                  <Button
+                    onClick={handleShowRecruiterProfile}
+                    disabled={!proposal.recruiter_email}
+                    variant="outline"
+                    size="sm"
+                    className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                  >
+                    <UserCircle className="h-4 w-4 mr-2" />
+                    Profilo
+                  </Button>
+                </div>
               </div>
               <div className="text-sm">
                 <div className="font-medium text-gray-900">
@@ -312,6 +356,14 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
         <RecruiterDashboardView
           recruiterEmail={proposal.recruiter_email}
           onClose={() => setShowRecruiterProfile(false)}
+        />
+      )}
+
+      {/* Message Center */}
+      {showMessageCenter && (
+        <MessageCenter
+          isOpen={showMessageCenter}
+          onClose={() => setShowMessageCenter(false)}
         />
       )}
     </TooltipProvider>

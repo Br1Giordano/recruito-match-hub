@@ -3,7 +3,10 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileMenu from "./MobileMenu";
 import RecruiterProfileButton from "./recruiter/RecruiterProfileButton";
+import { MessageIcon } from "./messaging/MessageIcon";
+import { MessageCenter } from "./messaging/MessageCenter";
 import { Building2 } from "lucide-react";
+import { useState } from "react";
 
 interface HeaderProps {
   onShowAuth?: () => void;
@@ -14,6 +17,7 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const { user, userProfile } = useAuth();
+  const [isMessageCenterOpen, setIsMessageCenterOpen] = useState(false);
 
   const scrollToSection = (sectionId: string) => {
     if (isHomePage) {
@@ -112,6 +116,7 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
             {/* Se l'utente è autenticato, mostra il profilo o i pulsanti in base al tipo utente */}
             {user && userProfile ? (
               <>
+                <MessageIcon onClick={() => setIsMessageCenterOpen(true)} />
                 {userProfile.user_type === 'recruiter' ? (
                   <RecruiterProfileButton />
                 ) : (
@@ -151,6 +156,13 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
           <MobileMenu />
         </div>
       </div>
+      
+      {user && userProfile && (
+        <MessageCenter
+          isOpen={isMessageCenterOpen}
+          onClose={() => setIsMessageCenterOpen(false)}
+        />
+      )}
     </header>
   );
 };

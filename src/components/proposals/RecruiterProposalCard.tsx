@@ -1,12 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Euro, Calendar, User, Phone, Linkedin, MapPin, Building2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Euro, Calendar, User, Phone, Linkedin, MapPin, Building2, MessageCircle } from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterAvatar from "../recruiter/RecruiterAvatar";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import { useRecruiterRating } from "@/hooks/useRecruiterRating";
+import { useMessages } from "@/hooks/useMessages";
+import { useAuth } from "@/hooks/useAuth";
 import { StarRating } from "@/components/ui/star-rating";
+import { MessageCenter } from "../messaging/MessageCenter";
+import { toast } from "@/hooks/use-toast";
 
 interface RecruiterProposalCardProps {
   proposal: {
@@ -35,6 +40,9 @@ interface RecruiterProposalCardProps {
 export default function RecruiterProposalCard({ proposal }: RecruiterProposalCardProps) {
   const { profile: recruiterProfile, fetchProfileByEmail, loading: loadingRecruiter } = useRecruiterProfileByEmail();
   const { rating, fetchRatingByEmail } = useRecruiterRating();
+  const { createConversation } = useMessages();
+  const { user } = useAuth();
+  const [showMessageCenter, setShowMessageCenter] = useState(false);
 
   // Carica il profilo del recruiter solo una volta quando il componente viene montato
   useEffect(() => {
@@ -43,6 +51,31 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
       fetchRatingByEmail(proposal.recruiter_email);
     }
   }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile, fetchRatingByEmail]);
+
+  const handleStartConversation = async () => {
+    if (!user?.email || !proposal.recruiter_email) {
+      toast({
+        title: "Errore",
+        description: "Impossibile avviare la conversazione",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const conversationId = await createConversation(
+      proposal.id,
+      proposal.recruiter_email,
+      user.email
+    );
+
+    if (conversationId) {
+      setShowMessageCenter(true);
+      toast({
+        title: "Conversazione avviata",
+        description: "Ora puoi chattare con il recruiter",
+      });
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -256,11 +289,29 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
           Ricevuta il {new Date(proposal.created_at).toLocaleDateString('it-IT')} alle {new Date(proposal.created_at).toLocaleTimeString('it-IT')}
         </div>
 
-        {/* Pulsante Dettagli */}
-        <div className="flex justify-end pt-2">
+        {/* Pulsanti azioni */}
+        <div className="flex justify-end gap-2 pt-2">
+          <Button
+            onClick={handleStartConversation}
+            disabled={!proposal.recruiter_email}
+            variant="outline"
+            size="sm"
+            className="text-green-600 border-green-300 hover:bg-green-100"
+          >
+            <MessageCircle className="h-4 w-4 mr-2" />
+            Messaggio
+          </Button>
           <ProposalDetailsDialog proposal={proposal} />
         </div>
       </CardContent>
+      
+      {/* Message Center */}
+      {showMessageCenter && (
+        <MessageCenter
+          isOpen={showMessageCenter}
+          onClose={() => setShowMessageCenter(false)}
+        />
+      )}
     </Card>
   );
 }

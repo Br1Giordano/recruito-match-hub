@@ -83,6 +83,44 @@ export type Database = {
         }
         Relationships: []
       }
+      conversations: {
+        Row: {
+          company_email: string
+          created_at: string
+          id: string
+          last_message_at: string
+          proposal_id: string | null
+          recruiter_email: string
+          updated_at: string
+        }
+        Insert: {
+          company_email: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          proposal_id?: string | null
+          recruiter_email: string
+          updated_at?: string
+        }
+        Update: {
+          company_email?: string
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          proposal_id?: string | null
+          recruiter_email?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversations_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_offers: {
         Row: {
           benefits: string | null
@@ -171,6 +209,47 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      messages: {
+        Row: {
+          attachment_url: string | null
+          conversation_id: string
+          created_at: string
+          id: string
+          message_content: string
+          read_at: string | null
+          sender_email: string
+          sender_type: string
+        }
+        Insert: {
+          attachment_url?: string | null
+          conversation_id: string
+          created_at?: string
+          id?: string
+          message_content: string
+          read_at?: string | null
+          sender_email: string
+          sender_type: string
+        }
+        Update: {
+          attachment_url?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          message_content?: string
+          read_at?: string | null
+          sender_email?: string
+          sender_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       proposal_responses: {
         Row: {

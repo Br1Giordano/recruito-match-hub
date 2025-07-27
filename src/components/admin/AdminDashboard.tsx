@@ -208,6 +208,8 @@ export default function AdminDashboard() {
         return <Badge variant="pending">In Attesa</Badge>;
       case 'rejected':
         return <Badge variant="rejected">Rifiutato</Badge>;
+      case 'blocked':
+        return <Badge variant="blocked">Bloccato</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -476,6 +478,7 @@ export default function AdminDashboard() {
                 <SelectItem value="pending">In Attesa</SelectItem>
                 <SelectItem value="approved">Approvato</SelectItem>
                 <SelectItem value="rejected">Rifiutato</SelectItem>
+                <SelectItem value="blocked">Bloccato</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -784,6 +787,30 @@ export default function AdminDashboard() {
               </Button>
             </div>
           )}
+
+          {/* Block/Unblock Buttons for Approved/Blocked Recruiters */}
+          {selectedRecruiter && (selectedRecruiter.status === 'approved' || selectedRecruiter.status === 'blocked') && (
+            <div className="flex gap-3 pt-4 border-t">
+              {selectedRecruiter.status === 'approved' ? (
+                <Button
+                  onClick={() => handleUpdateRecruiterStatus(selectedRecruiter.id, 'blocked')}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Blocca Account
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => handleUpdateRecruiterStatus(selectedRecruiter.id, 'approved')}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Sblocca Account
+                </Button>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
@@ -918,6 +945,30 @@ export default function AdminDashboard() {
                 <X className="h-4 w-4 mr-2" />
                 Rifiuta Azienda
               </Button>
+            </div>
+          )}
+
+          {/* Block/Unblock Buttons for Approved/Blocked Companies */}
+          {selectedCompany && (selectedCompany.status === 'approved' || selectedCompany.status === 'blocked') && (
+            <div className="flex gap-3 pt-4 border-t">
+              {selectedCompany.status === 'approved' ? (
+                <Button
+                  onClick={() => handleUpdateCompanyStatus(selectedCompany.id, 'blocked')}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  <X className="h-4 w-4 mr-2" />
+                  Blocca Account
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => handleUpdateCompanyStatus(selectedCompany.id, 'approved')}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Sblocca Account
+                </Button>
+              )}
             </div>
           )}
         </DialogContent>

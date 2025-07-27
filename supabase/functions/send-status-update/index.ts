@@ -9,7 +9,7 @@ const corsHeaders = {
 };
 
 interface StatusUpdateRequest {
-  type: 'profile_approved' | 'profile_rejected' | 'system_notification';
+  type: 'profile_approved' | 'profile_rejected' | 'profile_blocked' | 'system_notification';
   email: string;
   name?: string;
   userType: 'recruiter' | 'company';
@@ -171,6 +171,66 @@ const handler = async (req: Request): Promise<Response> => {
         `;
         break;
 
+      case 'profile_blocked':
+        subject = userType === 'recruiter' 
+          ? "🚫 Account bloccato - Recruito" 
+          : "🚫 Account azienda bloccato - Recruito";
+        emailContent = `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+            <div style="background-color: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+              <h1 style="color: #dc2626; text-align: center; margin-bottom: 30px;">
+                🚫 Account Bloccato
+              </h1>
+              
+              <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+                Ciao ${name || 'utente'},
+              </p>
+              
+              <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; border-left: 4px solid #dc2626; margin: 20px 0;">
+                <p style="margin: 0; font-size: 16px; color: #dc2626;">
+                  <strong>Il tuo account su Recruito è stato temporaneamente bloccato.</strong>
+                </p>
+              </div>
+              
+              <p style="font-size: 14px; color: #666; margin-bottom: 20px;">
+                Questo blocco può essere dovuto a una violazione dei nostri termini di servizio o per motivi di sicurezza.
+                Il tuo accesso alla piattaforma è stato temporaneamente sospeso.
+              </p>
+              
+              <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                <h3 style="color: #4b5563; margin-top: 0;">🔍 Cosa puoi fare:</h3>
+                <ul style="color: #6b7280; padding-left: 20px;">
+                  <li>Contatta il nostro supporto per maggiori informazioni</li>
+                  <li>Fornisci eventuali chiarimenti richiesti</li>
+                  <li>Attendi la revisione del tuo account</li>
+                </ul>
+              </div>
+              
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="mailto:support@recruito.eu" 
+                   style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); 
+                          color: white; 
+                          padding: 15px 30px; 
+                          text-decoration: none; 
+                          border-radius: 8px; 
+                          font-weight: bold; 
+                          font-size: 16px; 
+                          display: inline-block;
+                          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);">
+                  📧 Contatta il Supporto
+                </a>
+              </div>
+              
+              <div style="text-align: center; margin-top: 30px;">
+                <p style="color: #6b7280; font-size: 14px;">
+                  Ricevi questa email dal team di moderazione di Recruito
+                </p>
+              </div>
+            </div>
+          </div>
+        `;
+        break;
+
       case 'system_notification':
         subject = data?.subject || "📢 Notifica sistema - Recruito";
         emailContent = `
@@ -197,7 +257,7 @@ const handler = async (req: Request): Promise<Response> => {
                           color: white; 
                           padding: 15px 30px; 
                           text-decoration: none; 
-                          border-radius: 8px; 
+                          border-radius: 8px;
                           font-weight: bold; 
                           font-size: 16px; 
                           display: inline-block;

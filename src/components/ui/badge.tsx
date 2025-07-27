@@ -12,6 +12,7 @@ const badgeVariants = cva(
         approved: "bg-green-100 text-green-800 border border-green-200",
         pending: "bg-blue-100 text-blue-800 border border-blue-200", 
         rejected: "bg-red-100 text-red-800 border border-red-200",
+        blocked: "bg-red-200 text-red-900 border border-red-300",
         secondary: "bg-gray-100 text-gray-800 border border-gray-200",
         outline: "border border-gray-300 text-gray-700 bg-white hover:bg-gray-50",
       },

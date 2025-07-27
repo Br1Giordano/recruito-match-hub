@@ -95,10 +95,10 @@ export const RecruiterMessagesSection: React.FC = () => {
       <div className="grid gap-4">
         {conversations.map((conversation) => {
           const isUnread = (conversation.unread_count || 0) > 0;
-          const companyInitials = conversation.company_email
-            ?.split('@')[0]
-            .slice(0, 2)
-            .toUpperCase() || 'AZ';
+          const companyDisplayName = conversation.company_name || conversation.company_email?.split('@')[0] || 'Azienda';
+          const companyInitials = conversation.company_name 
+            ? conversation.company_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+            : conversation.company_email?.split('@')[0].slice(0, 2).toUpperCase() || 'AZ';
 
           return (
             <Card
@@ -136,11 +136,11 @@ export const RecruiterMessagesSection: React.FC = () => {
                             <Building2 className="h-3 w-3 mr-1" />
                             Azienda
                           </Badge>
-                          <p className={`font-medium truncate ${
-                            isUnread ? 'text-foreground font-semibold' : 'text-foreground'
-                          }`}>
-                            {conversation.company_email?.split('@')[0] || 'Azienda Non Specificata'}
-                          </p>
+                           <p className={`font-medium truncate ${
+                             isUnread ? 'text-foreground font-semibold' : 'text-foreground'
+                           }`}>
+                             {companyDisplayName}
+                           </p>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
                           <div className="flex items-center gap-1 text-xs text-muted-foreground">
@@ -170,13 +170,13 @@ export const RecruiterMessagesSection: React.FC = () => {
                       
                       <div className="flex items-start gap-2 text-sm">
                         <User className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                        <p className="text-muted-foreground">
-                          L'azienda <span className="font-medium text-foreground">{conversation.company_email?.split('@')[0]}</span> 
-                          {' '}è interessata alla tua proposta per{' '}
-                          <span className="font-medium text-foreground">
-                            {conversation.proposal_title || 'il candidato'}
-                          </span>
-                        </p>
+                         <p className="text-muted-foreground">
+                           L'azienda <span className="font-medium text-foreground">{companyDisplayName}</span> 
+                           {' '}è interessata alla tua proposta per{' '}
+                           <span className="font-medium text-foreground">
+                             {conversation.proposal_title || 'il candidato'}
+                           </span>
+                         </p>
                       </div>
                     </div>
                   </div>

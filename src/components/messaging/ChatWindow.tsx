@@ -56,7 +56,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
   };
 
   const otherPartyEmail = conversation.company_email || conversation.recruiter_email;
-  const otherPartyName = otherPartyEmail?.split('@')[0] || 'Utente';
+  const otherPartyName = conversation.other_party_name || otherPartyEmail?.split('@')[0] || 'Utente';
   const isCompanyConversation = conversation.company_email && user?.email === conversation.recruiter_email;
   const userType = isCompanyConversation ? 'company' : 'recruiter';
 

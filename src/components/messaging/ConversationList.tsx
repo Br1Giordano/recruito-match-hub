@@ -61,10 +61,10 @@ export const ConversationList: React.FC<ConversationListProps> = ({
       <div className="p-3 space-y-1">
         {conversations.map((conversation) => {
           const isUnread = (conversation.unread_count || 0) > 0;
-          const otherPartyInitials = conversation.other_party_name
-            ?.split('@')[0]
-            .slice(0, 2)
-            .toUpperCase() || 'XX';
+          const displayName = conversation.other_party_name || 'Utente';
+          const otherPartyInitials = displayName.includes('@') 
+            ? displayName.split('@')[0].slice(0, 2).toUpperCase()
+            : displayName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase() || 'XX';
           
           return (
             <Card
@@ -135,7 +135,7 @@ export const ConversationList: React.FC<ConversationListProps> = ({
                         <p className={`text-sm font-medium truncate ${
                           isUnread ? 'text-foreground font-semibold' : 'text-foreground'
                         }`}>
-                          {conversation.other_party_name?.split('@')[0] || 'Utente'}
+                          {displayName.includes('@') ? displayName.split('@')[0] : displayName}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0">

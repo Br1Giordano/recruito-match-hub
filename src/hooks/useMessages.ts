@@ -13,6 +13,8 @@ export interface Conversation {
   unread_count?: number;
   other_party_name?: string;
   proposal_title?: string;
+  recruiter_name?: string;
+  company_name?: string;
 }
 
 export interface Message {
@@ -52,7 +54,7 @@ export const useMessages = () => {
 
       if (error) throw error;
 
-      // Get unread message counts for each conversation
+      // Get unread message counts and user names for each conversation
       const conversationsWithUnread = await Promise.all(
         (data || []).map(async (conv) => {
           const { count } = await supabase
@@ -62,12 +64,38 @@ export const useMessages = () => {
             .neq('sender_email', user.email)
             .is('read_at', null);
 
+          // Fetch recruiter name
+          let recruiterName = conv.recruiter_email;
+          const { data: recruiterData } = await supabase
+            .from('recruiter_registrations')
+            .select('nome, cognome')
+            .eq('email', conv.recruiter_email)
+            .single();
+          
+          if (recruiterData) {
+            recruiterName = `${recruiterData.nome} ${recruiterData.cognome}`.trim();
+          }
+
+          // Fetch company name
+          let companyName = conv.company_email;
+          const { data: companyData } = await supabase
+            .from('company_registrations')
+            .select('nome_azienda')
+            .eq('email', conv.company_email)
+            .single();
+          
+          if (companyData) {
+            companyName = companyData.nome_azienda;
+          }
+
           return {
             ...conv,
             unread_count: count || 0,
+            recruiter_name: recruiterName,
+            company_name: companyName,
             other_party_name: conv.recruiter_email === user.email 
-              ? conv.company_email 
-              : conv.recruiter_email,
+              ? companyName 
+              : recruiterName,
             proposal_title: conv.proposals?.job_offers?.title || conv.proposals?.candidate_name
           };
         })

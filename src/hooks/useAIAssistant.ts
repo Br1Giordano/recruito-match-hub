@@ -98,11 +98,17 @@ export const useAIAssistant = () => {
     return result;
   };
 
+  const anonymizeCV = async (cvText: string): Promise<string | null> => {
+    const result = await callAIFunction('anonymize_cv', { cvText });
+    return result;
+  };
+
   return {
     isLoading,
     analyzeCVContent,
     generateProposalSuggestion,
     calculateMatchScore,
     generateCompanyInsights,
+    anonymizeCV,
   };
 };

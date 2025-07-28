@@ -298,12 +298,17 @@ export type Database = {
       proposals: {
         Row: {
           availability_weeks: number | null
+          candidate_cv_anonymized_url: string | null
           candidate_cv_url: string | null
           candidate_email: string
           candidate_linkedin: string | null
           candidate_name: string
           candidate_phone: string | null
+          company_access_level:
+            | Database["public"]["Enums"]["access_level_enum"]
+            | null
           company_id: string | null
+          contact_data_protected: boolean | null
           created_at: string
           current_salary: number | null
           expected_salary: number | null
@@ -323,12 +328,17 @@ export type Database = {
         }
         Insert: {
           availability_weeks?: number | null
+          candidate_cv_anonymized_url?: string | null
           candidate_cv_url?: string | null
           candidate_email: string
           candidate_linkedin?: string | null
           candidate_name: string
           candidate_phone?: string | null
+          company_access_level?:
+            | Database["public"]["Enums"]["access_level_enum"]
+            | null
           company_id?: string | null
+          contact_data_protected?: boolean | null
           created_at?: string
           current_salary?: number | null
           expected_salary?: number | null
@@ -348,12 +358,17 @@ export type Database = {
         }
         Update: {
           availability_weeks?: number | null
+          candidate_cv_anonymized_url?: string | null
           candidate_cv_url?: string | null
           candidate_email?: string
           candidate_linkedin?: string | null
           candidate_name?: string
           candidate_phone?: string | null
+          company_access_level?:
+            | Database["public"]["Enums"]["access_level_enum"]
+            | null
           company_id?: string | null
+          contact_data_protected?: boolean | null
           created_at?: string
           current_salary?: number | null
           expected_salary?: number | null
@@ -682,7 +697,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      access_level_enum: "restricted" | "partial" | "full"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -809,6 +824,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      access_level_enum: ["restricted", "partial", "full"],
+    },
   },
 } as const

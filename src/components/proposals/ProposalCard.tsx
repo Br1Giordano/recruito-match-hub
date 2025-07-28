@@ -14,6 +14,7 @@ import { Crown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { MessageCenter } from "../messaging/MessageCenter";
 import { toast } from "@/hooks/use-toast";
+import ContactDataProtection from "@/components/data-protection/ContactDataProtection";
 
 interface ProposalCardProps {
   proposal: {
@@ -23,6 +24,9 @@ interface ProposalCardProps {
     candidate_phone?: string;
     candidate_linkedin?: string;
     candidate_cv_url?: string;
+    candidate_cv_anonymized_url?: string;
+    contact_data_protected?: boolean;
+    company_access_level?: 'restricted' | 'partial' | 'full';
     proposal_description: string;
     years_experience?: number;
     expected_salary?: number;
@@ -37,12 +41,14 @@ interface ProposalCardProps {
       company_name?: string;
     };
   };
+  userType?: 'company' | 'recruiter';
   onStatusUpdate?: (proposalId: string, status: string) => void;
   onSendResponse?: (proposalId: string, response: any) => void;
   onDelete?: (proposalId: string) => void;
+  onRequestAccess?: (proposalId: string) => void;
 }
 
-export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse, onDelete }: ProposalCardProps) {
+export default function ProposalCard({ proposal, userType = 'company', onStatusUpdate, onSendResponse, onDelete, onRequestAccess }: ProposalCardProps) {
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
   const [showMessageCenter, setShowMessageCenter] = useState(false);
   const { rankingInfo } = useRecruiterRanking(proposal.recruiter_email);
@@ -207,39 +213,31 @@ export default function ProposalCard({ proposal, onStatusUpdate, onSendResponse,
             </div>
           )}
 
-          {/* Contatti Candidato e CV */}
+          {/* Contatti Candidato e CV con protezione dati */}
           <div>
             <div className="flex justify-between items-center mb-2">
               <h4 className="font-medium">Contatti Candidato:</h4>
               <CVViewer 
-                cvUrl={proposal.candidate_cv_url} 
+                cvUrl={userType === 'company' && proposal.contact_data_protected && proposal.company_access_level === 'restricted' 
+                      ? proposal.candidate_cv_anonymized_url || proposal.candidate_cv_url 
+                      : proposal.candidate_cv_url} 
                 candidateName={proposal.candidate_name}
               />
             </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2 text-sm">
-                <User className="h-4 w-4" />
-                <a href={`mailto:${proposal.candidate_email}`} className="text-blue-600 hover:underline">
-                  {proposal.candidate_email}
-                </a>
-              </div>
-              {proposal.candidate_phone && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4" />
-                  <a href={`tel:${proposal.candidate_phone}`} className="text-blue-600 hover:underline">
-                    {proposal.candidate_phone}
-                  </a>
-                </div>
-              )}
-              {proposal.candidate_linkedin && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Linkedin className="h-4 w-4" />
-                  <a href={proposal.candidate_linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                    Profilo LinkedIn
-                  </a>
-                </div>
-              )}
-            </div>
+            
+            <ContactDataProtection 
+              contactData={{
+                email: proposal.candidate_email,
+                phone: proposal.candidate_phone,
+                linkedin: proposal.candidate_linkedin,
+                isProtected: proposal.contact_data_protected ?? true,
+                accessLevel: proposal.company_access_level ?? 'restricted'
+              }}
+              candidateName={proposal.candidate_name}
+              proposalId={proposal.id}
+              userType={userType}
+              onRequestAccess={onRequestAccess}
+            />
           </div>
 
           {/* Dettagli */}

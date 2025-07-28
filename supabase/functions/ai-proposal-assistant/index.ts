@@ -37,6 +37,9 @@ serve(async (req) => {
       case 'generate_company_insights':
         response = await generateCompanyInsights(data);
         break;
+      case 'anonymize_cv':
+        response = await anonymizeCV(data.cvText);
+        break;
       default:
         throw new Error(`Unknown action: ${action}`);
     }
@@ -234,6 +237,52 @@ async function generateCompanyInsights(requestData: any) {
       interview_questions: ['Parlami della tua esperienza con React', 'Come gestisci i progetti in team?', 'Quali sono i tuoi obiettivi professionali?']
     }));
     
-    return { insights: fallbackInsights };
-  }
+  return { insights: fallbackInsights };
+}
+
+// CV Anonymization Function
+async function anonymizeCV(cvText: string): Promise<string> {
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'gpt-4.1-2025-04-14',
+      messages: [
+        {
+          role: 'system',
+          content: `Sei un esperto di privacy e protezione dati. Il tuo compito è oscurare informazioni di contatto sensibili in un CV per proteggere la privacy del candidato.
+
+OSCURA COMPLETAMENTE:
+- Email (sostituisci con: ****@*****.com)
+- Numeri di telefono (sostituisci con: +39 *** *** ****)
+- Indirizzi LinkedIn (sostituisci con: linkedin.com/in/******)
+- Indirizzi fisici completi (mantieni solo città e provincia)
+- Social media accounts
+- Siti web personali
+
+MANTIENI VISIBILI:
+- Nome e cognome del candidato
+- Titoli di studio e università
+- Esperienze lavorative e competenze
+- Certificazioni e corsi
+- Lingue parlate
+- Skills tecniche
+
+Restituisci il CV modificato mantenendo la formattazione originale.`
+        },
+        {
+          role: 'user',
+          content: `Oscura i dati di contatto in questo CV:\n\n${cvText}`
+        }
+      ],
+      temperature: 0.1,
+    }),
+  });
+
+  const data = await response.json();
+  return data.choices[0].message.content;
+}
 }

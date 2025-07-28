@@ -151,9 +151,14 @@ export default function CompanyProposalsDashboard() {
           <ProposalCard
             key={proposal.id}
             proposal={proposal}
+            userType="company"
             onStatusUpdate={updateProposalStatus}
             onSendResponse={handleSendResponse}
             onDelete={isAdmin ? handleDeleteProposal : undefined}
+            onRequestAccess={(proposalId) => {
+              // TODO: Implementare richiesta di accesso ai dati
+              console.log('Richiesta accesso per proposta:', proposalId);
+            }}
           />
         ))}
       </div>

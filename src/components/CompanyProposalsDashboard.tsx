@@ -9,6 +9,7 @@ import ProposalFilters from "./proposals/ProposalFilters";
 import ProposalCard from "./proposals/ProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import ProposalTabs from "./proposals/ProposalTabs";
+import AIProposalInsights from "./ai/AIProposalInsights";
 
 export default function CompanyProposalsDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -178,6 +179,8 @@ export default function CompanyProposalsDashboard() {
           />
         </CardContent>
       </Card>
+
+      <AIProposalInsights proposals={proposals} />
 
       <ProposalTabs
         pendingProposals={pendingProposals}

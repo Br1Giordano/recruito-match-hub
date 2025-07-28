@@ -14,7 +14,7 @@ import { Crown } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { MessageCenter } from "../messaging/MessageCenter";
 import { toast } from "@/hooks/use-toast";
-import ContactDataProtection from "@/components/data-protection/ContactDataProtection";
+import ContactDataProtection from "@/components/ContactDataProtection";
 
 interface ProposalCardProps {
   proposal: {

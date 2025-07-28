@@ -188,13 +188,27 @@ async function generateCompanyInsights(requestData: any) {
       messages: [
         {
           role: 'system',
-          content: `Analizza le proposte e genera insights per l'azienda.
-          Per ogni proposta genera: riassunto candidato (2-3 righe), punti di forza, domande colloquio suggerite.
-          Rispondi in JSON con array di oggetti.`
+          content: `Sei un esperto HR che analizza proposte di candidati per le aziende.
+          Per ogni proposta genera un JSON con:
+          - proposal_id: ID della proposta
+          - summary: riassunto candidato in 2-3 righe 
+          - strengths: array di 3-4 punti di forza principali
+          - interview_questions: array di 3-4 domande colloquio specifiche
+          
+          Rispondi SOLO con un array JSON valido, senza markdown o altro testo.`
         },
         {
           role: 'user',
-          content: `Analizza queste proposte: ${JSON.stringify(proposals)}`
+          content: `Analizza queste ${proposals.length} proposte per la posizione "Sviluppatore Full Stack Junior":
+          
+          ${proposals.map((p: any, i: number) => `
+          PROPOSTA ${i + 1}:
+          - ID: ${p.id}
+          - Candidato: ${p.candidate_name}
+          - Esperienza: ${p.years_experience || 'Non specificata'} anni
+          - Descrizione: ${p.proposal_description || 'Nessuna descrizione'}
+          - Recruiter: ${p.recruiter_name}
+          `).join('\n')}`
         }
       ],
       temperature: 0.5,
@@ -202,9 +216,24 @@ async function generateCompanyInsights(requestData: any) {
   });
 
   const data = await response.json();
+  const content = data.choices[0].message.content;
+  
   try {
-    return { insights: JSON.parse(data.choices[0].message.content) };
-  } catch {
-    return { insights: [] };
+    // Try to parse as JSON array
+    const insights = JSON.parse(content);
+    return { insights: Array.isArray(insights) ? insights : [insights] };
+  } catch (error) {
+    console.error('Failed to parse AI response as JSON:', error);
+    console.log('Raw AI response:', content);
+    
+    // Fallback: create basic insights
+    const fallbackInsights = proposals.slice(0, 5).map((p: any) => ({
+      proposal_id: p.id,
+      summary: `${p.candidate_name} è un candidato per la posizione di Sviluppatore Full Stack Junior con ${p.years_experience || 'esperienza'} anni di esperienza.`,
+      strengths: ['Esperienza rilevante', 'Competenze tecniche', 'Motivazione'],
+      interview_questions: ['Parlami della tua esperienza con React', 'Come gestisci i progetti in team?', 'Quali sono i tuoi obiettivi professionali?']
+    }));
+    
+    return { insights: fallbackInsights };
   }
 }

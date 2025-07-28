@@ -65,7 +65,7 @@ export default function CompanyProposalsDashboard() {
     }
 
     setFilteredProposals(filtered);
-  }, [searchTerm, statusFilter, proposals, activeTab, pendingProposals, evaluatingProposals, approvedProposals, otherProposals]);
+  }, [searchTerm, statusFilter, proposals, activeTab]);
 
   const handleDeleteProposal = async (proposalId: string) => {
     if (!isAdmin) return;

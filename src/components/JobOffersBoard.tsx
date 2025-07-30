@@ -35,7 +35,7 @@ export default function JobOffersBoard() {
   const { toast } = useToast();
   const { userProfile } = useAuth();
   const { isAdmin } = useAdminCheck();
-  const { addInterest, checkIfInterested } = useRecruiterJobInterests();
+  const { addInterest, checkIfInterested, interests } = useRecruiterJobInterests();
 
   const fetchJobOffers = async () => {
     setIsLoading(true);
@@ -73,6 +73,12 @@ export default function JobOffersBoard() {
   useEffect(() => {
     let filtered = jobOffers;
 
+    // Se è un recruiter, escludi le offerte già prese in carico
+    if (userProfile?.user_type === 'recruiter' && interests.length > 0) {
+      const interestedJobIds = new Set(interests.map(interest => interest.job_offer_id));
+      filtered = filtered.filter(offer => !interestedJobIds.has(offer.id));
+    }
+
     if (searchTerm) {
       filtered = filtered.filter(
         (offer) =>
@@ -93,7 +99,7 @@ export default function JobOffersBoard() {
     }
 
     setFilteredOffers(filtered);
-  }, [searchTerm, locationFilter, employmentFilter, jobOffers]);
+  }, [searchTerm, locationFilter, employmentFilter, jobOffers, interests, userProfile?.user_type]);
 
   const getCompanyName = (offer: JobOfferWithCompany): string => {
     // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations

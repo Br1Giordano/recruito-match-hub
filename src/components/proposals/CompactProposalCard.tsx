@@ -311,14 +311,14 @@ export default function CompactProposalCard({
 
             {/* Right Column: Unlock Contacts */}
             <div className="flex-shrink-0">
-              {proposal.contact_data_protected && onRequestAccess && (
+              {/* proposal.contact_data_protected && onRequestAccess && (
                 <button
                   onClick={() => onRequestAccess(proposal.id)}
                   className="text-xs text-primary hover:underline flex items-center gap-1"
                 >
                   🔒 Sblocca contatti
                 </button>
-              )}
+              ) */}
             </div>
           </div>
 

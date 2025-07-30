@@ -112,74 +112,28 @@ export const useRecruiterJobInterests = () => {
     if (!user?.email) return false;
 
     try {
-      // Prima controlla se esiste già un interesse per questa offerta
-      const { data: existingInterest, error: checkError } = await supabase
+      // Semplicemente inserisci o aggiorna se esiste già
+      const { error } = await supabase
         .from('recruiter_job_interests')
-        .select('id, status')
-        .eq('recruiter_email', user.email)
-        .eq('job_offer_id', jobOfferId)
-        .single();
+        .upsert({
+          recruiter_email: user.email,
+          job_offer_id: jobOfferId,
+          status: 'interested',
+          notes: notes || null,
+          updated_at: new Date().toISOString(),
+        }, {
+          onConflict: 'recruiter_email,job_offer_id',
+          ignoreDuplicates: false
+        });
 
-      if (checkError && checkError.code !== 'PGRST116') {
-        console.error('Error checking existing interest:', checkError);
+      if (error) {
+        console.error('Error adding job interest:', error);
         toast({
           title: "Errore",
-          description: "Errore durante la verifica dell'interesse",
+          description: "Impossibile prendere in carico l'offerta",
           variant: "destructive",
         });
         return false;
-      }
-
-      // Se esiste già un interesse
-      if (existingInterest) {
-        if (existingInterest.status === 'interested') {
-          toast({
-            title: "Già preso in carico",
-            description: "Hai già preso in carico questa offerta",
-            variant: "destructive",
-          });
-          return false;
-        } else if (existingInterest.status === 'removed') {
-          // Se l'interesse era stato rimosso, lo riattiva
-          const { error: updateError } = await supabase
-            .from('recruiter_job_interests')
-            .update({
-              status: 'interested',
-              notes: notes || null,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', existingInterest.id);
-
-          if (updateError) {
-            console.error('Error updating job interest:', updateError);
-            toast({
-              title: "Errore",
-              description: "Impossibile prendere in carico l'offerta",
-              variant: "destructive",
-            });
-            return false;
-          }
-        }
-      } else {
-        // Se non esiste, crea un nuovo interesse
-        const { error: insertError } = await supabase
-          .from('recruiter_job_interests')
-          .insert({
-            recruiter_email: user.email,
-            job_offer_id: jobOfferId,
-            status: 'interested',
-            notes: notes || null,
-          });
-
-        if (insertError) {
-          console.error('Error adding job interest:', insertError);
-          toast({
-            title: "Errore",
-            description: "Impossibile prendere in carico l'offerta",
-            variant: "destructive",
-          });
-          return false;
-        }
       }
 
       toast({
@@ -205,7 +159,7 @@ export const useRecruiterJobInterests = () => {
     try {
       const { error } = await supabase
         .from('recruiter_job_interests')
-        .update({ status: 'removed' })
+        .update({ status: 'removed', updated_at: new Date().toISOString() })
         .eq('id', interestId);
 
       if (error) {

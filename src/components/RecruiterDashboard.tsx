@@ -1,8 +1,10 @@
 
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecruiterProposals } from "@/hooks/useRecruiterProposals";
+import { useMessages } from "@/hooks/useMessages";
 import ProposalFilters from "./proposals/ProposalFilters";
 import RecruiterProposalCard from "./proposals/RecruiterProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
@@ -17,6 +19,7 @@ export default function RecruiterDashboard() {
   const [filteredProposals, setFilteredProposals] = useState<any[]>([]);
   const { user } = useAuth();
   const { proposals, isLoading } = useRecruiterProposals();
+  const { unreadCount } = useMessages();
 
   useEffect(() => {
     let filtered = proposals;
@@ -68,9 +71,17 @@ export default function RecruiterDashboard() {
             <Send className="h-4 w-4" />
             Le Mie Candidature
           </TabsTrigger>
-          <TabsTrigger value="messages" className="flex items-center gap-2">
+          <TabsTrigger value="messages" className="flex items-center gap-2 relative">
             <MessageCircle className="h-4 w-4" />
             Messaggi
+            {unreadCount > 0 && (
+              <Badge
+                variant="default"
+                className="h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-primary text-primary-foreground animate-pulse"
+              >
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </Badge>
+            )}
           </TabsTrigger>
           <TabsTrigger value="gamification" className="flex items-center gap-2">
             <Trophy className="h-4 w-4" />

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -6,9 +6,11 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Crown, FileText, User, MessageCircle } from "lucide-react";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
+import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import { useRecruiterRating } from "@/hooks/useRecruiterRating";
 import { StarRating } from "@/components/ui/star-rating";
 import CVViewer from "@/components/cv/CVViewer";
+import RecruiterProfileViewModal from "@/components/recruiter/RecruiterProfileViewModal";
 
 interface CompactProposalCardProps {
   proposal: {
@@ -44,13 +46,22 @@ export default function CompactProposalCard({
 }: CompactProposalCardProps) {
   const { rankingInfo } = useRecruiterRanking(proposal.recruiter_email);
   const { rating, fetchRatingByEmail } = useRecruiterRating();
+  const { profile: recruiterProfile, fetchProfileByEmail } = useRecruiterProfileByEmail();
+  const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
   
-  // Fetch rating when recruiter email is available
+  // Fetch rating and profile when recruiter email is available
   React.useEffect(() => {
     if (proposal.recruiter_email) {
       fetchRatingByEmail(proposal.recruiter_email);
     }
   }, [proposal.recruiter_email, fetchRatingByEmail]);
+
+  const handleShowProfile = async () => {
+    if (proposal.recruiter_email) {
+      await fetchProfileByEmail(proposal.recruiter_email);
+      setShowRecruiterProfile(true);
+    }
+  };
 
   const getStatusInfo = (status: string) => {
     switch (status) {
@@ -132,9 +143,12 @@ export default function CompactProposalCard({
                 </Avatar>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium">
+                    <button
+                      onClick={handleShowProfile}
+                      className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                    >
                       {proposal.recruiter_name || "Recruiter"}
-                    </span>
+                    </button>
                     {rankingInfo.ranking_label && (
                       <Tooltip>
                         <TooltipTrigger asChild>
@@ -291,6 +305,15 @@ export default function CompactProposalCard({
           </div>
         </CardContent>
       </Card>
+      
+      {/* Recruiter Profile Modal */}
+      {recruiterProfile && (
+        <RecruiterProfileViewModal
+          open={showRecruiterProfile}
+          onOpenChange={setShowRecruiterProfile}
+          profile={recruiterProfile}
+        />
+      )}
     </TooltipProvider>
   );
 }

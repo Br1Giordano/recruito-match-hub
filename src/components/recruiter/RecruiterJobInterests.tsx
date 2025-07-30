@@ -7,6 +7,7 @@ import { useRecruiterJobInterests } from "@/hooks/useRecruiterJobInterests";
 import { MapPin, Building2, Euro, Clock, Trash2 } from "lucide-react";
 import JobOfferDetailsDialog from "../JobOfferDetailsDialog";
 import ProposalFormModal from "../ProposalFormModal";
+import CompanyProfileViewModal from "../company/CompanyProfileViewModal";
 import { Database } from "@/integrations/supabase/types";
 
 type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
@@ -20,6 +21,8 @@ export const RecruiterJobInterests = () => {
   const { interests, loading, removeInterest, refetch } = useRecruiterJobInterests();
   const [selectedJobOffer, setSelectedJobOffer] = useState<JobOfferWithCompany | null>(null);
   const [showProposalForm, setShowProposalForm] = useState(false);
+  const [showCompanyProfile, setShowCompanyProfile] = useState(false);
+  const [selectedCompanyEmail, setSelectedCompanyEmail] = useState<string | null>(null);
 
   // Funzione per convertire i dati del hook al tipo JobOfferWithCompany
   const convertToJobOfferWithCompany = (jobOffer: any): JobOfferWithCompany => {
@@ -56,6 +59,11 @@ export const RecruiterJobInterests = () => {
     setShowProposalForm(false);
     setSelectedJobOffer(null);
     refetch(); // Ricarica le offerte di interesse
+  };
+
+  const handleCompanyClick = (companyEmail: string) => {
+    setSelectedCompanyEmail(companyEmail);
+    setShowCompanyProfile(true);
   };
 
   const getEmploymentTypeText = (type: string) => {
@@ -156,7 +164,12 @@ export const RecruiterJobInterests = () => {
                     {jobOffer.company_name && (
                       <div className="flex items-center gap-2 text-muted-foreground mt-1">
                         <Building2 className="h-4 w-4" />
-                        <span>{jobOffer.company_name}</span>
+                        <button
+                          onClick={() => handleCompanyClick(jobOffer.contact_email)}
+                          className="hover:text-primary hover:underline transition-colors"
+                        >
+                          {jobOffer.company_name}
+                        </button>
                       </div>
                     )}
                   </div>
@@ -260,6 +273,13 @@ export const RecruiterJobInterests = () => {
           jobOffer={selectedJobOffer}
         />
       )}
+
+      {/* Modal per visualizzare il profilo aziendale */}
+      <CompanyProfileViewModal
+        open={showCompanyProfile}
+        onOpenChange={setShowCompanyProfile}
+        companyEmail={selectedCompanyEmail || undefined}
+      />
     </div>
   );
 };

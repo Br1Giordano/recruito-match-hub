@@ -1,3 +1,4 @@
+import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -5,6 +6,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Crown, FileText, User, MessageCircle } from "lucide-react";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
+import { useRecruiterRating } from "@/hooks/useRecruiterRating";
+import { StarRating } from "@/components/ui/star-rating";
 import CVViewer from "@/components/cv/CVViewer";
 
 interface CompactProposalCardProps {
@@ -40,6 +43,14 @@ export default function CompactProposalCard({
   onContactRecruiter
 }: CompactProposalCardProps) {
   const { rankingInfo } = useRecruiterRanking(proposal.recruiter_email);
+  const { rating, fetchRatingByEmail } = useRecruiterRating();
+  
+  // Fetch rating when recruiter email is available
+  React.useEffect(() => {
+    if (proposal.recruiter_email) {
+      fetchRatingByEmail(proposal.recruiter_email);
+    }
+  }, [proposal.recruiter_email, fetchRatingByEmail]);
 
   const getStatusInfo = (status: string) => {
     switch (status) {
@@ -119,22 +130,32 @@ export default function CompactProposalCard({
                     {proposal.recruiter_name?.charAt(0) || "R"}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium">
-                    {proposal.recruiter_name || "Recruiter"}
-                  </span>
-                  {rankingInfo.ranking_label && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 flex items-center gap-1 cursor-help text-xs px-1 py-0">
-                          <Crown className="h-2 w-2" />
-                          {rankingInfo.ranking_label}
-                        </Badge>
-                      </TooltipTrigger>
-                      <TooltipContent side="top" className="text-xs max-w-[200px]">
-                        Tra i migliori {rankingInfo.ranking_label === 'Top 5' ? '5' : rankingInfo.ranking_label === 'Top 10' ? '10' : '25'} recruiter
-                      </TooltipContent>
-                    </Tooltip>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium">
+                      {proposal.recruiter_name || "Recruiter"}
+                    </span>
+                    {rankingInfo.ranking_label && (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 flex items-center gap-1 cursor-help text-xs px-1 py-0">
+                            <Crown className="h-2 w-2" />
+                            {rankingInfo.ranking_label}
+                          </Badge>
+                        </TooltipTrigger>
+                        <TooltipContent side="top" className="text-xs max-w-[200px]">
+                          Tra i migliori {rankingInfo.ranking_label === 'Top 5' ? '5' : rankingInfo.ranking_label === 'Top 10' ? '10' : '25'} recruiter
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
+                  </div>
+                  {rating.totalReviews > 0 && (
+                    <StarRating 
+                      rating={rating.averageRating} 
+                      totalReviews={rating.totalReviews}
+                      showNumber={true}
+                      size={12}
+                    />
                   )}
                 </div>
               </div>

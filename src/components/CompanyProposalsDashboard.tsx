@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProposals } from "@/hooks/useProposals";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import ProposalFilters from "./proposals/ProposalFilters";
-import ProposalCard from "./proposals/ProposalCard";
+import CompactProposalCard from "./proposals/CompactProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import ProposalTabs from "./proposals/ProposalTabs";
 import AIProposalInsights from "./ai/AIProposalInsights";
@@ -146,15 +146,12 @@ export default function CompanyProposalsDashboard() {
     }
 
     return (
-      <div className="grid gap-6">
+      <div className="grid gap-4">
         {proposalsToRender.map((proposal) => (
-          <ProposalCard
+          <CompactProposalCard
             key={proposal.id}
             proposal={proposal}
-            userType="company"
             onStatusUpdate={updateProposalStatus}
-            onSendResponse={handleSendResponse}
-            onDelete={isAdmin ? handleDeleteProposal : undefined}
             onRequestAccess={(proposalId) => {
               // TODO: Implementare richiesta di accesso ai dati
               console.log('Richiesta accesso per proposta:', proposalId);

@@ -23,7 +23,10 @@ export default function ProposalTabs({
     <Tabs defaultValue="pending" onValueChange={onTabChange} className="w-full">
       <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="pending" className="flex items-center gap-2">
-          Nuove Proposte
+          <span className="flex items-center gap-2">
+            📨 <span className="hidden sm:inline">Da visionare</span>
+            <span className="sm:hidden">Nuove</span>
+          </span>
           {pendingProposals.length > 0 && (
             <Badge variant="secondary" className="ml-1">
               {pendingProposals.length}
@@ -31,23 +34,32 @@ export default function ProposalTabs({
           )}
         </TabsTrigger>
         <TabsTrigger value="interested" className="flex items-center gap-2">
-          In Valutazione
+          <span className="flex items-center gap-2">
+            🔍 <span className="hidden sm:inline">In esame</span>
+            <span className="sm:hidden">Esame</span>
+          </span>
           {interestedProposals.length > 0 && (
-            <Badge variant="default" className="ml-1 bg-blue-500">
+            <Badge variant="default" className="ml-1 bg-amber-500">
               {interestedProposals.length}
             </Badge>
           )}
         </TabsTrigger>
         <TabsTrigger value="approved" className="flex items-center gap-2">
-          Approvate
+          <span className="flex items-center gap-2">
+            ⭐ <span className="hidden sm:inline">Short-list</span>
+            <span className="sm:hidden">Short</span>
+          </span>
           {approvedProposals.length > 0 && (
-            <Badge variant="default" className="ml-1 bg-green-500">
+            <Badge variant="default" className="ml-1 bg-emerald-500">
               {approvedProposals.length}
             </Badge>
           )}
         </TabsTrigger>
         <TabsTrigger value="other" className="flex items-center gap-2">
-          Altre
+          <span className="flex items-center gap-2">
+            🗑️ <span className="hidden sm:inline">Chiuse</span>
+            <span className="sm:hidden">Chiuse</span>
+          </span>
           {otherProposals.length > 0 && (
             <Badge variant="outline" className="ml-1">
               {otherProposals.length}

@@ -8,9 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase, Trash2, Shield, Eye } from "lucide-react";
+import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase, Trash2, Shield, Eye, Heart } from "lucide-react";
 import ProposalFormModal from "./ProposalFormModal";
 import JobOfferDetailsDialog from "./JobOfferDetailsDialog";
+import { useRecruiterJobInterests } from "@/hooks/useRecruiterJobInterests";
 import { Database } from "@/integrations/supabase/types";
 
 type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
@@ -34,6 +35,7 @@ export default function JobOffersBoard() {
   const { toast } = useToast();
   const { userProfile } = useAuth();
   const { isAdmin } = useAdminCheck();
+  const { addInterest, checkIfInterested } = useRecruiterJobInterests();
 
   const fetchJobOffers = async () => {
     setIsLoading(true);
@@ -119,6 +121,25 @@ export default function JobOffersBoard() {
       title: "Successo",
       description: "Proposta inviata con successo!",
     });
+  };
+
+  const handleTakeInterest = async (offer: JobOfferWithCompany) => {
+    if (!userProfile || userProfile.user_type !== 'recruiter') {
+      toast({
+        title: "Errore",
+        description: "Devi essere autenticato come recruiter per prendere in carico un'offerta",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const success = await addInterest(offer.id);
+    if (success) {
+      toast({
+        title: "Offerta presa in carico",
+        description: "L'offerta è stata aggiunta alle tue offerte di interesse. Ora puoi inviarle candidati dalla sezione dedicata.",
+      });
+    }
   };
 
   const handleShowDetails = (offer: JobOfferWithCompany) => {
@@ -356,12 +377,12 @@ export default function JobOffersBoard() {
                         Vedi Dettagli
                       </Button>
                       <Button 
-                        onClick={() => handleSendProposal(offer)}
+                        onClick={() => handleTakeInterest(offer)}
                         disabled={!userProfile || userProfile.user_type !== 'recruiter'}
-                        className="bg-recruito-blue hover:bg-recruito-blue/90"
+                        className="bg-green-600 hover:bg-green-700"
                       >
-                        <Send className="h-4 w-4 mr-2" />
-                        Invia Candidato
+                        <Heart className="h-4 w-4 mr-2" />
+                        Prendi in Carico
                       </Button>
                       {isAdmin && (
                         <Button 
@@ -406,7 +427,7 @@ export default function JobOffersBoard() {
           }}
           jobOffer={selectedOfferForDetails}
           onSendProposal={handleSendProposal}
-          canSendProposal={userProfile?.user_type === 'recruiter'}
+          canSendProposal={false}
         />
       )}
     </div>

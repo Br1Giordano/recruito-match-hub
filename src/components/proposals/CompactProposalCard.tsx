@@ -89,137 +89,110 @@ export default function CompactProposalCard({
     <TooltipProvider>
       <Card className={`w-full border-l-4 ${statusInfo.borderColor} hover:shadow-md transition-shadow`}>
         <CardContent className="p-4 space-y-4">
-          {/* Header: Job Title - More Prominent */}
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <h3 className="font-semibold text-lg leading-tight mb-2">
-                {proposal.job_offers?.title || "Posizione non specificata"}
-              </h3>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Badge className={`${statusInfo.color} cursor-help`}>
-                    {statusInfo.text}
-                  </Badge>
-                </TooltipTrigger>
-                <TooltipContent side="top" className="text-xs">
-                  {statusInfo.tooltip}
-                </TooltipContent>
-              </Tooltip>
-            </div>
+          {/* Header: Status Chip + Job Title */}
+          <div className="flex items-center gap-3">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge className={`${statusInfo.color} cursor-help`}>
+                  {statusInfo.text}
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="text-xs">
+                {statusInfo.tooltip}
+              </TooltipContent>
+            </Tooltip>
+            <h3 className="font-bold text-base leading-tight">
+              {proposal.job_offers?.title || "Posizione non specificata"}
+            </h3>
           </div>
 
-          {/* Candidate Info */}
-          <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-md">
-            <Avatar className="h-10 w-10">
-              <AvatarFallback className="text-sm bg-primary/10 text-primary">
-                <User className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="font-medium text-base">
+          {/* Body: Two Columns */}
+          <div className="flex items-start justify-between gap-4">
+            {/* Left Column: Recruiter + Candidate */}
+            <div className="flex-1 space-y-3">
+              {/* Recruiter Info */}
+              <div className="flex items-center gap-2">
+                <Avatar className="h-8 w-8">
+                  <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
+                    {proposal.recruiter_name?.charAt(0) || "R"}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">
+                    {proposal.recruiter_name || "Recruiter"}
+                  </span>
+                  {rankingInfo.ranking_label && (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 flex items-center gap-1 cursor-help text-xs px-1 py-0">
+                          <Crown className="h-2 w-2" />
+                          {rankingInfo.ranking_label}
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent side="top" className="text-xs max-w-[200px]">
+                        Tra i migliori {rankingInfo.ranking_label === 'Top 5' ? '5' : rankingInfo.ranking_label === 'Top 10' ? '10' : '25'} recruiter
+                      </TooltipContent>
+                    </Tooltip>
+                  )}
+                </div>
+              </div>
+              
+              {/* Candidate Info */}
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">
                   {formatCandidateName(proposal.candidate_name)}
                 </span>
-                {hasCv && (
-                  <CVViewer 
-                    cvUrl={cvUrl}
-                    candidateName={proposal.candidate_name}
-                    trigger={
-                      <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
-                        <FileText className="h-3 w-3 mr-1" />
-                        CV
-                      </Button>
-                    }
-                  />
-                )}
+                <Badge 
+                  variant={hasCv ? "default" : "outline"} 
+                  className={`text-xs ${hasCv ? "bg-blue-100 text-blue-800 border-blue-200" : "text-gray-600"}`}
+                >
+                  {hasCv ? "📄 CV" : "Nessun CV"}
+                </Badge>
               </div>
-              {proposal.candidate_description && (
-                <p className="text-sm text-muted-foreground line-clamp-2">
-                  {proposal.candidate_description}
-                </p>
+            </div>
+
+            {/* Right Column: Unlock Contacts */}
+            <div className="flex-shrink-0">
+              {proposal.contact_data_protected && onRequestAccess && (
+                <button
+                  onClick={() => onRequestAccess(proposal.id)}
+                  className="text-xs text-primary hover:underline flex items-center gap-1"
+                >
+                  🔒 Sblocca contatti
+                </button>
               )}
             </div>
           </div>
 
-          {/* Recruiter Info */}
-          <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs bg-blue-100 text-blue-600">
-                {proposal.recruiter_name?.charAt(0) || "R"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium truncate">
-                  {proposal.recruiter_name || "Recruiter"}
-                </span>
-                {rankingInfo.ranking_label && (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Badge className="bg-yellow-100 text-yellow-800 border-yellow-300 flex items-center gap-1 cursor-help text-xs px-1 py-0">
-                        <Crown className="h-2 w-2" />
-                        {rankingInfo.ranking_label}
-                      </Badge>
-                    </TooltipTrigger>
-                    <TooltipContent side="top" className="text-xs max-w-[200px]">
-                      Tra i migliori {rankingInfo.ranking_label === 'Top 5' ? '5' : rankingInfo.ranking_label === 'Top 10' ? '10' : '25'} recruiter
-                    </TooltipContent>
-                  </Tooltip>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Highlights - Hidden on mobile */}
-          <div className="hidden sm:flex items-center gap-4 text-sm text-muted-foreground">
-            {proposal.years_experience && (
-              <span>Esp: {proposal.years_experience}a</span>
-            )}
-            {proposal.expected_salary && (
-              <span>RAL: €{(proposal.expected_salary/1000).toFixed(0)}k</span>
-            )}
-            {proposal.availability_weeks && (
-              <span>Disp: {proposal.availability_weeks}sett</span>
-            )}
-          </div>
-
-          {/* CV Badge */}
-          <div className="flex items-center justify-between">
-            <Badge variant={hasCv ? "default" : "outline"} className="text-xs">
-              {hasCv ? "📄 CV" : "🔒 Nessun CV"}
-            </Badge>
-          </div>
-
           {/* Actions Footer */}
-          <div className="flex flex-wrap gap-2 pt-2">
+          <div className="flex gap-2 pt-2">
             {proposal.status === "pending" && onStatusUpdate && (
               <>
                 <Button
                   onClick={() => onStatusUpdate(proposal.id, "under_review")}
                   variant="default"
                   size="sm"
-                  className="flex-1 sm:flex-initial text-xs"
+                  className="text-xs"
                 >
                   Valuta
                 </Button>
-                <div className="hidden sm:flex gap-2">
-                  <Button
-                    onClick={() => onStatusUpdate(proposal.id, "approved")}
-                    variant="outline"
-                    size="sm"
-                    className="text-xs"
-                  >
-                    Short-lista
-                  </Button>
-                  <Button
-                    onClick={() => onStatusUpdate(proposal.id, "rejected")}
-                    variant="outline"
-                    size="sm"
-                    className="text-xs text-red-600 border-red-300 hover:bg-red-50"
-                  >
-                    Scarta
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "approved")}
+                  variant="secondary"
+                  size="sm"
+                  className="text-xs"
+                >
+                  Short-lista
+                </Button>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "rejected")}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  Scarta
+                </Button>
               </>
             )}
 
@@ -229,31 +202,19 @@ export default function CompactProposalCard({
                   onClick={() => onStatusUpdate(proposal.id, "approved")}
                   variant="default"
                   size="sm"
-                  className="flex-1 sm:flex-initial text-xs"
+                  className="text-xs"
                 >
                   Short-lista
                 </Button>
-                <div className="hidden sm:block">
-                  <Button
-                    onClick={() => onStatusUpdate(proposal.id, "rejected")}
-                    variant="outline"
-                    size="sm"
-                    className="text-xs text-red-600 border-red-300 hover:bg-red-50"
-                  >
-                    Scarta
-                  </Button>
-                </div>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "rejected")}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  Scarta
+                </Button>
               </>
-            )}
-
-            {/* Unlock contacts - Text link */}
-            {proposal.contact_data_protected && onRequestAccess && (
-              <button
-                onClick={() => onRequestAccess(proposal.id)}
-                className="text-xs text-primary hover:underline ml-auto"
-              >
-                Sblocca contatti
-              </button>
             )}
           </div>
         </CardContent>

@@ -4,13 +4,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Crown, FileText, User, MessageCircle } from "lucide-react";
+import { Crown, FileText, User, MessageCircle, Star } from "lucide-react";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import { useRecruiterRating } from "@/hooks/useRecruiterRating";
 import { StarRating } from "@/components/ui/star-rating";
 import CVViewer from "@/components/cv/CVViewer";
 import RecruiterProfileViewModal from "@/components/recruiter/RecruiterProfileViewModal";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CompactProposalCardProps {
   proposal: {
@@ -36,18 +41,25 @@ interface CompactProposalCardProps {
   onStatusUpdate?: (proposalId: string, status: string) => void;
   onRequestAccess?: (proposalId: string) => void;
   onContactRecruiter?: (proposalId: string, recruiterEmail: string, recruiterName: string) => void;
+  onRecruiterReviewed?: () => void;
 }
 
 export default function CompactProposalCard({ 
   proposal, 
   onStatusUpdate, 
   onRequestAccess,
-  onContactRecruiter
+  onContactRecruiter,
+  onRecruiterReviewed
 }: CompactProposalCardProps) {
   const { rankingInfo } = useRecruiterRanking(proposal.recruiter_email);
   const { rating, fetchRatingByEmail } = useRecruiterRating();
   const { profile: recruiterProfile, fetchProfileByEmail } = useRecruiterProfileByEmail();
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
+  const [showReviewDialog, setShowReviewDialog] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState("");
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const { toast } = useToast();
   
   // Fetch rating and profile when recruiter email is available
   React.useEffect(() => {
@@ -60,6 +72,57 @@ export default function CompactProposalCard({
     if (proposal.recruiter_email) {
       await fetchProfileByEmail(proposal.recruiter_email);
       setShowRecruiterProfile(true);
+    }
+  };
+
+  const handleSubmitReview = async () => {
+    if (!proposal.recruiter_email || reviewRating === 0) {
+      toast({
+        title: "Errore",
+        description: "Seleziona una valutazione prima di inviare.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSubmittingReview(true);
+    try {
+      const { error } = await supabase
+        .from('recruiter_reviews')
+        .insert({
+          recruiter_email: proposal.recruiter_email,
+          company_email: proposal.job_offers?.company_name || '',
+          rating: reviewRating,
+          review_text: reviewComment.trim() || null,
+          proposal_id: proposal.id
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Recensione inviata",
+        description: "Grazie per aver recensito questo recruiter!"
+      });
+
+      setShowReviewDialog(false);
+      setReviewRating(0);
+      setReviewComment("");
+      
+      // Refresh rating data
+      if (proposal.recruiter_email) {
+        fetchRatingByEmail(proposal.recruiter_email);
+      }
+      
+      onRecruiterReviewed?.();
+    } catch (error) {
+      console.error('Error submitting review:', error);
+      toast({
+        title: "Errore",
+        description: "Errore nell'invio della recensione. Riprova.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmittingReview(false);
     }
   };
 
@@ -302,6 +365,19 @@ export default function CompactProposalCard({
                 Contatta recruiter
               </Button>
             )}
+
+            {/* Review recruiter button for approved proposals */}
+            {proposal.status === "approved" && proposal.recruiter_email && (
+              <Button
+                onClick={() => setShowReviewDialog(true)}
+                variant="outline"
+                size="sm"
+                className="text-xs bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100"
+              >
+                <Star className="h-3 w-3 mr-1" />
+                Recensisci
+              </Button>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -314,6 +390,64 @@ export default function CompactProposalCard({
           profile={recruiterProfile}
         />
       )}
+
+      {/* Review Dialog */}
+      <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Recensisci {proposal.recruiter_name || "Recruiter"}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="rating">Valutazione *</Label>
+              <div className="flex gap-1 mt-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setReviewRating(star)}
+                    className={`p-1 transition-colors ${
+                      star <= reviewRating 
+                        ? 'text-yellow-400 hover:text-yellow-500' 
+                        : 'text-gray-300 hover:text-gray-400'
+                    }`}
+                  >
+                    <Star className={`h-6 w-6 ${star <= reviewRating ? 'fill-current' : ''}`} />
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="comment">Commento (opzionale)</Label>
+              <Textarea
+                id="comment"
+                placeholder="Condividi la tua esperienza con questo recruiter..."
+                value={reviewComment}
+                onChange={(e) => setReviewComment(e.target.value)}
+                className="mt-2"
+                rows={3}
+              />
+            </div>
+
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setShowReviewDialog(false)}
+                disabled={isSubmittingReview}
+              >
+                Annulla
+              </Button>
+              <Button
+                onClick={handleSubmitReview}
+                disabled={isSubmittingReview || reviewRating === 0}
+              >
+                {isSubmittingReview ? "Invio..." : "Invia recensione"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   );
 }

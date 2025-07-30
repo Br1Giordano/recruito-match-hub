@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Crown, FileText, User, MessageCircle, Star } from "lucide-react";
+import { Crown, FileText, User, MessageCircle, Star, CheckCircle, XCircle } from "lucide-react";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import { useRecruiterRating } from "@/hooks/useRecruiterRating";
@@ -133,28 +133,48 @@ export default function CompactProposalCard({
           color: "bg-indigo-100 text-indigo-800", 
           text: "Da visionare",
           borderColor: "border-l-indigo-600",
-          tooltip: "Candidatura mai aperta"
+          tooltip: "Candidatura mai aperta",
+          icon: null
         };
       case "under_review":
         return { 
           color: "bg-amber-100 text-amber-800", 
           text: "In esame",
           borderColor: "border-l-amber-600",
-          tooltip: "Screening in corso"
+          tooltip: "Screening in corso",
+          icon: null
         };
       case "approved":
         return { 
           color: "bg-emerald-100 text-emerald-800", 
           text: "Short-list",
           borderColor: "border-l-emerald-600",
-          tooltip: "Pronti al colloquio"
+          tooltip: "Pronti al colloquio",
+          icon: null
+        };
+      case "rejected":
+        return { 
+          color: "bg-red-100 text-red-800", 
+          text: "Chiuse - Esito negativo",
+          borderColor: "border-l-red-600",
+          tooltip: "Candidatura non andata a buon fine",
+          icon: <XCircle className="h-3 w-3" />
+        };
+      case "hired":
+        return { 
+          color: "bg-green-100 text-green-800", 
+          text: "Chiuse - Esito positivo",
+          borderColor: "border-l-green-600",
+          tooltip: "Candidato assunto con successo",
+          icon: <CheckCircle className="h-3 w-3" />
         };
       default:
         return { 
           color: "bg-gray-100 text-gray-800", 
           text: "Chiuse",
           borderColor: "border-l-gray-400",
-          tooltip: "Rifiutate o ritirate"
+          tooltip: "Candidatura conclusa",
+          icon: null
         };
     }
   };
@@ -180,7 +200,8 @@ export default function CompactProposalCard({
           <div className="flex items-center gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Badge className={`${statusInfo.color} cursor-help`}>
+                <Badge className={`${statusInfo.color} cursor-help flex items-center gap-1`}>
+                  {statusInfo.icon}
                   {statusInfo.text}
                 </Badge>
               </TooltipTrigger>
@@ -367,7 +388,7 @@ export default function CompactProposalCard({
             )}
 
             {/* Review recruiter button for closed proposals */}
-            {proposal.status === "rejected" && proposal.recruiter_email && (
+            {(proposal.status === "rejected" || proposal.status === "hired") && proposal.recruiter_email && (
               <Button
                 onClick={() => setShowReviewDialog(true)}
                 variant="outline"

@@ -9,8 +9,7 @@ import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RecruiterGamificationDashboard from "./gamification/RecruiterGamificationDashboard";
 import { RecruiterMessagesSection } from "./messaging/RecruiterMessagesSection";
-import { RecruiterJobInterests } from "./recruiter/RecruiterJobInterests";
-import { Target, Trophy, Send, MessageCircle, Heart } from "lucide-react";
+import { Target, Trophy, Send, MessageCircle } from "lucide-react";
 
 export default function RecruiterDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -64,14 +63,10 @@ export default function RecruiterDashboard() {
       </div>
 
       <Tabs defaultValue="proposals" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="proposals" className="flex items-center gap-2">
             <Send className="h-4 w-4" />
             Le Mie Candidature
-          </TabsTrigger>
-          <TabsTrigger value="interests" className="flex items-center gap-2">
-            <Heart className="h-4 w-4" />
-            Offerte di Interesse
           </TabsTrigger>
           <TabsTrigger value="messages" className="flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />
@@ -106,9 +101,6 @@ export default function RecruiterDashboard() {
           </div>
         </TabsContent>
 
-        <TabsContent value="interests">
-          <RecruiterJobInterests />
-        </TabsContent>
 
         <TabsContent value="messages">
           <RecruiterMessagesSection />

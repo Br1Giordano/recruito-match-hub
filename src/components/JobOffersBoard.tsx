@@ -11,6 +11,7 @@ import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase, Trash2, Shield, Eye, Heart } from "lucide-react";
 import ProposalFormModal from "./ProposalFormModal";
 import JobOfferDetailsDialog from "./JobOfferDetailsDialog";
+import CompanyProfileViewModal from "./company/CompanyProfileViewModal";
 import { useRecruiterJobInterests } from "@/hooks/useRecruiterJobInterests";
 import { Database } from "@/integrations/supabase/types";
 
@@ -32,6 +33,9 @@ export default function JobOffersBoard() {
   const [showProposalModal, setShowProposalModal] = useState(false);
   const [selectedOfferForDetails, setSelectedOfferForDetails] = useState<JobOfferWithCompany | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showCompanyProfile, setShowCompanyProfile] = useState(false);
+  const [selectedCompanyEmail, setSelectedCompanyEmail] = useState<string | null>(null);
+  const [selectedCompanyRegistrationId, setSelectedCompanyRegistrationId] = useState<string | null>(null);
   const { toast } = useToast();
   const { userProfile } = useAuth();
   const { isAdmin } = useAdminCheck();
@@ -151,6 +155,14 @@ export default function JobOffersBoard() {
   const handleShowDetails = (offer: JobOfferWithCompany) => {
     setSelectedOfferForDetails(offer);
     setShowDetailsDialog(true);
+  };
+
+  const handleShowCompanyProfile = (offer: JobOfferWithCompany) => {
+    if (offer.contact_email) {
+      setSelectedCompanyEmail(offer.contact_email);
+      setSelectedCompanyRegistrationId(offer.company_registrations?.id || null);
+      setShowCompanyProfile(true);
+    }
   };
 
   const handleDeleteOffer = async (offerId: string, offerTitle: string) => {
@@ -315,10 +327,13 @@ export default function JobOffersBoard() {
                       )}
                     </CardTitle>
                     <CardDescription className="flex items-center gap-4">
-                      <span className="flex items-center gap-1">
+                      <button 
+                        onClick={() => handleShowCompanyProfile(offer)}
+                        className="flex items-center gap-1 text-primary hover:text-primary/80 hover:underline transition-colors cursor-pointer"
+                      >
                         <Building2 className="h-4 w-4" />
                         {getCompanyName(offer)}
-                      </span>
+                      </button>
                       {isAdmin && offer.contact_email && (
                         <span className="text-xs bg-gray-100 px-2 py-1 rounded">
                           {offer.contact_email}
@@ -409,6 +424,14 @@ export default function JobOffersBoard() {
           ))
         )}
       </div>
+
+      {/* Company Profile Modal */}
+      <CompanyProfileViewModal
+        open={showCompanyProfile}
+        onOpenChange={setShowCompanyProfile}
+        companyEmail={selectedCompanyEmail || undefined}
+        companyRegistrationId={selectedCompanyRegistrationId || undefined}
+      />
 
       {/* Proposal Modal */}
       {showProposalModal && selectedOffer && (

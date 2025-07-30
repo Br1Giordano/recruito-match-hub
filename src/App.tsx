@@ -39,6 +39,11 @@ const queryClient = new QueryClient();
 // Cambia questo valore a 'false' per disattivare la modalità manutenzione
 const MAINTENANCE_MODE = false;
 
+// 🤖 FUNZIONALITÀ AI 🤖
+// Cambia questo valore a 'false' per disattivare tutte le funzionalità AI
+// Cambia questo valore a 'true' per riattivare le funzionalità AI
+export const AI_FEATURES_ENABLED = true;
+
 const App = () => {
   // Se la modalità manutenzione è attiva, mostra solo la pagina di manutenzione
   if (MAINTENANCE_MODE) {

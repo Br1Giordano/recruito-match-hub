@@ -10,6 +10,7 @@ import CompactProposalCard from "./proposals/CompactProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import ProposalTabs from "./proposals/ProposalTabs";
 import AIProposalInsights from "./ai/AIProposalInsights";
+import { AI_FEATURES_ENABLED } from "@/App";
 import { MessageCenter } from "./messaging/MessageCenter";
 import { toast } from "sonner";
 
@@ -193,7 +194,7 @@ export default function CompanyProposalsDashboard() {
         </CardContent>
       </Card>
 
-      <AIProposalInsights proposals={proposals} />
+      {AI_FEATURES_ENABLED && <AIProposalInsights proposals={proposals} />}
 
       <ProposalTabs
         pendingProposals={pendingProposals}

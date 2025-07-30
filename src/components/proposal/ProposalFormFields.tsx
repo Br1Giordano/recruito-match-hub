@@ -8,6 +8,7 @@ import { useFileUpload } from "@/hooks/useFileUpload";
 import { useAIAssistant } from "@/hooks/useAIAssistant";
 import { Sparkles, Target, FileText, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
+import { AI_FEATURES_ENABLED } from "@/App";
 
 interface ProposalFormFieldsProps {
   formData: {
@@ -42,8 +43,8 @@ export default function ProposalFormFields({ formData, onInputChange, jobOffer }
       const url = await uploadFile(file, 'candidate-cvs');
       if (url) {
         onInputChange('candidate_cv_url', url);
-        // Trigger AI analysis if CV is uploaded
-        if (file.type === 'application/pdf' || file.type.includes('text')) {
+        // Trigger AI analysis if CV is uploaded and AI is enabled
+        if (AI_FEATURES_ENABLED && (file.type === 'application/pdf' || file.type.includes('text'))) {
           await analyzeUploadedCV(file);
         }
       }
@@ -250,66 +251,66 @@ export default function ProposalFormFields({ formData, onInputChange, jobOffer }
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Descrizione della Proposta</h3>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="proposal_description">Descrizione Proposta</Label>
-            {cvAnalysis && jobOffer && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleAISuggestion}
-                disabled={isAILoading}
-                className="text-xs"
-              >
-                {isAILoading ? (
-                  <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                ) : (
-                  <Sparkles className="h-3 w-3 mr-1" />
-                )}
-                Migliora con AI
-              </Button>
-            )}
-          </div>
-          
-          {matchScore && (
-            <div className="flex items-center gap-2 text-sm">
-              <Target className="h-4 w-4" />
-              <span>Match Score: </span>
-              <Badge variant={matchScore.score >= 80 ? "default" : matchScore.score >= 60 ? "secondary" : "outline"}>
-                {matchScore.score}%
-              </Badge>
-              <span className="text-muted-foreground">{matchScore.reasoning}</span>
-            </div>
-          )}
-          
-          {cvAnalysis && (
-            <div className="bg-muted/50 p-3 rounded-lg border space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <FileText className="h-4 w-4" />
-                Analisi CV Automatica
-              </div>
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <span className="font-medium">Seniority:</span> {cvAnalysis.seniority_level}
-                </div>
-                <div>
-                  <span className="font-medium">Esperienza:</span> {cvAnalysis.experience_years} anni
-                </div>
-              </div>
-              {cvAnalysis.skills && (
-                <div className="space-y-1">
-                  <span className="text-xs font-medium">Competenze principali:</span>
-                  <div className="flex flex-wrap gap-1">
-                    {cvAnalysis.skills.slice(0, 5).map((skill: string, index: number) => (
-                      <Badge key={index} variant="secondary" className="text-xs">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="proposal_description">Descrizione Proposta</Label>
+              {AI_FEATURES_ENABLED && cvAnalysis && jobOffer && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAISuggestion}
+                  disabled={isAILoading}
+                  className="text-xs"
+                >
+                  {isAILoading ? (
+                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                  ) : (
+                    <Sparkles className="h-3 w-3 mr-1" />
+                  )}
+                  Migliora con AI
+                </Button>
               )}
             </div>
-          )}
+          
+            {AI_FEATURES_ENABLED && matchScore && (
+              <div className="flex items-center gap-2 text-sm">
+                <Target className="h-4 w-4" />
+                <span>Match Score: </span>
+                <Badge variant={matchScore.score >= 80 ? "default" : matchScore.score >= 60 ? "secondary" : "outline"}>
+                  {matchScore.score}%
+                </Badge>
+                <span className="text-muted-foreground">{matchScore.reasoning}</span>
+              </div>
+            )}
+          
+            {AI_FEATURES_ENABLED && cvAnalysis && (
+              <div className="bg-muted/50 p-3 rounded-lg border space-y-2">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <FileText className="h-4 w-4" />
+                  Analisi CV Automatica
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="font-medium">Seniority:</span> {cvAnalysis.seniority_level}
+                  </div>
+                  <div>
+                    <span className="font-medium">Esperienza:</span> {cvAnalysis.experience_years} anni
+                  </div>
+                </div>
+                {cvAnalysis.skills && (
+                  <div className="space-y-1">
+                    <span className="text-xs font-medium">Competenze principali:</span>
+                    <div className="flex flex-wrap gap-1">
+                      {cvAnalysis.skills.slice(0, 5).map((skill: string, index: number) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           
           <Textarea
             id="proposal_description"
@@ -319,24 +320,24 @@ export default function ProposalFormFields({ formData, onInputChange, jobOffer }
             className="min-h-[120px]"
           />
           
-          {aiSuggestion && aiSuggestion !== formData.proposal_description && (
-            <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2 text-sm font-medium text-blue-800 mb-2">
-                <Sparkles className="h-4 w-4" />
-                Suggerimento AI
+            {AI_FEATURES_ENABLED && aiSuggestion && aiSuggestion !== formData.proposal_description && (
+              <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                <div className="flex items-center gap-2 text-sm font-medium text-blue-800 mb-2">
+                  <Sparkles className="h-4 w-4" />
+                  Suggerimento AI
+                </div>
+                <p className="text-sm text-blue-700 mb-2">{aiSuggestion}</p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onInputChange('proposal_description', aiSuggestion)}
+                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                >
+                  Usa questo testo
+                </Button>
               </div>
-              <p className="text-sm text-blue-700 mb-2">{aiSuggestion}</p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => onInputChange('proposal_description', aiSuggestion)}
-                className="text-blue-600 border-blue-300 hover:bg-blue-100"
-              >
-                Usa questo testo
-              </Button>
-            </div>
-          )}
+            )}
         </div>
       </div>
 

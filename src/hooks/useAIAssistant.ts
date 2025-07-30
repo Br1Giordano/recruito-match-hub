@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { AI_FEATURES_ENABLED } from '@/App';
 
 interface CVAnalysis {
   skills: string[];
@@ -33,6 +34,10 @@ export const useAIAssistant = () => {
   const { toast } = useToast();
 
   const callAIFunction = async (action: string, data: any) => {
+    if (!AI_FEATURES_ENABLED) {
+      return null;
+    }
+    
     try {
       setIsLoading(true);
       

@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Crown, FileText, User } from "lucide-react";
+import { Crown, FileText, User, MessageCircle } from "lucide-react";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
 import CVViewer from "@/components/cv/CVViewer";
 
@@ -30,12 +30,14 @@ interface CompactProposalCardProps {
   };
   onStatusUpdate?: (proposalId: string, status: string) => void;
   onRequestAccess?: (proposalId: string) => void;
+  onContactRecruiter?: (proposalId: string, recruiterEmail: string, recruiterName: string) => void;
 }
 
 export default function CompactProposalCard({ 
   proposal, 
   onStatusUpdate, 
-  onRequestAccess 
+  onRequestAccess,
+  onContactRecruiter
 }: CompactProposalCardProps) {
   const { rankingInfo } = useRecruiterRanking(proposal.recruiter_email);
 
@@ -159,6 +161,33 @@ export default function CompactProposalCard({
                   </Badge>
                 )}
               </div>
+              
+              {/* Candidate Details - Show when approved */}
+              {proposal.status === "approved" && (
+                <div className="mt-2 p-2 bg-muted/20 rounded-md space-y-1">
+                  {proposal.candidate_description && (
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Profilo:</strong> {proposal.candidate_description}
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+                    {proposal.years_experience && (
+                      <span><strong>Esperienza:</strong> {proposal.years_experience} anni</span>
+                    )}
+                    {proposal.expected_salary && (
+                      <span><strong>RAL:</strong> €{(proposal.expected_salary/1000).toFixed(0)}k</span>
+                    )}
+                    {proposal.availability_weeks && (
+                      <span><strong>Disponibilità:</strong> {proposal.availability_weeks} settimane</span>
+                    )}
+                  </div>
+                  {!proposal.contact_data_protected && (
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Email:</strong> {proposal.candidate_email}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Right Column: Unlock Contacts */}
@@ -224,6 +253,19 @@ export default function CompactProposalCard({
                   Scarta
                 </Button>
               </>
+            )}
+
+            {/* Message recruiter button for approved proposals */}
+            {proposal.status === "approved" && onContactRecruiter && proposal.recruiter_email && (
+              <Button
+                onClick={() => onContactRecruiter(proposal.id, proposal.recruiter_email, proposal.recruiter_name || "Recruiter")}
+                variant="outline"
+                size="sm"
+                className="text-xs bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+              >
+                <MessageCircle className="h-3 w-3 mr-1" />
+                Contatta recruiter
+              </Button>
             )}
           </div>
         </CardContent>

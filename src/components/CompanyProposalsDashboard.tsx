@@ -10,12 +10,16 @@ import CompactProposalCard from "./proposals/CompactProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import ProposalTabs from "./proposals/ProposalTabs";
 import AIProposalInsights from "./ai/AIProposalInsights";
+import { MessageCenter } from "./messaging/MessageCenter";
+import { toast } from "sonner";
 
 export default function CompanyProposalsDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [activeTab, setActiveTab] = useState("pending");
   const [filteredProposals, setFilteredProposals] = useState<any[]>([]);
+  const [showMessageCenter, setShowMessageCenter] = useState(false);
+  const [selectedRecruiter, setSelectedRecruiter] = useState<{email: string, name: string} | null>(null);
   const { user } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
@@ -83,6 +87,12 @@ export default function CompanyProposalsDashboard() {
     }
   };
 
+  const handleContactRecruiter = (proposalId: string, recruiterEmail: string, recruiterName: string) => {
+    setSelectedRecruiter({ email: recruiterEmail, name: recruiterName });
+    setShowMessageCenter(true);
+    toast.success(`Apertura chat con ${recruiterName}`);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -148,15 +158,16 @@ export default function CompanyProposalsDashboard() {
     return (
       <div className="grid gap-4">
         {proposalsToRender.map((proposal) => (
-          <CompactProposalCard
-            key={proposal.id}
-            proposal={proposal}
-            onStatusUpdate={updateProposalStatus}
-            onRequestAccess={(proposalId) => {
-              // TODO: Implementare richiesta di accesso ai dati
-              console.log('Richiesta accesso per proposta:', proposalId);
-            }}
-          />
+           <CompactProposalCard
+             key={proposal.id}
+             proposal={proposal}
+             onStatusUpdate={updateProposalStatus}
+             onRequestAccess={(proposalId) => {
+               // TODO: Implementare richiesta di accesso ai dati
+               console.log('Richiesta accesso per proposta:', proposalId);
+             }}
+             onContactRecruiter={handleContactRecruiter}
+           />
         ))}
       </div>
     );
@@ -193,6 +204,17 @@ export default function CompanyProposalsDashboard() {
       >
         {renderProposals}
       </ProposalTabs>
+
+      {/* Message Center Modal */}
+      {showMessageCenter && (
+        <MessageCenter
+          isOpen={showMessageCenter}
+          onClose={() => {
+            setShowMessageCenter(false);
+            setSelectedRecruiter(null);
+          }}
+        />
+      )}
     </div>
   );
 }

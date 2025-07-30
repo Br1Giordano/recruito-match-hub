@@ -3,14 +3,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Crown } from "lucide-react";
+import { Crown, FileText, User } from "lucide-react";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
+import CVViewer from "@/components/cv/CVViewer";
 
 interface CompactProposalCardProps {
   proposal: {
     id: string;
     candidate_name: string;
     candidate_email: string;
+    candidate_description?: string;
     candidate_cv_url?: string;
     candidate_cv_anonymized_url?: string;
     contact_data_protected?: boolean;
@@ -72,25 +74,70 @@ export default function CompactProposalCard({
 
   const statusInfo = getStatusInfo(proposal.status);
   const hasCv = proposal.candidate_cv_url || proposal.candidate_cv_anonymized_url;
+  const cvUrl = proposal.candidate_cv_url || proposal.candidate_cv_anonymized_url;
+  
+  // Format candidate name: Nome + Iniziale cognome
+  const formatCandidateName = (fullName: string) => {
+    const parts = fullName.split(' ');
+    if (parts.length === 1) return parts[0];
+    const firstName = parts[0];
+    const lastNameInitial = parts[parts.length - 1].charAt(0);
+    return `${firstName} ${lastNameInitial}.`;
+  };
 
   return (
     <TooltipProvider>
       <Card className={`w-full border-l-4 ${statusInfo.borderColor} hover:shadow-md transition-shadow`}>
-        <CardContent className="p-4 space-y-3">
-          {/* Header: Status + Job Title */}
-          <div className="flex items-center justify-between">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Badge className={`${statusInfo.color} cursor-help`}>
-                  {statusInfo.text}
-                </Badge>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="text-xs">
-                {statusInfo.tooltip}
-              </TooltipContent>
-            </Tooltip>
-            <div className="text-sm font-medium text-right">
-              {proposal.job_offers?.title || "Posizione non specificata"}
+        <CardContent className="p-4 space-y-4">
+          {/* Header: Job Title - More Prominent */}
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg leading-tight mb-2">
+                {proposal.job_offers?.title || "Posizione non specificata"}
+              </h3>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Badge className={`${statusInfo.color} cursor-help`}>
+                    {statusInfo.text}
+                  </Badge>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="text-xs">
+                  {statusInfo.tooltip}
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          </div>
+
+          {/* Candidate Info */}
+          <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-md">
+            <Avatar className="h-10 w-10">
+              <AvatarFallback className="text-sm bg-primary/10 text-primary">
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-medium text-base">
+                  {formatCandidateName(proposal.candidate_name)}
+                </span>
+                {hasCv && (
+                  <CVViewer 
+                    cvUrl={cvUrl}
+                    candidateName={proposal.candidate_name}
+                    trigger={
+                      <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                        <FileText className="h-3 w-3 mr-1" />
+                        CV
+                      </Button>
+                    }
+                  />
+                )}
+              </div>
+              {proposal.candidate_description && (
+                <p className="text-sm text-muted-foreground line-clamp-2">
+                  {proposal.candidate_description}
+                </p>
+              )}
             </div>
           </div>
 

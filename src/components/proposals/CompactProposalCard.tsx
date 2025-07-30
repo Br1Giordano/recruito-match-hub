@@ -374,6 +374,28 @@ export default function CompactProposalCard({
               </>
             )}
 
+            {/* Actions for approved (short-listed) proposals */}
+            {proposal.status === "approved" && onStatusUpdate && (
+              <>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "hired")}
+                  variant="default"
+                  size="sm"
+                  className="text-xs bg-green-600 hover:bg-green-700"
+                >
+                  Assumi
+                </Button>
+                <Button
+                  onClick={() => onStatusUpdate(proposal.id, "rejected")}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  Scarta
+                </Button>
+              </>
+            )}
+
             {/* Message recruiter button for approved proposals */}
             {proposal.status === "approved" && onContactRecruiter && proposal.recruiter_email && (
               <Button

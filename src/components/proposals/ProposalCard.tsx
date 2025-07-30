@@ -163,16 +163,19 @@ export default function ProposalCard({ proposal, userType = 'company', onStatusU
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <Button
-                    onClick={handleStartConversation}
-                    disabled={!proposal.recruiter_email}
-                    variant="outline"
-                    size="sm"
-                    className="text-green-600 border-green-300 hover:bg-green-100"
-                  >
-                    <MessageCircle className="h-4 w-4 mr-2" />
-                    Messaggio
-                  </Button>
+                  {/* Bottone messaggio solo per aziende e solo per candidature approvate */}
+                  {userType === 'company' && proposal.status === 'approved' && (
+                    <Button
+                      onClick={handleStartConversation}
+                      disabled={!proposal.recruiter_email}
+                      variant="outline"
+                      size="sm"
+                      className="text-green-600 border-green-300 hover:bg-green-100"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-2" />
+                      Messaggio
+                    </Button>
+                  )}
                   <Button
                     onClick={handleShowRecruiterProfile}
                     disabled={!proposal.recruiter_email}

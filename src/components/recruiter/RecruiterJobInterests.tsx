@@ -160,7 +160,7 @@ export const RecruiterJobInterests = () => {
                       </div>
                     )}
                   </div>
-                  <Badge variant="outline" className="flex items-center gap-1">
+                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {getEmploymentTypeText(jobOffer.employment_type || 'full-time')}
                   </Badge>

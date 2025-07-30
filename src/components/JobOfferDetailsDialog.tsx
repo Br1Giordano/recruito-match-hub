@@ -95,10 +95,10 @@ export default function JobOfferDetailsDialog({
                       {jobOffer.location}
                     </span>
                   )}
-                  <span className="flex items-center gap-2">
+                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200 flex items-center gap-2">
                     <Clock className="h-4 w-4" />
                     {getEmploymentTypeText(jobOffer.employment_type)}
-                  </span>
+                  </Badge>
                 </div>
               </DialogDescription>
             </div>

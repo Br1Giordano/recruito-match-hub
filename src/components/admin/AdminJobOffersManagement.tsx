@@ -325,10 +325,10 @@ export default function AdminJobOffersManagement() {
                             {offer.location}
                           </span>
                         )}
-                        <span className="flex items-center gap-1">
-                          <Clock className="h-4 w-4" />
+                        <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
+                          <Clock className="h-4 w-4 mr-1" />
                           {getEmploymentTypeText(offer.employment_type)}
-                        </span>
+                        </Badge>
                       </div>
                     </CardDescription>
                   </div>

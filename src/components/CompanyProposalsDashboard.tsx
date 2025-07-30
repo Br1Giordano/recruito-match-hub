@@ -194,7 +194,7 @@ export default function CompanyProposalsDashboard() {
         </CardContent>
       </Card>
 
-      {AI_FEATURES_ENABLED && <AIProposalInsights proposals={proposals} />}
+      {/* AI_FEATURES_ENABLED && <AIProposalInsights proposals={proposals} /> */}
 
       <ProposalTabs
         pendingProposals={pendingProposals}

@@ -345,10 +345,10 @@ export default function JobOffersBoard() {
                           {offer.location}
                         </span>
                       )}
-                      <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-200">
-                        <Clock className="h-3 w-3 mr-1" />
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
                         {getEmploymentTypeText(offer.employment_type)}
-                      </Badge>
+                      </span>
                     </CardDescription>
                   </div>
                   <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">

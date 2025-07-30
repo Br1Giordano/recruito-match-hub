@@ -366,8 +366,8 @@ export default function CompactProposalCard({
               </Button>
             )}
 
-            {/* Review recruiter button for approved proposals */}
-            {proposal.status === "approved" && proposal.recruiter_email && (
+            {/* Review recruiter button for closed proposals */}
+            {proposal.status === "rejected" && proposal.recruiter_email && (
               <Button
                 onClick={() => setShowReviewDialog(true)}
                 variant="outline"

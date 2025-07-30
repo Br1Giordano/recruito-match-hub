@@ -63,15 +63,15 @@ export default function RecruiterDashboard() {
         </p>
       </div>
 
-      <Tabs defaultValue="interests" className="space-y-6">
+      <Tabs defaultValue="proposals" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="interests" className="flex items-center gap-2">
-            <Heart className="h-4 w-4" />
-            Offerte di Interesse
-          </TabsTrigger>
           <TabsTrigger value="proposals" className="flex items-center gap-2">
             <Send className="h-4 w-4" />
             Le Mie Candidature
+          </TabsTrigger>
+          <TabsTrigger value="interests" className="flex items-center gap-2">
+            <Heart className="h-4 w-4" />
+            Offerte di Interesse
           </TabsTrigger>
           <TabsTrigger value="messages" className="flex items-center gap-2">
             <MessageCircle className="h-4 w-4" />

@@ -3,11 +3,6 @@ import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
-// Fallback temporaneo durante la migrazione
-const ADMIN_EMAILS_FALLBACK = [
-  'giordano.brunolucio@gmail.com'
-];
-
 export function useAdminCheck() {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -28,17 +23,15 @@ export function useAdminCheck() {
 
         if (error) {
           console.error('Errore controllo admin:', error);
-          // Fallback temporaneo in caso di errore
-          const fallbackAdmin = ADMIN_EMAILS_FALLBACK.includes(user.email);
-          setIsAdmin(fallbackAdmin);
+          // In caso di errore, l'utente NON è considerato admin per sicurezza
+          setIsAdmin(false);
         } else {
           setIsAdmin(data || false);
         }
       } catch (error) {
         console.error('Errore connessione admin check:', error);
-        // Fallback temporaneo in caso di errore di connessione
-        const fallbackAdmin = ADMIN_EMAILS_FALLBACK.includes(user.email);
-        setIsAdmin(fallbackAdmin);
+        // In caso di errore di connessione, l'utente NON è considerato admin per sicurezza
+        setIsAdmin(false);
       } finally {
         setLoading(false);
       }

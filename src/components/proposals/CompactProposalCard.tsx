@@ -143,12 +143,21 @@ export default function CompactProposalCard({
                 <span className="text-sm font-medium">
                   {formatCandidateName(proposal.candidate_name)}
                 </span>
-                <Badge 
-                  variant={hasCv ? "default" : "outline"} 
-                  className={`text-xs ${hasCv ? "bg-blue-100 text-blue-800 border-blue-200" : "text-gray-600"}`}
-                >
-                  {hasCv ? "📄 CV" : "Nessun CV"}
-                </Badge>
+                {hasCv ? (
+                  <CVViewer 
+                    cvUrl={cvUrl}
+                    candidateName={proposal.candidate_name}
+                    trigger={
+                      <Badge className="bg-blue-100 text-blue-800 border-blue-200 cursor-pointer hover:bg-blue-200 text-xs">
+                        📄 CV
+                      </Badge>
+                    }
+                  />
+                ) : (
+                  <Badge variant="outline" className="text-xs text-gray-600">
+                    Nessun CV
+                  </Badge>
+                )}
               </div>
             </div>
 

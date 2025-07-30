@@ -12,7 +12,7 @@ import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
 import { CompanyMessagesSection } from "./messaging/CompanyMessagesSection";
 import AdminDashboard from "./admin/AdminDashboard";
-import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut, Settings, ChevronDown, Shield } from "lucide-react";
+import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut, Settings, ChevronDown, Shield, Star } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,6 +23,7 @@ import {
 import JobOffersBoard from "./JobOffersBoard";
 import { useToast } from "@/components/ui/use-toast";
 import RecruiterProfileButton from "./recruiter/RecruiterProfileButton";
+import { RecruiterJobInterests } from "./recruiter/RecruiterJobInterests";
 import DeleteAccountDialog from "./account/DeleteAccountDialog";
 import CompanyProfileModal from "./company/CompanyProfileModal";
 import CompanyAvatar from "./company/CompanyAvatar";
@@ -218,10 +219,14 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
 
       <div className="container mx-auto p-4">
         <Tabs defaultValue="job-board" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="job-board" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
               Posizioni Aperte
+            </TabsTrigger>
+            <TabsTrigger value="taken-jobs" className="flex items-center gap-2">
+              <Star className="h-4 w-4" />
+              Offerte Prese in Carico
             </TabsTrigger>
             <TabsTrigger value="proposals" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
@@ -231,6 +236,10 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
           
           <TabsContent value="job-board">
             <JobOffersBoard />
+          </TabsContent>
+          
+          <TabsContent value="taken-jobs">
+            <RecruiterJobInterests />
           </TabsContent>
           
           <TabsContent value="proposals">

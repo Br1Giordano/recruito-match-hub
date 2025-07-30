@@ -1,10 +1,20 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from '@/hooks/use-toast';
 
 export const useRealTimeNotifications = () => {
   const { user } = useAuth();
+  const [hasNewMessages, setHasNewMessages] = useState(false);
+  const [hasNewReviews, setHasNewReviews] = useState(false);
+
+  const clearMessageNotifications = () => {
+    setHasNewMessages(false);
+  };
+
+  const clearReviewNotifications = () => {
+    setHasNewReviews(false);
+  };
 
   useEffect(() => {
     if (!user?.email) return;
@@ -24,6 +34,7 @@ export const useRealTimeNotifications = () => {
           
           // Only show notification if the message is not from the current user
           if (newMessage.sender_email !== user.email) {
+            setHasNewMessages(true);
             toast({
               title: "Nuovo messaggio",
               description: `Hai ricevuto un nuovo messaggio da ${newMessage.sender_type === 'company' ? 'un\'azienda' : 'un recruiter'}`,
@@ -48,6 +59,7 @@ export const useRealTimeNotifications = () => {
           
           // Only show notification if the review is for the current user
           if (newReview.recruiter_email === user.email) {
+            setHasNewReviews(true);
             toast({
               title: "Nuova recensione",
               description: `Hai ricevuto una nuova recensione con ${newReview.rating} stelle!`,
@@ -62,4 +74,11 @@ export const useRealTimeNotifications = () => {
       supabase.removeChannel(reviewsChannel);
     };
   }, [user?.email]);
+
+  return {
+    hasNewMessages,
+    hasNewReviews,
+    clearMessageNotifications,
+    clearReviewNotifications
+  };
 };

@@ -474,6 +474,36 @@ export type Database = {
         }
         Relationships: []
       }
+      recruiter_job_interests: {
+        Row: {
+          created_at: string
+          id: string
+          job_offer_id: string
+          notes: string | null
+          recruiter_email: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_offer_id: string
+          notes?: string | null
+          recruiter_email: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_offer_id?: string
+          notes?: string | null
+          recruiter_email?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       recruiter_registrations: {
         Row: {
           avatar_url: string | null

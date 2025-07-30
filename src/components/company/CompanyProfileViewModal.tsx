@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Building2, MapPin, Users, Mail, Phone, Globe, Calendar } from 'lucide-react';
+import { Building2, MapPin, Users, Calendar } from 'lucide-react';
 import { useCompanyProfileByEmail } from '@/hooks/useCompanyProfileByEmail';
 import { useEffect } from 'react';
 import CompanyAvatar from './CompanyAvatar';
@@ -81,21 +81,11 @@ export default function CompanyProfileViewModal({
           <div className="space-y-4">
             <h3 className="font-semibold flex items-center gap-2">
               <Building2 className="h-4 w-4" />
-              Informazioni di Contatto
+              Informazioni Azienda
             </h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-center gap-2 text-sm">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>{profile.email}</span>
-              </div>
-              
-              {profile.telefono && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{profile.telefono}</span>
-                </div>
-              )}
+              {/* Removed email and phone information for recruiters */}
               
               {profile.sede && (
                 <div className="flex items-center gap-2 text-sm">

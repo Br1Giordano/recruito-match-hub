@@ -1,6 +1,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { X } from "lucide-react";
 
 interface ProposalTabsProps {
   pendingProposals: any[];
@@ -57,7 +58,7 @@ export default function ProposalTabs({
         </TabsTrigger>
         <TabsTrigger value="other" className="flex items-center gap-2">
           <span className="flex items-center gap-2">
-            🗑️ <span className="hidden sm:inline">Chiuse</span>
+            <X className="h-4 w-4" /> <span className="hidden sm:inline">Chiuse</span>
             <span className="sm:hidden">Chiuse</span>
           </span>
           {otherProposals.length > 0 && (

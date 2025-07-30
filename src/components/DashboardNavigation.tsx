@@ -354,7 +354,7 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
               {unreadCount > 0 && (
                 <Badge
                   variant="default"
-                  className="h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-primary text-primary-foreground animate-pulse"
+                  className="h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-primary text-primary-foreground"
                 >
                   {unreadCount > 9 ? '9+' : unreadCount}
                 </Badge>

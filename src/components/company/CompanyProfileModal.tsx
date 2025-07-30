@@ -193,7 +193,7 @@ export default function CompanyProfileModal({ open, onOpenChange }: CompanyProfi
               <CompanyAvatar
                 logoUrl={displayProfile.logo_url}
                 companyName={displayProfile.nome_azienda || 'Azienda'}
-                size="lg"
+                size="xl"
               />
               {isEditing && (
                 <div className="mt-3 space-y-2">

@@ -8,6 +8,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeFormData } from "@/utils/inputSanitizer";
 
 const RecruiterRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -25,33 +26,29 @@ const RecruiterRegistrationForm = () => {
   const { toast } = useToast();
   const { user, linkToRegistration } = useAuth();
 
-  const validateInput = (value: string, maxLength: number = 255) => {
-    return value.trim().substring(0, maxLength);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      // Validate and sanitize inputs
-      const sanitizedData = {
-        nome: validateInput(formData.nome, 100),
-        cognome: validateInput(formData.cognome, 100),
-        email: validateInput(formData.email, 255),
-        telefono: validateInput(formData.telefono, 20),
-        azienda: validateInput(formData.azienda, 255),
-        esperienza: validateInput(formData.esperienza, 100),
-        settori: validateInput(formData.settori, 500),
-        messaggio: validateInput(formData.messaggio, 1000)
-      };
+      // Validate and sanitize inputs with improved security
+      const { sanitized: sanitizedData, errors } = sanitizeFormData(formData, {
+        nome: { maxLength: 100, type: 'text' },
+        cognome: { maxLength: 100, type: 'text' },
+        email: { maxLength: 255, type: 'email' },
+        telefono: { maxLength: 20, type: 'phone' },
+        azienda: { maxLength: 255, type: 'text' },
+        esperienza: { maxLength: 100, type: 'text' },
+        settori: { maxLength: 500, type: 'text' },
+        messaggio: { maxLength: 1000, type: 'text' }
+      });
 
-      // Basic email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(sanitizedData.email)) {
+      // Check for validation errors
+      if (Object.keys(errors).length > 0) {
+        const firstError = Object.values(errors)[0];
         toast({
-          title: "Email non valida",
-          description: "Inserisci un indirizzo email valido.",
+          title: "Dati non validi",
+          description: firstError,
           variant: "destructive",
         });
         return;

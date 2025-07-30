@@ -8,6 +8,7 @@ import { DialogClose } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { sanitizeFormData } from "@/utils/inputSanitizer";
 
 const CompanyRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -22,30 +23,26 @@ const CompanyRegistrationForm = () => {
   const { toast } = useToast();
   const { user, linkToRegistration } = useAuth();
 
-  const validateInput = (value: string, maxLength: number = 255) => {
-    return value.trim().substring(0, maxLength);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
     try {
-      // Validate and sanitize inputs
-      const sanitizedData = {
-        nome_azienda: validateInput(formData.nome_azienda, 255),
-        settore: validateInput(formData.settore, 255),
-        email: validateInput(formData.email, 255),
-        telefono: validateInput(formData.telefono, 20),
-        messaggio: validateInput(formData.messaggio, 1000)
-      };
+      // Validate and sanitize inputs with improved security
+      const { sanitized: sanitizedData, errors } = sanitizeFormData(formData, {
+        nome_azienda: { maxLength: 255, type: 'text' },
+        settore: { maxLength: 255, type: 'text' },
+        email: { maxLength: 255, type: 'email' },
+        telefono: { maxLength: 20, type: 'phone' },
+        messaggio: { maxLength: 1000, type: 'text' }
+      });
 
-      // Basic email validation
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(sanitizedData.email)) {
+      // Check for validation errors
+      if (Object.keys(errors).length > 0) {
+        const firstError = Object.values(errors)[0];
         toast({
-          title: "Email non valida",
-          description: "Inserisci un indirizzo email valido.",
+          title: "Dati non validi",
+          description: firstError,
           variant: "destructive",
         });
         return;

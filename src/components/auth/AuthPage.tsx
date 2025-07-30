@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ArrowLeft, User, Building2, Eye, EyeOff } from "lucide-react";
 import AuthErrorHandler from "./AuthErrorHandler";
+import { sanitizeEmail } from "@/utils/inputSanitizer";
 
 interface AuthPageProps {
   onBack?: () => void;
@@ -24,8 +25,16 @@ export default function AuthPage({ onBack, onAuthSuccess }: AuthPageProps) {
     setIsLoading(true);
     setError(null);
 
+    // Sanitize email input
+    const { value: sanitizedEmail, isValid } = sanitizeEmail(email);
+    if (!isValid) {
+      setError("Inserisci un indirizzo email valido");
+      setIsLoading(false);
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: sanitizedEmail,
       password,
     });
 
@@ -47,15 +56,15 @@ export default function AuthPage({ onBack, onAuthSuccess }: AuthPageProps) {
     setIsLoading(true);
     setError(null);
 
-    // Basic validation
+    // Enhanced validation with sanitization
     if (password.length < 6) {
       setError("La password deve essere di almeno 6 caratteri");
       setIsLoading(false);
       return;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email.trim())) {
+    const { value: sanitizedEmail, isValid } = sanitizeEmail(email);
+    if (!isValid) {
       setError("Inserisci un indirizzo email valido");
       setIsLoading(false);
       return;
@@ -65,7 +74,7 @@ export default function AuthPage({ onBack, onAuthSuccess }: AuthPageProps) {
       // Use edge function for conditional signup
       const { data, error } = await supabase.functions.invoke('conditional-signup', {
         body: {
-          email: email.trim(),
+          email: sanitizedEmail,
           password,
           userType
         }

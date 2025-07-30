@@ -112,28 +112,47 @@ export const useRecruiterJobInterests = () => {
     if (!user?.email) return false;
 
     try {
-      // Semplicemente inserisci o aggiorna se esiste già
-      const { error } = await supabase
+      // Prima controlla se esiste già un interesse
+      const { data: existing } = await supabase
         .from('recruiter_job_interests')
-        .upsert({
-          recruiter_email: user.email,
-          job_offer_id: jobOfferId,
-          status: 'interested',
-          notes: notes || null,
-          updated_at: new Date().toISOString(),
-        }, {
-          onConflict: 'recruiter_email,job_offer_id',
-          ignoreDuplicates: false
-        });
+        .select('id, status')
+        .eq('recruiter_email', user.email)
+        .eq('job_offer_id', jobOfferId)
+        .maybeSingle();
 
-      if (error) {
-        console.error('Error adding job interest:', error);
-        toast({
-          title: "Errore",
-          description: "Impossibile prendere in carico l'offerta",
-          variant: "destructive",
-        });
-        return false;
+      if (existing) {
+        if (existing.status === 'interested') {
+          toast({
+            title: "Già preso in carico",
+            description: "Hai già preso in carico questa offerta",
+            variant: "destructive",
+          });
+          return false;
+        } else {
+          // Aggiorna se esisteva ma era rimosso
+          const { error } = await supabase
+            .from('recruiter_job_interests')
+            .update({
+              status: 'interested',
+              notes: notes || null,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', existing.id);
+
+          if (error) throw error;
+        }
+      } else {
+        // Inserisci nuovo
+        const { error } = await supabase
+          .from('recruiter_job_interests')
+          .insert({
+            recruiter_email: user.email,
+            job_offer_id: jobOfferId,
+            status: 'interested',
+            notes: notes || null,
+          });
+
+        if (error) throw error;
       }
 
       toast({
@@ -141,14 +160,13 @@ export const useRecruiterJobInterests = () => {
         description: "L'offerta è stata aggiunta alle tue offerte di interesse",
       });
 
-      // Ricarica la lista
       fetchInterests();
       return true;
     } catch (error) {
       console.error('Error adding job interest:', error);
       toast({
         title: "Errore",
-        description: "Errore durante l'operazione",
+        description: "Impossibile prendere in carico l'offerta",
         variant: "destructive",
       });
       return false;

@@ -2,11 +2,13 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import { useCompanyProfile } from "@/hooks/useCompanyProfile";
+import { useMessages } from "@/hooks/useMessages";
 import RecruiterDashboard from "./RecruiterDashboard";
 import CompanyOffersDashboard from "./CompanyOffersDashboard";
 import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
@@ -254,6 +256,7 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
 function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; onSignOut: () => void }) {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const { profile } = useCompanyProfile();
+  const { unreadCount } = useMessages();
 
   return (
     <>
@@ -345,9 +348,17 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
               <FileText className="h-4 w-4" />
               Proposte Ricevute
             </TabsTrigger>
-            <TabsTrigger value="messages" className="flex items-center gap-2">
+            <TabsTrigger value="messages" className="flex items-center gap-2 relative">
               <MessageSquare className="h-4 w-4" />
               Messaggi
+              {unreadCount > 0 && (
+                <Badge
+                  variant="default"
+                  className="h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-primary text-primary-foreground animate-pulse"
+                >
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </Badge>
+              )}
             </TabsTrigger>
             <TabsTrigger value="offers" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />

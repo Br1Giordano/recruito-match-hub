@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRecruiterJobInterests } from "@/hooks/useRecruiterJobInterests";
-import { MapPin, Building2, Euro, Clock, Trash2 } from "lucide-react";
+import { MapPin, Building2, Euro, Clock, X } from "lucide-react";
 import JobOfferDetailsDialog from "../JobOfferDetailsDialog";
 import ProposalFormModal from "../ProposalFormModal";
 import CompanyProfileViewModal from "../company/CompanyProfileViewModal";
@@ -141,15 +141,15 @@ export const RecruiterJobInterests = () => {
               <Card key={interest.id} className="border-dashed border-muted-foreground/50">
                 <CardContent className="p-6">
                   <p className="text-muted-foreground">Offerta non trovata o non più disponibile</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleRemoveInterest(interest.id)}
-                    className="mt-2"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Rimuovi
-                  </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleRemoveInterest(interest.id)}
+                      className="mt-2"
+                    >
+                      <X className="h-4 w-4 mr-2" />
+                      Rimuovi
+                    </Button>
                 </CardContent>
               </Card>
             );
@@ -243,7 +243,7 @@ export const RecruiterJobInterests = () => {
                       size="sm"
                       onClick={() => handleRemoveInterest(interest.id)}
                     >
-                      <Trash2 className="h-4 w-4 mr-2" />
+                      <X className="h-4 w-4 mr-2" />
                       Rimuovi Interesse
                     </Button>
                     <Button

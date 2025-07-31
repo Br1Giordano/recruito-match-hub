@@ -38,6 +38,71 @@ export type Database = {
         }
         Relationships: []
       }
+      company_fiscal_data: {
+        Row: {
+          cap_fatturazione: string | null
+          citta_fatturazione: string | null
+          codice_fiscale: string | null
+          codice_sdi: string | null
+          company_id: string
+          created_at: string
+          iban: string | null
+          id: string
+          indirizzo_fatturazione: string | null
+          is_complete: boolean
+          partita_iva: string | null
+          pec: string | null
+          provincia_fatturazione: string | null
+          ragione_sociale: string | null
+          swift: string | null
+          updated_at: string
+        }
+        Insert: {
+          cap_fatturazione?: string | null
+          citta_fatturazione?: string | null
+          codice_fiscale?: string | null
+          codice_sdi?: string | null
+          company_id: string
+          created_at?: string
+          iban?: string | null
+          id?: string
+          indirizzo_fatturazione?: string | null
+          is_complete?: boolean
+          partita_iva?: string | null
+          pec?: string | null
+          provincia_fatturazione?: string | null
+          ragione_sociale?: string | null
+          swift?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cap_fatturazione?: string | null
+          citta_fatturazione?: string | null
+          codice_fiscale?: string | null
+          codice_sdi?: string | null
+          company_id?: string
+          created_at?: string
+          iban?: string | null
+          id?: string
+          indirizzo_fatturazione?: string | null
+          is_complete?: boolean
+          partita_iva?: string | null
+          pec?: string | null
+          provincia_fatturazione?: string | null
+          ragione_sociale?: string | null
+          swift?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_company_fiscal_data_company_id"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "company_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_registrations: {
         Row: {
           created_at: string

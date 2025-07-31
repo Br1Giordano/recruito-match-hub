@@ -19,6 +19,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import CompanyAvatar from './CompanyAvatar';
 import CompanyRecruiterReviews from '../reviews/CompanyRecruiterReviews';
+import CompanyFiscalDataForm from './CompanyFiscalDataForm';
 
 interface CompanyProfileModalProps {
   open: boolean;
@@ -189,8 +190,9 @@ export default function CompanyProfileModal({ open, onOpenChange }: CompanyProfi
         </DialogHeader>
 
         <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="profile">Profilo Azienda</TabsTrigger>
+            <TabsTrigger value="fiscal">Dati Fiscali</TabsTrigger>
             <TabsTrigger value="reviews">Recensioni Recruiter</TabsTrigger>
           </TabsList>
           
@@ -423,6 +425,17 @@ export default function CompanyProfileModal({ open, onOpenChange }: CompanyProfi
                 </Button>
               )}
             </div>
+          </TabsContent>
+
+          <TabsContent value="fiscal" className="mt-6">
+            {profile?.id ? (
+              <CompanyFiscalDataForm companyId={profile.id} />
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Building2 className="mx-auto h-12 w-12 mb-4 opacity-50" />
+                <p>Devi prima completare il profilo aziendale per accedere ai dati fiscali</p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="reviews" className="mt-6">

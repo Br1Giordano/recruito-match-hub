@@ -143,7 +143,7 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <ProposalFormFields formData={formData} onInputChange={handleInputChange} jobOffer={jobOffer} />
+      <ProposalFormFields formData={formData} onInputChange={handleInputChange} />
       
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onClose}>

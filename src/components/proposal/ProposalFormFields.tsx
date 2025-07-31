@@ -2,13 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import FileUpload from "@/components/ui/file-upload";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useFileUpload } from "@/hooks/useFileUpload";
-import { useAIAssistant } from "@/hooks/useAIAssistant";
-import { Sparkles, Target, FileText, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { AI_FEATURES_ENABLED } from "@/App";
 
 interface ProposalFormFieldsProps {
   formData: {
@@ -28,88 +22,26 @@ interface ProposalFormFieldsProps {
     candidate_cv_url: string;
   };
   onInputChange: (field: string, value: string) => void;
-  jobOffer?: any;
 }
 
-export default function ProposalFormFields({ formData, onInputChange, jobOffer }: ProposalFormFieldsProps) {
+export default function ProposalFormFields({ formData, onInputChange }: ProposalFormFieldsProps) {
   const { uploadFile, isUploading } = useFileUpload();
-  const { isLoading: isAILoading, analyzeCVContent, generateProposalSuggestion, calculateMatchScore } = useAIAssistant();
-  const [cvAnalysis, setCvAnalysis] = useState<any>(null);
-  const [matchScore, setMatchScore] = useState<any>(null);
-  const [aiSuggestion, setAISuggestion] = useState<string>("");
 
   const handleFileUpload = async (file: File): Promise<string | null> => {
     try {
       const url = await uploadFile(file, 'candidate-cvs');
       if (url) {
         onInputChange('candidate_cv_url', url);
-        // Trigger AI analysis if CV is uploaded and AI is enabled
-        if (AI_FEATURES_ENABLED && (file.type === 'application/pdf' || file.type.includes('text'))) {
-          await analyzeUploadedCV(file);
-        }
       }
       return url;
     } catch (error) {
-      console.error('File upload error:', error);
+      console.error('Error uploading CV:', error);
       return null;
     }
   };
 
   const handleFileRemove = (url: string) => {
     onInputChange('candidate_cv_url', '');
-    setCvAnalysis(null);
-    setMatchScore(null);
-    setAISuggestion("");
-  };
-
-  const analyzeUploadedCV = async (file: File) => {
-    try {
-      // For demo purposes, we'll simulate CV text extraction
-      // In a real implementation, you'd use PDF parsing libraries
-      const simulatedCVText = `
-        CV di ${formData.candidate_name}
-        Email: ${formData.candidate_email}
-        Esperienza: ${formData.years_experience} anni
-        LinkedIn: ${formData.candidate_linkedin}
-      `;
-      
-      const analysis = await analyzeCVContent(simulatedCVText);
-      if (analysis) {
-        setCvAnalysis(analysis);
-        
-        // Auto-fill experience years if detected
-        if (analysis.experience_years && !formData.years_experience) {
-          onInputChange('years_experience', analysis.experience_years.toString());
-        }
-        
-        // Calculate match score if job offer is available
-        if (jobOffer && analysis) {
-          const score = await calculateMatchScore(jobOffer, analysis);
-          if (score) {
-            setMatchScore(score);
-          }
-        }
-      }
-    } catch (error) {
-      console.error('CV analysis failed:', error);
-    }
-  };
-
-  const handleAISuggestion = async () => {
-    if (!cvAnalysis || !jobOffer) return;
-    
-    const recruiterContext = {
-      name: formData.recruiter_name,
-      experience: "Recruiter esperto"
-    };
-    
-    const suggestion = await generateProposalSuggestion(jobOffer, cvAnalysis, recruiterContext);
-    if (suggestion?.suggestion) {
-      setAISuggestion(suggestion.suggestion);
-      if (!formData.proposal_description) {
-        onInputChange('proposal_description', suggestion.suggestion);
-      }
-    }
   };
 
   return (
@@ -247,71 +179,11 @@ export default function ProposalFormFields({ formData, onInputChange, jobOffer }
         </div>
       </div>
 
-      {/* Sezione Descrizione con AI */}
+      {/* Sezione Descrizione */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold">Descrizione della Proposta</h3>
         <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="proposal_description">Descrizione Proposta</Label>
-              {AI_FEATURES_ENABLED && cvAnalysis && jobOffer && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAISuggestion}
-                  disabled={isAILoading}
-                  className="text-xs"
-                >
-                  {isAILoading ? (
-                    <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                  ) : (
-                    <Sparkles className="h-3 w-3 mr-1" />
-                  )}
-                  Migliora con AI
-                </Button>
-              )}
-            </div>
-          
-            {AI_FEATURES_ENABLED && matchScore && (
-              <div className="flex items-center gap-2 text-sm">
-                <Target className="h-4 w-4" />
-                <span>Match Score: </span>
-                <Badge variant={matchScore.score >= 80 ? "default" : matchScore.score >= 60 ? "secondary" : "outline"}>
-                  {matchScore.score}%
-                </Badge>
-                <span className="text-muted-foreground">{matchScore.reasoning}</span>
-              </div>
-            )}
-          
-            {AI_FEATURES_ENABLED && cvAnalysis && (
-              <div className="bg-muted/50 p-3 rounded-lg border space-y-2">
-                <div className="flex items-center gap-2 text-sm font-medium">
-                  <FileText className="h-4 w-4" />
-                  Analisi CV Automatica
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <span className="font-medium">Seniority:</span> {cvAnalysis.seniority_level}
-                  </div>
-                  <div>
-                    <span className="font-medium">Esperienza:</span> {cvAnalysis.experience_years} anni
-                  </div>
-                </div>
-                {cvAnalysis.skills && (
-                  <div className="space-y-1">
-                    <span className="text-xs font-medium">Competenze principali:</span>
-                    <div className="flex flex-wrap gap-1">
-                      {cvAnalysis.skills.slice(0, 5).map((skill: string, index: number) => (
-                        <Badge key={index} variant="secondary" className="text-xs">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          
+          <Label htmlFor="proposal_description">Descrizione Proposta</Label>
           <Textarea
             id="proposal_description"
             value={formData.proposal_description}
@@ -319,25 +191,6 @@ export default function ProposalFormFields({ formData, onInputChange, jobOffer }
             placeholder="Descrivi perché questo candidato è perfetto per la posizione..."
             className="min-h-[120px]"
           />
-          
-            {AI_FEATURES_ENABLED && aiSuggestion && aiSuggestion !== formData.proposal_description && (
-              <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                <div className="flex items-center gap-2 text-sm font-medium text-blue-800 mb-2">
-                  <Sparkles className="h-4 w-4" />
-                  Suggerimento AI
-                </div>
-                <p className="text-sm text-blue-700 mb-2">{aiSuggestion}</p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onInputChange('proposal_description', aiSuggestion)}
-                  className="text-blue-600 border-blue-300 hover:bg-blue-100"
-                >
-                  Usa questo testo
-                </Button>
-              </div>
-            )}
         </div>
       </div>
 

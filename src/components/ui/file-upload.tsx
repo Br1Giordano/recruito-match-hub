@@ -78,6 +78,7 @@ export default function FileUpload({
         </div>
         <div className="flex items-center gap-2">
           <Button
+            type="button"
             variant="outline"
             size="sm"
             onClick={() => window.open(currentFileUrl, '_blank')}
@@ -87,6 +88,7 @@ export default function FileUpload({
           </Button>
           {onFileRemove && (
             <Button
+              type="button"
               variant="outline"
               size="sm"
               onClick={() => onFileRemove(currentFileUrl)}

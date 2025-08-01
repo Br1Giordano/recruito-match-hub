@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
-import { Users, Building2, FileText, TrendingUp, Search, Filter, Eye, Shield, Mail, MapPin, Calendar, User, Phone, Globe, Briefcase, Check, X } from "lucide-react";
+import { Users, Building2, FileText, TrendingUp, Search, Filter, Eye, Shield, Mail, MapPin, Calendar, User, Phone, Globe, Briefcase, Check, X, Receipt, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
@@ -67,6 +67,25 @@ interface CompanyDetails {
   created_at: string;
 }
 
+interface CompanyFiscalData {
+  id: string;
+  company_id: string;
+  partita_iva?: string;
+  codice_fiscale?: string;
+  ragione_sociale?: string;
+  codice_sdi?: string;
+  pec?: string;
+  indirizzo_fatturazione?: string;
+  cap_fatturazione?: string;
+  citta_fatturazione?: string;
+  provincia_fatturazione?: string;
+  iban?: string;
+  swift?: string;
+  is_complete: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export default function AdminDashboard() {
   const [metrics, setMetrics] = useState<AdminMetrics>({
     totalRecruiters: 0,
@@ -84,6 +103,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedRecruiter, setSelectedRecruiter] = useState<RecruiterDetails | null>(null);
   const [selectedCompany, setSelectedCompany] = useState<CompanyDetails | null>(null);
+  const [selectedCompanyFiscalData, setSelectedCompanyFiscalData] = useState<CompanyFiscalData | null>(null);
+  const [companiesFiscalStatus, setCompaniesFiscalStatus] = useState<Record<string, boolean>>({});
   const [isRecruiterModalOpen, setIsRecruiterModalOpen] = useState(false);
   const [isCompanyModalOpen, setIsCompanyModalOpen] = useState(false);
   const { toast } = useToast();
@@ -91,6 +112,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchMetrics();
     fetchUsers();
+    fetchCompaniesFiscalStatus();
   }, []);
 
   const fetchMetrics = async () => {
@@ -200,68 +222,56 @@ export default function AdminDashboard() {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'approved':
-        return <Badge variant="approved">Approvato</Badge>;
-      case 'pending':
-        return <Badge variant="pending">In Attesa</Badge>;
-      case 'rejected':
-        return <Badge variant="rejected">Rifiutato</Badge>;
-      case 'blocked':
-        return <Badge variant="blocked">Bloccato</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
+  const fetchCompaniesFiscalStatus = async () => {
+    try {
+      const { data: fiscalData } = await supabase
+        .from('company_fiscal_data')
+        .select('company_id, is_complete');
+
+      const fiscalStatusMap: Record<string, boolean> = {};
+      (fiscalData || []).forEach(item => {
+        fiscalStatusMap[item.company_id] = item.is_complete;
+      });
+      
+      setCompaniesFiscalStatus(fiscalStatusMap);
+    } catch (error) {
+      console.error('Error fetching companies fiscal status:', error);
     }
   };
 
-  const getRoleBadge = (userType: 'recruiter' | 'company') => {
-    return userType === 'recruiter' ? (
-      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-medium">
-        <Users className="w-3 h-3 mr-1" />
-        Recruiter
-      </Badge>
-    ) : (
-      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">
-        <Building2 className="w-3 h-3 mr-1" />
-        Azienda
-      </Badge>
-    );
-  };
-
-  const filterUsers = (users: UserRecord[]) => {
-    return users.filter(user => {
-      const matchesSearch = !searchTerm || 
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.company_name?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    });
-  };
-
-  const handleViewRecruiterDetails = async (recruiterId: string) => {
+  const fetchCompanyFiscalData = async (companyId: string) => {
     try {
       const { data, error } = await supabase
-        .from('recruiter_registrations')
+        .from('company_fiscal_data')
         .select('*')
-        .eq('id', recruiterId)
-        .single();
+        .eq('company_id', companyId)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
 
-      setSelectedRecruiter(data);
-      setIsRecruiterModalOpen(true);
+      setSelectedCompanyFiscalData(data);
     } catch (error) {
-      console.error('Error fetching recruiter details:', error);
+      console.error('Error fetching company fiscal data:', error);
       toast({
         title: "Errore",
-        description: "Impossibile caricare i dettagli del recruiter",
+        description: "Impossibile caricare i dati fiscali dell'azienda",
         variant: "destructive",
       });
     }
+  };
+
+  const getFiscalDataBadge = (companyId: string) => {
+    const isComplete = companiesFiscalStatus[companyId];
+    if (isComplete === undefined) {
+      return <Badge variant="secondary" className="text-xs">Non inseriti</Badge>;
+    }
+    return isComplete ? (
+      <Badge variant="default" className="text-xs bg-green-100 text-green-800 border-green-200">Completi</Badge>
+    ) : (
+      <Badge variant="outline" className="text-xs bg-yellow-50 text-yellow-700 border-yellow-200">Incompleti</Badge>
+    );
   };
 
   const handleViewCompanyDetails = async (companyId: string) => {
@@ -275,6 +285,7 @@ export default function AdminDashboard() {
       if (error) throw error;
 
       setSelectedCompany(data);
+      await fetchCompanyFiscalData(companyId);
       setIsCompanyModalOpen(true);
     } catch (error) {
       console.error('Error fetching company details:', error);
@@ -345,6 +356,70 @@ export default function AdminDashboard() {
       toast({
         title: "Errore",
         description: "Impossibile aggiornare lo stato dell'azienda",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'approved':
+        return <Badge variant="approved">Approvato</Badge>;
+      case 'pending':
+        return <Badge variant="pending">In Attesa</Badge>;
+      case 'rejected':
+        return <Badge variant="rejected">Rifiutato</Badge>;
+      case 'blocked':
+        return <Badge variant="blocked">Bloccato</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
+  const getRoleBadge = (userType: 'recruiter' | 'company') => {
+    return userType === 'recruiter' ? (
+      <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 font-medium">
+        <Users className="w-3 h-3 mr-1" />
+        Recruiter
+      </Badge>
+    ) : (
+      <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 font-medium">
+        <Building2 className="w-3 h-3 mr-1" />
+        Azienda
+      </Badge>
+    );
+  };
+
+  const filterUsers = (users: UserRecord[]) => {
+    return users.filter(user => {
+      const matchesSearch = !searchTerm || 
+        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.company_name?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    });
+  };
+
+  const handleViewRecruiterDetails = async (recruiterId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('recruiter_registrations')
+        .select('*')
+        .eq('id', recruiterId)
+        .single();
+
+      if (error) throw error;
+
+      setSelectedRecruiter(data);
+      setIsRecruiterModalOpen(true);
+    } catch (error) {
+      console.error('Error fetching recruiter details:', error);
+      toast({
+        title: "Errore",
+        description: "Impossibile caricare i dettagli del recruiter",
         variant: "destructive",
       });
     }
@@ -514,9 +589,10 @@ export default function AdminDashboard() {
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
                   >
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                       <div className="flex items-center gap-2 mb-1">
                         {getRoleBadge(user.user_type)}
                         {getStatusBadge(user.status)}
+                        {user.user_type === 'company' && getFiscalDataBadge(user.id)}
                       </div>
                       <div className="font-medium">
                         {user.user_type === 'company' ? user.company_name : user.name} 
@@ -597,9 +673,10 @@ export default function AdminDashboard() {
                     className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
                   >
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                     <div className="flex items-center gap-2 mb-1">
                         {getRoleBadge(company.user_type)}
                         {getStatusBadge(company.status)}
+                        {getFiscalDataBadge(company.id)}
                       </div>
                       <div className="font-medium">{company.company_name || company.email}</div>
                       <div className="text-sm text-muted-foreground">{company.email}</div>
@@ -828,9 +905,23 @@ export default function AdminDashboard() {
           </DialogHeader>
 
           {selectedCompany && (
-            <div className="space-y-6">
-              {/* Basic Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Tabs defaultValue="basic" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="basic">Informazioni Base</TabsTrigger>
+                <TabsTrigger value="fiscal" className="flex items-center gap-2">
+                  <Receipt className="h-4 w-4" />
+                  Dati Fiscali
+                  {selectedCompanyFiscalData?.is_complete ? (
+                    <Badge variant="default" className="ml-1 text-xs bg-green-100 text-green-800 border-green-200">✓</Badge>
+                  ) : (
+                    <Badge variant="outline" className="ml-1 text-xs bg-yellow-50 text-yellow-700 border-yellow-200">!</Badge>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="basic" className="space-y-6">
+                {/* Basic Info */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -924,7 +1015,162 @@ export default function AdminDashboard() {
                   </p>
                 </div>
               )}
-            </div>
+              </TabsContent>
+
+              <TabsContent value="fiscal" className="space-y-6">
+                {selectedCompanyFiscalData ? (
+                  <div className="space-y-6">
+                    {/* Completeness Status */}
+                    <div className="flex items-center gap-2 p-3 rounded-lg border bg-gray-50">
+                      <Receipt className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-medium">Stato Completezza:</span>
+                      {selectedCompanyFiscalData.is_complete ? (
+                        <Badge variant="default" className="bg-green-100 text-green-800 border-green-200">
+                          <Check className="h-3 w-3 mr-1" />
+                          Dati Completi
+                        </Badge>
+                      ) : (
+                        <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                          <X className="h-3 w-3 mr-1" />
+                          Dati Incompleti
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Principal Data */}
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-sm flex items-center gap-2">
+                        <Building2 className="h-4 w-4" />
+                        Dati Principali
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {selectedCompanyFiscalData.partita_iva && (
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">Partita IVA:</span>
+                            <span className="text-sm">{selectedCompanyFiscalData.partita_iva}</span>
+                          </div>
+                        )}
+                        {selectedCompanyFiscalData.codice_fiscale && (
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">Codice Fiscale:</span>
+                            <span className="text-sm">{selectedCompanyFiscalData.codice_fiscale}</span>
+                          </div>
+                        )}
+                        {selectedCompanyFiscalData.ragione_sociale && (
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">Ragione Sociale:</span>
+                            <span className="text-sm">{selectedCompanyFiscalData.ragione_sociale}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Electronic Invoicing */}
+                    {(selectedCompanyFiscalData.codice_sdi || selectedCompanyFiscalData.pec) && (
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-sm flex items-center gap-2">
+                          <FileText className="h-4 w-4" />
+                          Fatturazione Elettronica
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {selectedCompanyFiscalData.codice_sdi && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">Codice SDI:</span>
+                              <span className="text-sm">{selectedCompanyFiscalData.codice_sdi}</span>
+                            </div>
+                          )}
+                          {selectedCompanyFiscalData.pec && (
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-4 w-4 text-muted-foreground" />
+                              <span className="font-medium text-sm">PEC:</span>
+                              <span className="text-sm">{selectedCompanyFiscalData.pec}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Billing Address */}
+                    {(selectedCompanyFiscalData.indirizzo_fatturazione || selectedCompanyFiscalData.cap_fatturazione || selectedCompanyFiscalData.citta_fatturazione || selectedCompanyFiscalData.provincia_fatturazione) && (
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-sm flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          Indirizzo di Fatturazione
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {selectedCompanyFiscalData.indirizzo_fatturazione && (
+                            <div className="flex items-center gap-2 md:col-span-2">
+                              <span className="font-medium text-sm">Indirizzo:</span>
+                              <span className="text-sm">{selectedCompanyFiscalData.indirizzo_fatturazione}</span>
+                            </div>
+                          )}
+                          {selectedCompanyFiscalData.cap_fatturazione && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">CAP:</span>
+                              <span className="text-sm">{selectedCompanyFiscalData.cap_fatturazione}</span>
+                            </div>
+                          )}
+                          {selectedCompanyFiscalData.citta_fatturazione && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">Città:</span>
+                              <span className="text-sm">{selectedCompanyFiscalData.citta_fatturazione}</span>
+                            </div>
+                          )}
+                          {selectedCompanyFiscalData.provincia_fatturazione && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">Provincia:</span>
+                              <span className="text-sm">{selectedCompanyFiscalData.provincia_fatturazione}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Banking Details */}
+                    {(selectedCompanyFiscalData.iban || selectedCompanyFiscalData.swift) && (
+                      <div className="space-y-4">
+                        <h4 className="font-medium text-sm flex items-center gap-2">
+                          <CreditCard className="h-4 w-4" />
+                          Dati Bancari
+                        </h4>
+                        <div className="grid grid-cols-1 gap-4">
+                          {selectedCompanyFiscalData.iban && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">IBAN:</span>
+                              <span className="text-sm font-mono">{selectedCompanyFiscalData.iban}</span>
+                            </div>
+                          )}
+                          {selectedCompanyFiscalData.swift && (
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-sm">SWIFT/BIC:</span>
+                              <span className="text-sm font-mono">{selectedCompanyFiscalData.swift}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Dates */}
+                    <div className="space-y-2 pt-4 border-t">
+                      <div className="text-xs text-muted-foreground">
+                        Dati fiscali creati: {format(new Date(selectedCompanyFiscalData.created_at), 'dd/MM/yyyy HH:mm', { locale: it })}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Ultimo aggiornamento: {format(new Date(selectedCompanyFiscalData.updated_at), 'dd/MM/yyyy HH:mm', { locale: it })}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Receipt className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+                    <h4 className="font-medium text-lg mb-2">Dati fiscali non disponibili</h4>
+                    <p className="text-muted-foreground text-sm">
+                      L'azienda non ha ancora inserito i propri dati fiscali.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           )}
 
           {/* Action Buttons for Pending Companies */}

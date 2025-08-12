@@ -27,11 +27,11 @@ const KeyMetricsStrip: React.FC = () => {
 
   useEffect(() => {
     let mounted = true;
-    supabase
+    (supabase as any)
       .from("public_site_stats")
       .select("total_recruiters, avg_time_to_hire, total_placements")
       .maybeSingle()
-      .then(({ data, error }) => {
+      .then(({ data, error }: any) => {
         if (!mounted) return;
         if (error) {
           console.warn("public_site_stats error", error.message);

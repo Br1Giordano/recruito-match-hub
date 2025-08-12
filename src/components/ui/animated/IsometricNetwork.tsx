@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Player } from "lottie-react";
+import Lottie from "lottie-react";
 import { motion } from "framer-motion";
 
 interface IsometricNetworkProps {
@@ -52,10 +52,9 @@ const IsometricNetwork: React.FC<IsometricNetworkProps> = ({ className }) => {
 
   return (
     <div className={className} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
-      <Player
+      <Lottie
         autoplay={!hover}
         loop
-        keepLastFrame
         animationData={data}
         style={{ width: "100%", height: "100%" }}
       />

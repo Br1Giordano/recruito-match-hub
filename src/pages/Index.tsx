@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { LogIn } from "lucide-react";
+import BrandedGradient from "@/components/ui/animated/BrandedGradient";
 
 const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -109,7 +110,8 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen overflow-hidden">
+      <BrandedGradient position="fixed" />
       <Header onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />
       <main>
         <Hero onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />

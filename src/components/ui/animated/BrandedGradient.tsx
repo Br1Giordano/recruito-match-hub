@@ -1,8 +1,13 @@
 import React from "react";
 
-const BrandedGradient = () => {
+interface BrandedGradientProps {
+  position?: "fixed" | "absolute";
+  className?: string;
+}
+
+const BrandedGradient = ({ position = "absolute", className }: BrandedGradientProps) => {
   return (
-    <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden>
+    <div className={`${position} inset-0 -z-10 overflow-hidden ${className ?? ''}`} aria-hidden>
       {/* Animated brand gradient */}
       <div className="animated-gradient absolute inset-0" />
 

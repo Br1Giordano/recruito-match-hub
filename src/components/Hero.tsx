@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap, Sparkles, TrendingUp, Building2 } from "lucide-react";
-import BrandedGradient from "@/components/ui/animated/BrandedGradient";
+
 
 interface HeroProps {
   onShowAuth?: () => void;
@@ -50,9 +50,7 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Minimal branded animated background */}
-      <BrandedGradient />
-      
+      {/* Background handled globally on Index page */}
       <div className="container mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <div className="space-y-10 animate-fade-in">

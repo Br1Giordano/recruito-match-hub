@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap, Sparkles, TrendingUp, Building2 } from "lucide-react";
+import AnimatedBackground from "@/components/ui/animated/AnimatedBackground";
 
 interface HeroProps {
   onShowAuth?: () => void;
@@ -49,6 +50,8 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
+      {/* Dynamic animated canvas background */}
+      <AnimatedBackground />
       {/* Background gradient */}
       <div className="absolute inset-0 gradient-recruito opacity-5"></div>
       

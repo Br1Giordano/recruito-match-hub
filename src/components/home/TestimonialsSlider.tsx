@@ -17,18 +17,18 @@ const TestimonialsSlider: React.FC = () => {
 
   useEffect(() => {
     let mounted = true;
-    (supabase as any)
+    supabase
       .from("testimonials")
       .select("id, name, role, company, quote, approved")
       .eq("approved", true)
-      .then(({ data, error }: any) => {
+      .then(({ data, error }) => {
         if (!mounted) return;
         if (error) {
           console.warn("testimonials error", error.message);
           setItems([]);
           return;
         }
-        setItems((data as Testimonial[]) || []);
+        setItems((data as any) || []);
       });
     return () => {
       mounted = false;

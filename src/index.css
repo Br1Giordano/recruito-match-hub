@@ -113,10 +113,6 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
   }
-
-  h1, h2, h3 {
-    @apply font-display tracking-tight;
-  }
 }
 
 @layer utilities {

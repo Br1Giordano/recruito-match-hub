@@ -67,26 +67,23 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 
             {/* Pulsanti con colori più chiari del brand */}
             <div className="flex justify-center gap-4 pt-8">
-              <Button 
+              <button 
                 onClick={scrollToDemo}
-                size="lg"
-                className="min-w-[220px]"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-blue-300/30"
               >
                 <Building2 className="h-5 w-5" />
                 Unisciti come azienda
                 <ArrowRight className="h-5 w-5" />
-              </Button>
+              </button>
               
-              <Button 
+              <button 
                 onClick={scrollToDemo}
-                size="lg"
-                variant="outline"
-                className="min-w-[220px]"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-400 to-emerald-400 hover:from-teal-500 hover:to-emerald-500 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-teal-300/30"
               >
                 <Users className="h-5 w-5" />
                 Unisciti come recruiter
                 <ArrowRight className="h-5 w-5" />
-              </Button>
+              </button>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-12">

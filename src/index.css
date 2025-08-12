@@ -70,7 +70,11 @@
     /* Shadows */
     --shadow-startup: 0 8px 16px -4px rgba(0,0,0,0.08);
     --shadow-hover: 0 16px 32px -8px rgba(0,0,0,0.12);
-  }
+
+    /* Brand Teal gradient (HSL of #12a57d -> #1dccb2) */
+    --brand-teal-start: 164 80% 36%;
+    --brand-teal-end: 171 75% 46%;
+
 
   .dark {
     --background: 222.2 84% 4.9%;
@@ -119,6 +123,8 @@
   .gradient-primary {
     background: linear-gradient(45deg, hsl(var(--primary-start)) 0%, hsl(var(--primary-end)) 100%);
   }
+  .gradient-brand-teal { background: linear-gradient(135deg, hsl(var(--brand-teal-start)), hsl(var(--brand-teal-end))); }
+
   
   .text-gradient {
     background: linear-gradient(45deg, hsl(var(--primary-start)) 0%, hsl(var(--primary-end)) 100%);
@@ -128,23 +134,15 @@
   }
   
   /* Card shadows startup style */
-  .shadow-startup {
-    box-shadow: var(--shadow-startup);
-  }
-  
-  .shadow-startup-hover {
-    box-shadow: var(--shadow-hover);
-  }
+  .shadow-startup { box-shadow: var(--shadow-startup); }
+  .shadow-startup-hover { box-shadow: var(--shadow-hover); }
   
   /* Hover effects con micro-interazioni */
-  .hover-startup {
-    transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .hover-startup:hover {
-    transform: scale(1.03);
-    box-shadow: var(--shadow-hover);
-  }
+  .hover-startup { transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1); }
+  .hover-startup:hover { transform: scale(1.03); box-shadow: var(--shadow-hover); }
+  .hover-scale { transition: transform 180ms ease; }
+  .hover-scale:hover { transform: scale(1.05); }
+
   
   /* Ripple effect per CTA */
   .ripple {
@@ -171,17 +169,15 @@
   }
 
   /* Layout utilities */
-  .container-startup {
-    max-width: 1240px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-  
-  @media (min-width: 768px) {
-    .container-startup {
-      padding: 0 2rem;
-    }
-  }
+  .container-startup { max-width: 1240px; margin: 0 auto; padding: 0 1rem; }
+  @media (min-width: 768px) { .container-startup { padding: 0 2rem; } }
+
+  /* Glass morphism */
+  .glass { background: hsl(0 0% 100% / 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); }
+
+  /* Simple marquee */
+  .marquee { animation: slide-in 20s linear infinite; }
+
 }
 
 /* Custom loading animations */

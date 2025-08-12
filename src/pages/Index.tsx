@@ -2,6 +2,10 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
+import WhyRecruito from "@/components/home/WhyRecruito";
+import KeyMetricsStrip from "@/components/home/KeyMetricsStrip";
+import ClientLogosMarquee from "@/components/home/ClientLogosMarquee";
+import TestimonialsSlider from "@/components/home/TestimonialsSlider";
 import HowItWorks from "@/components/HowItWorks";
 import ProblemSolution from "@/components/ProblemSolution";
 import Market from "@/components/Market";
@@ -113,6 +117,10 @@ const Index = () => {
       <Header onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />
       <main>
         <Hero onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />
+        <WhyRecruito />
+        <KeyMetricsStrip />
+        <ClientLogosMarquee logos={[]} />
+        <TestimonialsSlider />
         
         {/* Demo Section with improved styling */}
         <div className="py-20 bg-gradient-to-r from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 relative overflow-hidden" data-demo-section id="demo">

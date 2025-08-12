@@ -1,0 +1,32 @@
+/* Animated background utilities scoped to design tokens */
+
+/* Keyframes */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float-slow {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Classes */
+.animated-gradient {
+  background: linear-gradient(45deg, hsl(var(--primary-start)) 0%, hsl(var(--primary-end)) 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 18s ease infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 12s ease-in-out infinite;
+}
+
+/* Accessibility: respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animated-gradient, .animate-float-slow {
+    animation: none !important;
+  }
+}

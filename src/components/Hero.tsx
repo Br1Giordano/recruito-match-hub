@@ -1,8 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap, Sparkles, TrendingUp, Building2 } from "lucide-react";
-import AnimatedBackground from "@/components/ui/animated/AnimatedBackground";
-import VideoBackground from "@/components/ui/animated/VideoBackground";
+import BrandedGradient from "@/components/ui/animated/BrandedGradient";
 
 interface HeroProps {
   onShowAuth?: () => void;
@@ -51,10 +50,8 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Video background */}
-      <VideoBackground src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" poster="/placeholder.svg" />
-      {/* Background gradient overlay */}
-      <div className="absolute inset-0 gradient-recruito opacity-5"></div>
+      {/* Minimal branded animated background */}
+      <BrandedGradient />
       
       <div className="container mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-2 gap-16 items-center">

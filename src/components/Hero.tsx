@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap, Sparkles, TrendingUp, Building2 } from "lucide-react";
 import AnimatedBackground from "@/components/ui/animated/AnimatedBackground";
+import VideoBackground from "@/components/ui/animated/VideoBackground";
 
 interface HeroProps {
   onShowAuth?: () => void;
@@ -50,9 +51,9 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Dynamic animated canvas background */}
-      <AnimatedBackground />
-      {/* Background gradient */}
+      {/* Video background */}
+      <VideoBackground src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" poster="/placeholder.svg" />
+      {/* Background gradient overlay */}
       <div className="absolute inset-0 gradient-recruito opacity-5"></div>
       
       <div className="container mx-auto px-4 py-20">

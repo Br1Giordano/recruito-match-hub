@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
@@ -148,6 +148,87 @@ export type Database = {
         }
         Relationships: []
       }
+      compliance_audit_log: {
+        Row: {
+          audit_type: string
+          audited_by: string | null
+          compliance_status: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          findings: string[] | null
+          id: string
+          metadata: Json | null
+          recommendations: string[] | null
+        }
+        Insert: {
+          audit_type: string
+          audited_by?: string | null
+          compliance_status: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          findings?: string[] | null
+          id?: string
+          metadata?: Json | null
+          recommendations?: string[] | null
+        }
+        Update: {
+          audit_type?: string
+          audited_by?: string | null
+          compliance_status?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          findings?: string[] | null
+          id?: string
+          metadata?: Json | null
+          recommendations?: string[] | null
+        }
+        Relationships: []
+      }
+      contract_templates: {
+        Row: {
+          category: string
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_mandatory: boolean
+          language: string
+          name: string
+          updated_at: string
+          variables: Json | null
+          version: string
+        }
+        Insert: {
+          category: string
+          content: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_mandatory?: boolean
+          language?: string
+          name: string
+          updated_at?: string
+          variables?: Json | null
+          version?: string
+        }
+        Update: {
+          category?: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_mandatory?: boolean
+          language?: string
+          name?: string
+          updated_at?: string
+          variables?: Json | null
+          version?: string
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           company_email: string
@@ -185,6 +266,138 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      digital_contracts: {
+        Row: {
+          content: string
+          contract_type: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          template_data: Json | null
+          title: string
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          content: string
+          contract_type: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          template_data?: Json | null
+          title: string
+          updated_at?: string
+          version?: string
+        }
+        Update: {
+          content?: string
+          contract_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          template_data?: Json | null
+          title?: string
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
+      gdpr_activity_log: {
+        Row: {
+          activity_type: string
+          created_at: string
+          data_categories: string[] | null
+          description: string
+          id: string
+          ip_address: unknown | null
+          legal_basis: string | null
+          metadata: Json | null
+          processed_by: string | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          data_categories?: string[] | null
+          description: string
+          id?: string
+          ip_address?: unknown | null
+          legal_basis?: string | null
+          metadata?: Json | null
+          processed_by?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          data_categories?: string[] | null
+          description?: string
+          id?: string
+          ip_address?: unknown | null
+          legal_basis?: string | null
+          metadata?: Json | null
+          processed_by?: string | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      gdpr_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          id: string
+          processed_by: string | null
+          rejection_reason: string | null
+          request_type: string
+          requested_data: string[] | null
+          response_data: Json | null
+          status: string
+          updated_at: string
+          user_email: string
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          processed_by?: string | null
+          rejection_reason?: string | null
+          request_type: string
+          requested_data?: string[] | null
+          response_data?: Json | null
+          status?: string
+          updated_at?: string
+          user_email: string
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          processed_by?: string | null
+          rejection_reason?: string | null
+          request_type?: string
+          requested_data?: string[] | null
+          response_data?: Json | null
+          status?: string
+          updated_at?: string
+          user_email?: string
+          user_id?: string | null
+        }
+        Relationships: []
       }
       job_offers: {
         Row: {
@@ -250,6 +463,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      legal_notifications: {
+        Row: {
+          created_at: string
+          expires_at: string | null
+          id: string
+          is_read: boolean
+          message: string
+          metadata: Json | null
+          notification_type: string
+          priority: string
+          read_at: string | null
+          target_audience: string
+          target_user_id: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean
+          message: string
+          metadata?: Json | null
+          notification_type: string
+          priority?: string
+          read_at?: string | null
+          target_audience: string
+          target_user_id?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          is_read?: boolean
+          message?: string
+          metadata?: Json | null
+          notification_type?: string
+          priority?: string
+          read_at?: string | null
+          target_audience?: string
+          target_user_id?: string | null
+          title?: string
+        }
+        Relationships: []
       }
       login_attempts: {
         Row: {
@@ -717,6 +975,62 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      signed_contracts: {
+        Row: {
+          contract_data: Json | null
+          contract_id: string
+          created_at: string
+          expiry_date: string | null
+          id: string
+          ip_address: unknown | null
+          signature_data: Json
+          signed_at: string
+          status: string
+          user_agent: string | null
+          user_email: string
+          user_id: string
+          user_type: string
+        }
+        Insert: {
+          contract_data?: Json | null
+          contract_id: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          ip_address?: unknown | null
+          signature_data: Json
+          signed_at?: string
+          status?: string
+          user_agent?: string | null
+          user_email: string
+          user_id: string
+          user_type: string
+        }
+        Update: {
+          contract_data?: Json | null
+          contract_id?: string
+          created_at?: string
+          expiry_date?: string | null
+          id?: string
+          ip_address?: unknown | null
+          signature_data?: Json
+          signed_at?: string
+          status?: string
+          user_agent?: string | null
+          user_email?: string
+          user_id?: string
+          user_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signed_contracts_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "digital_contracts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_profiles: {
         Row: {

@@ -50,98 +50,77 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden">
-      {/* Floating decorative elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="floating-blob absolute top-20 left-20 w-32 h-32 bg-primary/10 animate-float stagger-1" />
-        <div className="floating-blob absolute top-40 right-32 w-24 h-24 bg-primary-glow/15 animate-float stagger-3" />
-        <div className="floating-blob absolute bottom-32 left-1/3 w-28 h-28 bg-primary/8 animate-float stagger-5" />
-      </div>
-      
-      <div className="container-modern py-20">
-        <div className="grid lg:grid-cols-2 gap-20 items-center">
-          <div className="space-y-12 animate-fade-in-up">
-            <div className="space-y-8">
-              <h1 className="text-6xl lg:text-8xl font-black text-foreground leading-[0.9] tracking-tight">
+      {/* Background handled globally on Index page */}
+      <div className="container mx-auto px-4 py-20">
+        <div className="grid lg:grid-cols-2 gap-16 items-center">
+          <div className="space-y-10 animate-fade-in">
+            <div className="space-y-6">
+              <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 leading-tight">
                 Il recruiting che 
-                <span className="text-gradient block animate-glow">funziona davvero</span>
+                <span className="text-gradient block">funziona davvero</span>
               </h1>
-              <p className="text-xl lg:text-2xl text-muted-foreground leading-relaxed font-medium max-w-2xl">
+              <p className="text-xl lg:text-2xl text-gray-600 leading-relaxed">
                 Connetti la tua azienda con i migliori recruiter freelance d'Italia. 
                 Assumi profili qualificati in tempi rapidi, pagando solo a risultato.
               </p>
             </div>
 
-            {/* Modern CTAs with advanced effects */}
-            <div className="flex flex-col sm:flex-row gap-6 pt-8 animate-scale-in stagger-2">
+            {/* Pulsanti con colori più chiari del brand */}
+            <div className="flex justify-center gap-4 pt-8">
               <button 
                 onClick={scrollToDemo}
-                className="group relative inline-flex items-center gap-3 gradient-primary hover:shadow-glow text-primary-foreground px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-500 cursor-pointer shadow-strong hover:shadow-strong hover:scale-105 ripple-effect overflow-hidden"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-400 to-blue-500 hover:from-blue-500 hover:to-blue-600 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-blue-300/30"
               >
-                <div className="absolute inset-0 animate-shimmer opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <Building2 className="h-6 w-6 transition-transform group-hover:scale-110" />
-                <span>Unisciti come azienda</span>
-                <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
+                <Building2 className="h-5 w-5" />
+                Unisciti come azienda
+                <ArrowRight className="h-5 w-5" />
               </button>
               
               <button 
                 onClick={scrollToDemo}
-                className="group relative inline-flex items-center gap-3 glass-card hover:shadow-medium text-foreground px-10 py-4 rounded-2xl text-lg font-bold transition-all duration-500 cursor-pointer hover:scale-105 ripple-effect overflow-hidden border border-border/50"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-teal-400 to-emerald-400 hover:from-teal-500 hover:to-emerald-500 text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl transform hover:scale-105 border-2 border-teal-300/30"
               >
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <Users className="h-6 w-6 transition-transform group-hover:scale-110" />
-                <span>Unisciti come recruiter</span>
-                <ArrowRight className="h-6 w-6 transition-transform group-hover:translate-x-1" />
+                <Users className="h-5 w-5" />
+                Unisciti come recruiter
+                <ArrowRight className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-16 animate-fade-in-up stagger-3">
-              <div className="group text-center space-y-3 p-6 rounded-xl hover-lift transition-all duration-300">
-                <div className="text-4xl font-black text-foreground group-hover:text-primary transition-colors">Solo successo</div>
-                <div className="text-lg text-muted-foreground font-medium">Paghi solo a risultato ottenuto</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-12">
+              <div className="text-center space-y-2">
+                <div className="text-3xl font-bold text-gray-900">Solo successo</div>
+                <div className="text-base text-gray-600">Paghi solo a risultato ottenuto</div>
               </div>
-              <div className="group text-center space-y-3 p-6 rounded-xl hover-lift transition-all duration-300">
-                <div className="text-4xl font-black text-foreground group-hover:text-primary transition-colors">Qualità garantita</div>
-                <div className="text-lg text-muted-foreground font-medium">Recruiter selezionati e verificati</div>
+              <div className="text-center space-y-2">
+                <div className="text-3xl font-bold text-gray-900">Qualità garantita</div>
+                <div className="text-base text-gray-600">Recruiter selezionati e verificati</div>
               </div>
-              <div className="group text-center space-y-3 p-6 rounded-xl hover-lift transition-all duration-300">
-                <div className="text-4xl font-black text-foreground group-hover:text-primary transition-colors">Processo digitale</div>
-                <div className="text-lg text-muted-foreground font-medium">Piattaforma moderna ed efficiente</div>
+              <div className="text-center space-y-2">
+                <div className="text-3xl font-bold text-gray-900">Processo digitale</div>
+                <div className="text-base text-gray-600">Piattaforma moderna ed efficiente</div>
               </div>
             </div>
           </div>
 
-          <div className="relative animate-slide-in stagger-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-8">
-                <div className="group gradient-card p-8 rounded-3xl shadow-medium hover-float border border-border/20">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <Users className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">Recruiter Verificati</h3>
-                  <p className="text-muted-foreground leading-relaxed">Solo i migliori professionisti, selezionati e valutati con standard elevati</p>
+          <div className="relative animate-slide-in">
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-6">
+                <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
+                  <Users className="h-12 w-12 text-recruito-blue mb-4" />
+                  <h3 className="font-semibold text-gray-900 mb-2">Recruiter Verificati</h3>
+                  <p className="text-gray-600 text-sm">Solo i migliori professionisti, selezionati e valutati</p>
                 </div>
-                <div className="group gradient-card p-8 rounded-3xl shadow-medium hover-float border border-border/20">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <Zap className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">Risultati Rapidi</h3>
-                  <p className="text-muted-foreground leading-relaxed">Profili qualificati in giorni, non mesi. Efficienza garantita</p>
+                <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
+                  <Zap className="h-12 w-12 text-recruito-green mb-4" />
+                  <h3 className="font-semibold text-gray-900 mb-2">Risultati Rapidi</h3>
+                  <p className="text-gray-600 text-sm">Profili qualificati in giorni, non mesi</p>
                 </div>
               </div>
-              <div className="space-y-8 md:pt-12">
-                <div className="group gradient-card p-8 rounded-3xl shadow-medium hover-float border border-border/20">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <Target className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">Solo a Successo</h3>
-                  <p className="text-muted-foreground leading-relaxed">Paghi solo quando trovi e assumi il candidato giusto. Zero rischi</p>
-                </div>
-                <div className="group gradient-card p-8 rounded-3xl shadow-medium hover-float border border-border/20">
-                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <Sparkles className="h-8 w-8 text-primary" />
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-3">AI Powered</h3>
-                  <p className="text-muted-foreground leading-relaxed">Matching intelligente tra aziende e recruiter per risultati ottimali</p>
+              <div className="space-y-6 pt-12">
+                <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
+                  <Target className="h-12 w-12 text-recruito-teal mb-4" />
+                  <h3 className="font-semibold text-gray-900 mb-2">Solo a Successo</h3>
+                  <p className="text-gray-600 text-sm">Paghi solo quando trovi e assumi il candidato giusto</p>
                 </div>
               </div>
             </div>

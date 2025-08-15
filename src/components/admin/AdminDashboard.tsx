@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { it } from "date-fns/locale";
 import AdminJobOffersManagement from "./AdminJobOffersManagement";
+import { LegalAdminDashboard } from "./LegalAdminDashboard";
 
 interface AdminMetrics {
   totalRecruiters: number;
@@ -567,7 +568,7 @@ export default function AdminDashboard() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="users" className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="users">
                 Utenti ({filterUsers([...recruiters, ...companies]).length})
               </TabsTrigger>
@@ -576,6 +577,9 @@ export default function AdminDashboard() {
               </TabsTrigger>
               <TabsTrigger value="companies">
                 Aziende ({filterUsers(companies).length})
+              </TabsTrigger>
+              <TabsTrigger value="legal">
+                Gestione Legale
               </TabsTrigger>
             </TabsList>
 
@@ -700,6 +704,10 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
+            </TabsContent>
+
+            <TabsContent value="legal" className="space-y-4">
+              <LegalAdminDashboard />
             </TabsContent>
           </Tabs>
         </CardContent>

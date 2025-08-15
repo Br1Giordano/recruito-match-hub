@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { sanitizeFormData } from "@/utils/inputSanitizer";
-import { ContractAcceptanceStep } from "@/components/legal/ContractAcceptanceStep";
 
 const CompanyRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -21,8 +20,6 @@ const CompanyRegistrationForm = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [step, setStep] = useState(1); // 1: form, 2: contracts
-  const [registrationId, setRegistrationId] = useState<string | null>(null);
   const { toast } = useToast();
   const { user, linkToRegistration } = useAuth();
 
@@ -66,13 +63,34 @@ const CompanyRegistrationForm = () => {
         return;
       }
 
-      // Store registration ID and move to contracts step
-      setRegistrationId(data.id);
-      setStep(2);
+      // If user is authenticated, link this registration to their profile
+      if (user && data) {
+        const linked = await linkToRegistration(data.id, 'company');
+        if (linked) {
+          toast({
+            title: "Registrazione completata!",
+            description: "Il tuo profilo aziendale è stato collegato con successo.",
+          });
+        } else {
+          toast({
+            title: "Registrazione inviata!",
+            description: "Ti contatteremo presto per discutere come Recruito può aiutare la tua azienda.",
+          });
+        }
+      } else {
+        toast({
+          title: "Registrazione inviata!",
+          description: "Ti contatteremo presto per discutere come Recruito può aiutare la tua azienda.",
+        });
+      }
 
-      toast({
-        title: "Dati salvati!",
-        description: "Ora accetta i contratti per completare la registrazione.",
+      // Reset form
+      setFormData({
+        nome_azienda: "",
+        settore: "",
+        email: "",
+        telefono: "",
+        messaggio: ""
       });
     } catch (error) {
       toast({
@@ -92,58 +110,6 @@ const CompanyRegistrationForm = () => {
       [name]: value
     }));
   };
-
-  const handleContractsComplete = async () => {
-    try {
-      // If user is authenticated, link this registration to their profile
-      if (user && registrationId) {
-        const linked = await linkToRegistration(registrationId, 'company');
-        if (linked) {
-          toast({
-            title: "Registrazione completata!",
-            description: "Il tuo profilo aziendale è stato collegato con successo.",
-          });
-        } else {
-          toast({
-            title: "Registrazione completata!",
-            description: "Ti contatteremo presto per discutere come Recruito può aiutare la tua azienda.",
-          });
-        }
-      } else {
-        toast({
-          title: "Registrazione completata!",
-          description: "Ti contatteremo presto per discutere come Recruito può aiutare la tua azienda.",
-        });
-      }
-
-      // Reset form
-      setFormData({
-        nome_azienda: "",
-        settore: "",
-        email: "",
-        telefono: "",
-        messaggio: ""
-      });
-      setStep(1);
-      setRegistrationId(null);
-    } catch (error) {
-      toast({
-        title: "Errore",
-        description: "Errore durante il completamento della registrazione",
-        variant: "destructive",
-      });
-    }
-  };
-
-  if (step === 2) {
-    return (
-      <ContractAcceptanceStep
-        userType="company"
-        onComplete={handleContractsComplete}
-        isRequired={true}
-      />
-    );
-  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

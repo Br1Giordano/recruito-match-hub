@@ -15,8 +15,6 @@ import CompanyProposalsDashboard from "./CompanyProposalsDashboard";
 import { CompanyMessagesSection } from "./messaging/CompanyMessagesSection";
 import AdminDashboard from "./admin/AdminDashboard";
 import { User, Building2, FileText, Briefcase, MessageSquare, ArrowLeft, Home, LogOut, Settings, ChevronDown, Shield, Star } from "lucide-react";
-import { LegalDashboard } from "@/components/legal/LegalDashboard";
-import { LegalNotificationBanner } from "@/components/legal/LegalNotificationBanner";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -222,9 +220,8 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
       </div>
 
       <div className="container mx-auto p-4">
-        <LegalNotificationBanner />
         <Tabs defaultValue="job-board" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="job-board" className="flex items-center gap-2">
               <Briefcase className="h-4 w-4" />
               Posizioni Aperte
@@ -236,10 +233,6 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
             <TabsTrigger value="proposals" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Le Mie Candidature
-            </TabsTrigger>
-            <TabsTrigger value="legal" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Privacy & Accordi
             </TabsTrigger>
           </TabsList>
           
@@ -253,10 +246,6 @@ function RecruiterDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; 
           
           <TabsContent value="proposals">
             <RecruiterDashboard />
-          </TabsContent>
-          
-          <TabsContent value="legal">
-            <LegalDashboard />
           </TabsContent>
         </Tabs>
       </div>
@@ -353,9 +342,8 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
       />
 
       <div className="container mx-auto p-4">
-        <LegalNotificationBanner />
         <Tabs defaultValue="proposals" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="proposals" className="flex items-center gap-2">
               <FileText className="h-4 w-4" />
               Proposte Ricevute
@@ -376,10 +364,6 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
               <Briefcase className="h-4 w-4" />
               Le Mie Offerte
             </TabsTrigger>
-            <TabsTrigger value="legal" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Contratti & Privacy
-            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="proposals">
@@ -392,10 +376,6 @@ function CompanyDashboardLayout({ onBack, onSignOut }: { onBack?: () => void; on
           
           <TabsContent value="offers">
             <CompanyOffersDashboard />
-          </TabsContent>
-          
-          <TabsContent value="legal">
-            <LegalDashboard />
           </TabsContent>
         </Tabs>
       </div>

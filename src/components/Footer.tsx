@@ -1,7 +1,6 @@
 
 import { Separator } from "@/components/ui/separator";
 import { Link } from "react-router-dom";
-import { LegalFooterLinks } from "./legal/LegalFooterLinks";
 
 const Footer = () => {
   return <footer className="bg-gray-900 text-white py-16">
@@ -60,7 +59,6 @@ const Footer = () => {
             <Link to="/cookie-policy" className="text-gray-400 hover:text-white transition-colors text-sm">
               Cookie Policy
             </Link>
-            <LegalFooterLinks />
           </div>
         </div>
       </div>

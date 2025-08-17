@@ -14,6 +14,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 import { ArrowLeft, Save } from "lucide-react";
+import { sanitizeFormData } from "@/utils/inputSanitizer";
 
 const jobOfferSchema = z.object({
   company_name: z.string().min(1, "Il nome dell'azienda è obbligatorio"),
@@ -78,26 +79,51 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
         return;
       }
 
+      // Sanitize input data
+      const sanitizationSchema = {
+        company_name: { maxLength: 200, type: 'text' as const },
+        title: { maxLength: 200, type: 'text' as const },
+        description: { maxLength: 5000, type: 'text' as const },
+        location: { maxLength: 200, type: 'text' as const },
+        salary_min: { maxLength: 20, type: 'text' as const },
+        salary_max: { maxLength: 20, type: 'text' as const },
+        requirements: { maxLength: 3000, type: 'text' as const },
+        benefits: { maxLength: 3000, type: 'text' as const },
+        employment_type: { maxLength: 50, type: 'text' as const },
+        status: { maxLength: 20, type: 'text' as const },
+      };
+
+      const { sanitized, errors } = sanitizeFormData(data, sanitizationSchema);
+
+      if (Object.keys(errors).length > 0) {
+        toast({
+          title: "Errore di validazione",
+          description: Object.values(errors).join(', '),
+          variant: "destructive",
+        });
+        return;
+      }
+
       console.log("Creating job offer with user:", user.email);
-      console.log("Company name:", data.company_name);
+      console.log("Company name:", sanitized.company_name);
 
       // Convert salary strings to numbers if provided
-      const salaryMin = data.salary_min ? parseInt(data.salary_min) : null;
-      const salaryMax = data.salary_max ? parseInt(data.salary_max) : null;
+      const salaryMin = sanitized.salary_min ? parseInt(sanitized.salary_min) : null;
+      const salaryMax = sanitized.salary_max ? parseInt(sanitized.salary_max) : null;
 
       const jobOfferData = {
-        company_name: data.company_name,
+        company_name: sanitized.company_name,
         contact_email: user.email,
         user_id: user.id, // Aggiunto per soddisfare la policy RLS
-        title: data.title,
-        description: data.description || null,
-        location: data.location || null,
+        title: sanitized.title,
+        description: sanitized.description || null,
+        location: sanitized.location || null,
         salary_min: salaryMin,
         salary_max: salaryMax,
-        requirements: data.requirements || null,
-        benefits: data.benefits || null,
-        employment_type: data.employment_type,
-        status: data.status,
+        requirements: sanitized.requirements || null,
+        benefits: sanitized.benefits || null,
+        employment_type: sanitized.employment_type,
+        status: sanitized.status,
         // company_id rimane null per questa nuova struttura semplificata
         company_id: null,
       };

@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { sanitizeFormData } from "@/utils/inputSanitizer";
 
 const proposalSchema = z.object({
   company_id: z.string().min(1, "Seleziona un'azienda"),
@@ -103,6 +104,34 @@ export default function ProposalForm() {
   const onSubmit = async (data: ProposalFormData) => {
     setIsLoading(true);
 
+    // Sanitize input data
+    const sanitizationSchema = {
+      company_id: { maxLength: 100, type: 'text' as const },
+      job_offer_id: { maxLength: 100, type: 'text' as const },
+      candidate_name: { maxLength: 100, type: 'text' as const },
+      candidate_email: { type: 'email' as const },
+      candidate_phone: { type: 'phone' as const },
+      candidate_linkedin: { type: 'url' as const },
+      proposal_description: { maxLength: 2000, type: 'text' as const },
+      years_experience: { maxLength: 10, type: 'text' as const },
+      current_salary: { maxLength: 20, type: 'text' as const },
+      expected_salary: { maxLength: 20, type: 'text' as const },
+      availability_weeks: { maxLength: 10, type: 'text' as const },
+      recruiter_fee_percentage: { maxLength: 10, type: 'text' as const },
+    };
+
+    const { sanitized, errors } = sanitizeFormData(data, sanitizationSchema);
+
+    if (Object.keys(errors).length > 0) {
+      toast({
+        title: "Errore di validazione",
+        description: Object.values(errors).join(', '),
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
     // Get current recruiter ID (in a real app, this would come from auth)
     const { data: recruiterData, error: recruiterError } = await supabase
       .from("recruiter_registrations")
@@ -122,18 +151,18 @@ export default function ProposalForm() {
 
     const proposalData = {
       recruiter_id: recruiterData.id,
-      company_id: data.company_id,
-      job_offer_id: data.job_offer_id || null,
-      candidate_name: data.candidate_name,
-      candidate_email: data.candidate_email,
-      candidate_phone: data.candidate_phone || null,
-      candidate_linkedin: data.candidate_linkedin || null,
-      proposal_description: data.proposal_description,
-      years_experience: data.years_experience,
-      current_salary: data.current_salary || null,
-      expected_salary: data.expected_salary || null,
-      availability_weeks: data.availability_weeks,
-      recruiter_fee_percentage: data.recruiter_fee_percentage,
+      company_id: sanitized.company_id,
+      job_offer_id: sanitized.job_offer_id || null,
+      candidate_name: sanitized.candidate_name,
+      candidate_email: sanitized.candidate_email,
+      candidate_phone: sanitized.candidate_phone || null,
+      candidate_linkedin: sanitized.candidate_linkedin || null,
+      proposal_description: sanitized.proposal_description,
+      years_experience: sanitized.years_experience,
+      current_salary: sanitized.current_salary || null,
+      expected_salary: sanitized.expected_salary || null,
+      availability_weeks: sanitized.availability_weeks,
+      recruiter_fee_percentage: sanitized.recruiter_fee_percentage,
     };
 
     const { error } = await supabase

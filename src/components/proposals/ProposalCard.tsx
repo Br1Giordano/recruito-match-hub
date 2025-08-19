@@ -1,8 +1,9 @@
+
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { CVViewer } from '@/components/cv/CVViewer';
+import CVViewer from '@/components/cv/CVViewer';
 import {
   CheckCircle2,
   Clock4,
@@ -12,10 +13,10 @@ import {
   User,
 } from "lucide-react";
 
-const statusMap: { [key: string]: { label: string; variant: "default" | "secondary" | "outline" | "destructive"; icon: LucideIcon } } = {
+const statusMap: { [key: string]: { label: string; variant: "default" | "secondary" | "outline"; icon: LucideIcon } } = {
   pending: { label: "In Attesa", variant: "outline", icon: Clock4 },
   approved: { label: "Approvata", variant: "default", icon: CheckCircle2 },
-  rejected: { label: "Rifiutata", variant: "destructive", icon: FileText },
+  rejected: { label: "Rifiutata", variant: "outline", icon: FileText },
   under_review: { label: "In Revisione", variant: "secondary", icon: Clock4 },
   contacted: { label: "Contattato", variant: "secondary", icon: Mail },
   interview_scheduled: { label: "Colloquio", variant: "secondary", icon: User },
@@ -149,9 +150,10 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
         {userType === 'recruiter' && onDelete && (
           <div className="flex justify-end pt-2">
             <Button
-              variant="destructive"
+              variant="outline"
               size="sm"
               onClick={() => onDelete(proposal.id)}
+              className="text-red-600 border-red-300 hover:bg-red-50"
             >
               Elimina Proposta
             </Button>

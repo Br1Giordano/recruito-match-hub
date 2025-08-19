@@ -6,7 +6,7 @@ import { FileText, Shield, Eye, Download, Lock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface CVViewerProps {
-  proposal: {
+  proposal?: {
     id: string;
     candidate_cv_url?: string;
     candidate_cv_anonymized_url?: string;
@@ -15,34 +15,29 @@ interface CVViewerProps {
     company_access_level?: 'restricted' | 'full';
     candidate_name: string;
   };
-  userType: 'company' | 'recruiter';
+  userType?: 'company' | 'recruiter';
+  cvUrl?: string;
+  candidateName?: string;
+  trigger?: React.ReactNode;
 }
 
-export const CVViewer: React.FC<CVViewerProps> = ({ proposal, userType }) => {
+export default function CVViewer({ 
+  proposal, 
+  userType, 
+  cvUrl: directCvUrl, 
+  candidateName: directCandidateName,
+  trigger
+}: CVViewerProps) {
   const [showCV, setShowCV] = useState(false);
   const { user } = useAuth();
 
-  const canViewFullCV = () => {
-    // I recruiter possono sempre vedere il CV completo
-    if (userType === 'recruiter') return true;
-    
-    // Le aziende possono vedere il CV completo solo se la proposta è approvata/accettata
-    if (userType === 'company') {
-      return proposal.status in ['approved', 'accepted', 'under_review'];
-    }
-    
-    return false;
-  };
+  // Handle both direct props and proposal-based props
+  const candidateName = directCandidateName || proposal?.candidate_name || 'Candidato';
+  const cvUrl = directCvUrl || getCVUrl();
 
-  const shouldShowAnonymizedCV = () => {
-    // Mostra CV anonimizzato alle aziende quando la proposta è in stato pending/submitted
-    return userType === 'company' && 
-           !canViewFullCV() && 
-           proposal.candidate_cv_anonymized_url &&
-           proposal.cv_processing_status === 'completed';
-  };
-
-  const getCVUrl = () => {
+  function getCVUrl() {
+    if (!proposal) return null;
+    
     if (canViewFullCV() && proposal.candidate_cv_url) {
       return proposal.candidate_cv_url;
     }
@@ -52,9 +47,35 @@ export const CVViewer: React.FC<CVViewerProps> = ({ proposal, userType }) => {
     }
     
     return null;
+  }
+
+  const canViewFullCV = () => {
+    if (!proposal || !userType) return true; // For direct usage
+    
+    // I recruiter possono sempre vedere il CV completo
+    if (userType === 'recruiter') return true;
+    
+    // Le aziende possono vedere il CV completo solo se la proposta è approvata/accettata
+    if (userType === 'company') {
+      return ['approved', 'accepted', 'under_review'].includes(proposal.status);
+    }
+    
+    return false;
+  };
+
+  const shouldShowAnonymizedCV = () => {
+    if (!proposal || !userType) return false;
+    
+    // Mostra CV anonimizzato alle aziende quando la proposta è in stato pending/submitted
+    return userType === 'company' && 
+           !canViewFullCV() && 
+           proposal.candidate_cv_anonymized_url &&
+           proposal.cv_processing_status === 'completed';
   };
 
   const getAccessLevelBadge = () => {
+    if (!proposal || !userType) return null;
+    
     if (userType === 'recruiter') {
       return <Badge variant="default">Accesso Completo</Badge>;
     }
@@ -71,6 +92,8 @@ export const CVViewer: React.FC<CVViewerProps> = ({ proposal, userType }) => {
   };
 
   const getStatusMessage = () => {
+    if (!proposal) return null;
+    
     if (proposal.cv_processing_status === 'processing') {
       return "CV in elaborazione...";
     }
@@ -86,15 +109,26 @@ export const CVViewer: React.FC<CVViewerProps> = ({ proposal, userType }) => {
     return null;
   };
 
-  const cvUrl = getCVUrl();
   const statusMessage = getStatusMessage();
 
+  // Simple trigger button for direct usage
+  if (trigger) {
+    return (
+      <>
+        <span onClick={() => cvUrl && window.open(cvUrl, '_blank')} className="cursor-pointer">
+          {trigger}
+        </span>
+      </>
+    );
+  }
+
+  // Full component for proposal usage
   return (
     <div className="border rounded-lg p-4 space-y-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FileText className="h-5 w-5 text-gray-600" />
-          <span className="font-medium">CV di {proposal.candidate_name}</span>
+          <span className="font-medium">CV di {candidateName}</span>
         </div>
         {getAccessLevelBadge()}
       </div>
@@ -137,7 +171,7 @@ export const CVViewer: React.FC<CVViewerProps> = ({ proposal, userType }) => {
             onClick={() => {
               const link = document.createElement('a');
               link.href = cvUrl;
-              link.download = `CV_${proposal.candidate_name}_${canViewFullCV() ? 'completo' : 'anonimizzato'}.pdf`;
+              link.download = `CV_${candidateName}_${canViewFullCV() ? 'completo' : 'anonimizzato'}.pdf`;
               link.click();
             }}
           >
@@ -147,11 +181,14 @@ export const CVViewer: React.FC<CVViewerProps> = ({ proposal, userType }) => {
         </div>
       )}
 
-      {!cvUrl && proposal.cv_processing_status === 'completed' && (
+      {!cvUrl && proposal?.cv_processing_status === 'completed' && (
         <p className="text-sm text-gray-500">
           Nessun CV disponibile per il tuo livello di accesso
         </p>
       )}
     </div>
   );
-};
+}
+
+// Also export as named export for backward compatibility
+export { CVViewer };

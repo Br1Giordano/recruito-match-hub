@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -23,7 +24,7 @@ interface ProposalFormFieldsProps {
   onInputChange: (field: string, value: string) => void;
 }
 
-export default function ProposalFormFields({ formData, onInputChange }: ProposalFormFieldsProps) {
+function ProposalFormFields({ formData, onInputChange }: ProposalFormFieldsProps) {
   return (
     <div className="space-y-6">
       {/* Informazioni Candidato */}
@@ -202,4 +203,5 @@ export default function ProposalFormFields({ formData, onInputChange }: Proposal
   );
 }
 
+export default ProposalFormFields;
 export { ProposalFormFields };

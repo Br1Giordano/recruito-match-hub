@@ -21,7 +21,7 @@ interface CVViewerProps {
   trigger?: React.ReactNode;
 }
 
-export default function CVViewer({ 
+function CVViewer({ 
   proposal, 
   userType, 
   cvUrl: directCvUrl, 
@@ -190,5 +190,5 @@ export default function CVViewer({
   );
 }
 
-// Also export as named export for backward compatibility
+export default CVViewer;
 export { CVViewer };

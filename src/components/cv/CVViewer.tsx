@@ -1,125 +1,157 @@
-import { useState } from 'react';
+
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { FileText, Download, Eye, ExternalLink } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { FileText, Shield, Eye, Download, Lock } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 interface CVViewerProps {
-  cvUrl?: string;
-  candidateName: string;
-  trigger?: React.ReactNode;
+  proposal: {
+    id: string;
+    candidate_cv_url?: string;
+    candidate_cv_anonymized_url?: string;
+    cv_processing_status?: string;
+    status: string;
+    company_access_level?: 'restricted' | 'full';
+    candidate_name: string;
+  };
+  userType: 'company' | 'recruiter';
 }
 
-export default function CVViewer({ cvUrl, candidateName, trigger }: CVViewerProps) {
-  const [isOpen, setIsOpen] = useState(false);
-  const { toast } = useToast();
+export const CVViewer: React.FC<CVViewerProps> = ({ proposal, userType }) => {
+  const [showCV, setShowCV] = useState(false);
+  const { user } = useAuth();
 
-  if (!cvUrl) {
-    return (
-      <Badge variant="secondary" className="text-gray-500">
-        <FileText className="h-3 w-3 mr-1" />
-        Nessun CV
-      </Badge>
-    );
-  }
-
-  const handleDownload = async () => {
-    try {
-      const response = await fetch(cvUrl);
-      const blob = await response.blob();
-      
-      // Estrai il nome del file dall'URL o usa un nome di default
-      const fileName = cvUrl.split('/').pop() || `CV_${candidateName.replace(' ', '_')}.pdf`;
-      
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast({
-        title: "Download completato",
-        description: `CV di ${candidateName} scaricato con successo`,
-      });
-    } catch (error) {
-      console.error('Error downloading CV:', error);
-      toast({
-        title: "Errore download",
-        description: "Impossibile scaricare il CV",
-        variant: "destructive",
-      });
+  const canViewFullCV = () => {
+    // I recruiter possono sempre vedere il CV completo
+    if (userType === 'recruiter') return true;
+    
+    // Le aziende possono vedere il CV completo solo se la proposta è approvata/accettata
+    if (userType === 'company') {
+      return proposal.status in ['approved', 'accepted', 'under_review'];
     }
+    
+    return false;
   };
 
-  const handleOpenInNewTab = () => {
-    window.open(cvUrl, '_blank');
+  const shouldShowAnonymizedCV = () => {
+    // Mostra CV anonimizzato alle aziende quando la proposta è in stato pending/submitted
+    return userType === 'company' && 
+           !canViewFullCV() && 
+           proposal.candidate_cv_anonymized_url &&
+           proposal.cv_processing_status === 'completed';
   };
+
+  const getCVUrl = () => {
+    if (canViewFullCV() && proposal.candidate_cv_url) {
+      return proposal.candidate_cv_url;
+    }
+    
+    if (shouldShowAnonymizedCV()) {
+      return proposal.candidate_cv_anonymized_url;
+    }
+    
+    return null;
+  };
+
+  const getAccessLevelBadge = () => {
+    if (userType === 'recruiter') {
+      return <Badge variant="default">Accesso Completo</Badge>;
+    }
+    
+    if (canViewFullCV()) {
+      return <Badge variant="default">CV Completo</Badge>;
+    }
+    
+    if (shouldShowAnonymizedCV()) {
+      return <Badge variant="secondary"><Shield className="h-3 w-3 mr-1" />CV Anonimizzato</Badge>;
+    }
+    
+    return <Badge variant="outline"><Lock className="h-3 w-3 mr-1" />Accesso Limitato</Badge>;
+  };
+
+  const getStatusMessage = () => {
+    if (proposal.cv_processing_status === 'processing') {
+      return "CV in elaborazione...";
+    }
+    
+    if (proposal.cv_processing_status === 'error') {
+      return "Errore nell'elaborazione del CV";
+    }
+    
+    if (userType === 'company' && !canViewFullCV() && !shouldShowAnonymizedCV()) {
+      return "Il CV completo sarà disponibile dopo l'approvazione della proposta";
+    }
+    
+    return null;
+  };
+
+  const cvUrl = getCVUrl();
+  const statusMessage = getStatusMessage();
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {trigger || (
-          <Button variant="outline" size="sm" className="text-blue-600 border-blue-300 hover:bg-blue-50">
-            <FileText className="h-4 w-4 mr-2" />
-            Visualizza CV
-          </Button>
-        )}
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5 text-blue-600" />
-            CV di {candidateName}
-          </DialogTitle>
-          <DialogDescription>
-            Visualizza o scarica il CV del candidato
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div className="space-y-4">
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <div className="flex items-center gap-2 mb-2">
-              <FileText className="h-4 w-4 text-blue-600" />
-              <span className="font-medium text-blue-900">CV Candidato</span>
+    <div className="border rounded-lg p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FileText className="h-5 w-5 text-gray-600" />
+          <span className="font-medium">CV di {proposal.candidate_name}</span>
+        </div>
+        {getAccessLevelBadge()}
+      </div>
+
+      {statusMessage && (
+        <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+          {statusMessage}
+        </p>
+      )}
+
+      {!canViewFullCV() && shouldShowAnonymizedCV() && (
+        <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
+          <div className="flex items-start gap-2">
+            <Shield className="h-4 w-4 text-blue-600 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-medium text-blue-900">CV Protetto</p>
+              <p className="text-blue-700">
+                I dati di contatto sono stati oscurati per proteggere la privacy. 
+                Il CV completo sarà disponibile dopo l'approvazione della proposta.
+              </p>
             </div>
-            <p className="text-sm text-blue-700">
-              Il CV di <strong>{candidateName}</strong> è disponibile per la visualizzazione e il download.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Button onClick={handleOpenInNewTab} className="w-full">
-              <Eye className="h-4 w-4 mr-2" />
-              Visualizza CV
-            </Button>
-            
-            <Button variant="outline" onClick={handleDownload} className="w-full">
-              <Download className="h-4 w-4 mr-2" />
-              Scarica CV
-            </Button>
-            
-            <Button variant="ghost" onClick={handleOpenInNewTab} className="w-full text-blue-600">
-              <ExternalLink className="h-4 w-4 mr-2" />
-              Apri in nuova scheda
-            </Button>
-          </div>
-
-          <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded">
-            <strong>Nota:</strong> Il CV verrà aperto nel tuo browser predefinito. Assicurati di avere un visualizzatore PDF installato per una migliore esperienza.
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
+
+      {cvUrl && (
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => window.open(cvUrl, '_blank')}
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Visualizza CV
+          </Button>
+          
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = cvUrl;
+              link.download = `CV_${proposal.candidate_name}_${canViewFullCV() ? 'completo' : 'anonimizzato'}.pdf`;
+              link.click();
+            }}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Scarica
+          </Button>
+        </div>
+      )}
+
+      {!cvUrl && proposal.cv_processing_status === 'completed' && (
+        <p className="text-sm text-gray-500">
+          Nessun CV disponibile per il tuo livello di accesso
+        </p>
+      )}
+    </div>
   );
-}
+};

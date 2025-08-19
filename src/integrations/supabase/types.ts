@@ -622,6 +622,7 @@ export type Database = {
         Row: {
           availability_weeks: number | null
           candidate_cv_anonymized_url: string | null
+          candidate_cv_original_filename: string | null
           candidate_cv_url: string | null
           candidate_email: string
           candidate_linkedin: string | null
@@ -634,6 +635,7 @@ export type Database = {
           contact_data_protected: boolean | null
           created_at: string
           current_salary: number | null
+          cv_processing_status: string | null
           expected_salary: number | null
           id: string
           job_offer_id: string | null
@@ -652,6 +654,7 @@ export type Database = {
         Insert: {
           availability_weeks?: number | null
           candidate_cv_anonymized_url?: string | null
+          candidate_cv_original_filename?: string | null
           candidate_cv_url?: string | null
           candidate_email: string
           candidate_linkedin?: string | null
@@ -664,6 +667,7 @@ export type Database = {
           contact_data_protected?: boolean | null
           created_at?: string
           current_salary?: number | null
+          cv_processing_status?: string | null
           expected_salary?: number | null
           id?: string
           job_offer_id?: string | null
@@ -682,6 +686,7 @@ export type Database = {
         Update: {
           availability_weeks?: number | null
           candidate_cv_anonymized_url?: string | null
+          candidate_cv_original_filename?: string | null
           candidate_cv_url?: string | null
           candidate_email?: string
           candidate_linkedin?: string | null
@@ -694,6 +699,7 @@ export type Database = {
           contact_data_protected?: boolean | null
           created_at?: string
           current_salary?: number | null
+          cv_processing_status?: string | null
           expected_salary?: number | null
           id?: string
           job_offer_id?: string | null

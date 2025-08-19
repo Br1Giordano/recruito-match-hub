@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +16,20 @@ import { Database } from "@/integrations/supabase/types";
 
 type JobOffer = Database['public']['Tables']['job_offers']['Row'];
 
+// Usa gli stessi valori validi del form di creazione
+const validEmploymentTypes = [
+  "tempo-indeterminato",
+  "tempo-determinato", 
+  "full-time",
+  "part-time",
+  "contratto-progetto",
+  "partita-iva",
+  "stage",
+  "tirocinio",
+  "apprendistato",
+  "consulenza"
+];
+
 const jobOfferSchema = z.object({
   company_name: z.string().min(1, "Il nome dell'azienda è obbligatorio"),
   title: z.string().min(1, "Il titolo è obbligatorio"),
@@ -26,7 +39,10 @@ const jobOfferSchema = z.object({
   salary_max: z.string().optional(),
   requirements: z.string().optional(),
   benefits: z.string().optional(),
-  employment_type: z.string().default("full-time"),
+  employment_type: z.string().refine(
+    (val) => validEmploymentTypes.includes(val),
+    "Tipo di contratto non valido"
+  ),
   status: z.string().default("active"),
 });
 
@@ -54,7 +70,9 @@ export default function JobOfferEditForm({ offer, onBack, onSuccess }: JobOfferE
       salary_max: offer.salary_max?.toString() || "",
       requirements: offer.requirements || "",
       benefits: offer.benefits || "",
-      employment_type: offer.employment_type || "full-time",
+      employment_type: validEmploymentTypes.includes(offer.employment_type || "") 
+        ? offer.employment_type || "tempo-indeterminato" 
+        : "tempo-indeterminato", // Fallback a un valore valido
       status: offer.status || "active",
     },
   });
@@ -227,10 +245,16 @@ export default function JobOfferEditForm({ offer, onBack, onSuccess }: JobOfferE
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
+                          <SelectItem value="tempo-indeterminato">Tempo Indeterminato</SelectItem>
+                          <SelectItem value="tempo-determinato">Tempo Determinato</SelectItem>
                           <SelectItem value="full-time">Tempo Pieno</SelectItem>
                           <SelectItem value="part-time">Part-time</SelectItem>
-                          <SelectItem value="contract">Contratto</SelectItem>
-                          <SelectItem value="internship">Stage</SelectItem>
+                          <SelectItem value="contratto-progetto">Contratto a Progetto</SelectItem>
+                          <SelectItem value="partita-iva">Partita IVA</SelectItem>
+                          <SelectItem value="stage">Stage</SelectItem>
+                          <SelectItem value="tirocinio">Tirocinio</SelectItem>
+                          <SelectItem value="apprendistato">Apprendistato</SelectItem>
+                          <SelectItem value="consulenza">Consulenza</SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />

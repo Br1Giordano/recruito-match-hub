@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -79,7 +78,6 @@ export default function ProposalFormFields({ formData, onInputChange }: Proposal
         <CVUploadWithAnonymization
           onCVUploaded={(url) => onInputChange("candidate_cv_url", url)}
           onAnonymizedCVReady={(url) => onInputChange("candidate_cv_anonymized_url", url)}
-          candidateName={formData.candidate_name}
         />
       </div>
 
@@ -203,3 +201,5 @@ export default function ProposalFormFields({ formData, onInputChange }: Proposal
     </div>
   );
 }
+
+export { ProposalFormFields };

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +15,20 @@ import { useCompanyProfile } from "@/hooks/useCompanyProfile";
 import { ArrowLeft, Save } from "lucide-react";
 import { sanitizeFormData } from "@/utils/inputSanitizer";
 
+// Aggiungiamo i valori validi per employment_type per evitare errori di constraint
+const validEmploymentTypes = [
+  "tempo-indeterminato",
+  "tempo-determinato", 
+  "full-time",
+  "part-time",
+  "contratto-progetto",
+  "partita-iva",
+  "stage",
+  "tirocinio",
+  "apprendistato",
+  "consulenza"
+];
+
 const jobOfferSchema = z.object({
   company_name: z.string().min(1, "Il nome dell'azienda è obbligatorio"),
   title: z.string().min(1, "Il titolo è obbligatorio"),
@@ -25,7 +38,10 @@ const jobOfferSchema = z.object({
   salary_max: z.string().optional(),
   requirements: z.string().optional(),
   benefits: z.string().optional(),
-  employment_type: z.string().default("full-time"),
+  employment_type: z.string().refine(
+    (val) => validEmploymentTypes.includes(val),
+    "Tipo di contratto non valido"
+  ),
   status: z.string().default("active"),
 });
 
@@ -53,7 +69,7 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
       salary_max: "",
       requirements: "",
       benefits: "",
-      employment_type: "full-time",
+      employment_type: "tempo-indeterminato",
       status: "active",
     },
   });
@@ -111,10 +127,15 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
       const salaryMin = sanitized.salary_min ? parseInt(sanitized.salary_min) : null;
       const salaryMax = sanitized.salary_max ? parseInt(sanitized.salary_max) : null;
 
+      // Validazione extra per employment_type prima dell'inserimento
+      if (!validEmploymentTypes.includes(sanitized.employment_type)) {
+        throw new Error(`Tipo di contratto non valido: ${sanitized.employment_type}`);
+      }
+
       const jobOfferData = {
         company_name: sanitized.company_name,
         contact_email: user.email,
-        user_id: user.id, // Aggiunto per soddisfare la policy RLS
+        user_id: user.id,
         title: sanitized.title,
         description: sanitized.description || null,
         location: sanitized.location || null,
@@ -124,7 +145,6 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
         benefits: sanitized.benefits || null,
         employment_type: sanitized.employment_type,
         status: sanitized.status,
-        // company_id rimane null per questa nuova struttura semplificata
         company_id: null,
       };
 
@@ -274,7 +294,7 @@ export default function JobOfferForm({ onBack, onSuccess }: JobOfferFormProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Tipo di Contratto</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Seleziona il tipo di contratto" />

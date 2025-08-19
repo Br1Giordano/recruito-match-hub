@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRecruiterJobInterests } from "@/hooks/useRecruiterJobInterests";
-import { MapPin, Building2, Euro, Clock, Trash2 } from "lucide-react";
+import { MapPin, Building2, Euro, Clock, Trash2, Eye } from "lucide-react";
 import JobOfferDetailsDialog from "../JobOfferDetailsDialog";
 import ProposalFormModal from "../ProposalFormModal";
 import CompanyProfileViewModal from "../company/CompanyProfileViewModal";
@@ -23,8 +23,8 @@ export const RecruiterJobInterests = () => {
   const [showProposalForm, setShowProposalForm] = useState(false);
   const [showCompanyProfile, setShowCompanyProfile] = useState(false);
   const [selectedCompanyEmail, setSelectedCompanyEmail] = useState<string | null>(null);
+  const [showJobDetails, setShowJobDetails] = useState(false);
 
-  // Funzione per convertire i dati del hook al tipo JobOfferWithCompany
   const convertToJobOfferWithCompany = (jobOffer: any): JobOfferWithCompany => {
     return {
       ...jobOffer,
@@ -49,6 +49,12 @@ export const RecruiterJobInterests = () => {
     const convertedJobOffer = convertToJobOfferWithCompany(jobOffer);
     setSelectedJobOffer(convertedJobOffer);
     setShowProposalForm(true);
+  };
+
+  const handleShowJobDetails = (jobOffer: any) => {
+    const convertedJobOffer = convertToJobOfferWithCompany(jobOffer);
+    setSelectedJobOffer(convertedJobOffer);
+    setShowJobDetails(true);
   };
 
   const handleRemoveInterest = async (interestId: string) => {
@@ -229,12 +235,14 @@ export const RecruiterJobInterests = () => {
 
                 <div className="flex justify-between items-center pt-2">
                   <div className="flex gap-2">
-                    <JobOfferDetailsDialog
-                      isOpen={false}
-                      onClose={() => {}}
-                      jobOffer={convertToJobOfferWithCompany(jobOffer)}
-                      canSendProposal={false}
-                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleShowJobDetails(jobOffer)}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      Dettagli
+                    </Button>
                   </div>
                   
                   <div className="flex gap-2">
@@ -260,6 +268,19 @@ export const RecruiterJobInterests = () => {
           );
         })}
       </div>
+
+      {/* Modal per visualizzare i dettagli dell'offerta */}
+      {showJobDetails && selectedJobOffer && (
+        <JobOfferDetailsDialog
+          isOpen={showJobDetails}
+          onClose={() => {
+            setShowJobDetails(false);
+            setSelectedJobOffer(null);
+          }}
+          jobOffer={selectedJobOffer}
+          canSendProposal={false}
+        />
+      )}
 
       {/* Modal per inviare la proposta */}
       {showProposalForm && selectedJobOffer && (

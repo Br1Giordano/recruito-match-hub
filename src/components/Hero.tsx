@@ -88,15 +88,15 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 pt-12">
               <div className="text-center space-y-2">
-                <div className="text-3xl font-bold text-gray-900">Solo successo</div>
+                <div className="text-3xl font-bold text-gradient">Solo successo</div>
                 <div className="text-base text-gray-600">Paghi solo a risultato ottenuto</div>
               </div>
               <div className="text-center space-y-2">
-                <div className="text-3xl font-bold text-gray-900">Qualità garantita</div>
+                <div className="text-3xl font-bold text-gradient">Qualità garantita</div>
                 <div className="text-base text-gray-600">Recruiter selezionati e verificati</div>
               </div>
               <div className="text-center space-y-2">
-                <div className="text-3xl font-bold text-gray-900">Processo digitale</div>
+                <div className="text-3xl font-bold text-gradient">Processo digitale</div>
                 <div className="text-base text-gray-600">Piattaforma moderna ed efficiente</div>
               </div>
             </div>
@@ -106,20 +106,20 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
             <div className="grid grid-cols-2 gap-6">
               <div className="space-y-6">
                 <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
-                  <Users className="h-12 w-12 text-recruito-blue mb-4" />
-                  <h3 className="font-semibold text-gray-900 mb-2">Recruiter Verificati</h3>
+                  <Users className="h-12 w-12 text-primary mb-4" />
+                  <h3 className="font-semibold text-gradient mb-2">Recruiter Verificati</h3>
                   <p className="text-gray-600 text-sm">Solo i migliori professionisti, selezionati e valutati</p>
                 </div>
                 <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
-                  <Zap className="h-12 w-12 text-recruito-green mb-4" />
-                  <h3 className="font-semibold text-gray-900 mb-2">Risultati Rapidi</h3>
+                  <Zap className="h-12 w-12 text-primary-end mb-4" />
+                  <h3 className="font-semibold text-gradient mb-2">Risultati Rapidi</h3>
                   <p className="text-gray-600 text-sm">Profili qualificati in giorni, non mesi</p>
                 </div>
               </div>
               <div className="space-y-6 pt-12">
                 <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
-                  <Target className="h-12 w-12 text-recruito-teal mb-4" />
-                  <h3 className="font-semibold text-gray-900 mb-2">Solo a Successo</h3>
+                  <Target className="h-12 w-12 text-primary mb-4" />
+                  <h3 className="font-semibold text-gradient mb-2">Solo a Successo</h3>
                   <p className="text-gray-600 text-sm">Paghi solo quando trovi e assumi il candidato giusto</p>
                 </div>
               </div>

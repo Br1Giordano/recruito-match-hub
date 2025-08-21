@@ -88,12 +88,12 @@ const BusinessModel = () => {
           <Card className="hover-lift">
             <CardHeader>
               <CardTitle className="flex items-center space-x-3">
-                <DollarSign className="h-8 w-8 text-recruito-green" />
-                <span>Revenue Model</span>
+                <DollarSign className="h-8 w-8 text-primary" />
+                <span className="text-gradient">Revenue Model</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-3xl font-bold text-gray-900">15%</div>
+              <div className="text-3xl font-bold text-gradient">15%</div>
               <p className="text-gray-600">
                 della RAL annuale, trattenuta dalla success fee pagata dalle aziende 
                 solo a assunzione completata. Il 70% va direttamente al recruiter.
@@ -111,12 +111,12 @@ const BusinessModel = () => {
           <Card className="hover-lift">
             <CardHeader>
               <CardTitle className="flex items-center space-x-3">
-                <TrendingUp className="h-8 w-8 text-recruito-blue" />
-                <span>Scalabilità</span>
+                <TrendingUp className="h-8 w-8 text-primary-end" />
+                <span className="text-gradient">Scalabilità</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-3xl font-bold text-gray-900">Asset-Light</div>
+              <div className="text-3xl font-bold text-gradient">Asset-Light</div>
               <p className="text-gray-600">
                 Modello completamente digitale senza costi fissi per le aziende. 
                 Margini crescenti con i volumi.
@@ -132,12 +132,12 @@ const BusinessModel = () => {
           <Card className="hover-lift">
             <CardHeader>
               <CardTitle className="flex items-center space-x-3">
-                <Users className="h-8 w-8 text-recruito-teal" />
-                <span>Growth Strategy</span>
+                <Users className="h-8 w-8 text-primary" />
+                <span className="text-gradient">Growth Strategy</span>
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="text-3xl font-bold text-gray-900">Go-to-Market</div>
+              <div className="text-3xl font-bold text-gradient">Go-to-Market</div>
               <p className="text-gray-600">
                 Strategia di crescita focalizzata su qualità del servizio 
                 e network effect organico.

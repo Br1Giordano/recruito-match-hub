@@ -110,26 +110,14 @@ function ProposalFormFields({ formData, onInputChange }: ProposalFormFieldsProps
             />
           </div>
           <div>
-            <Label htmlFor="expected_salary">Salario Desiderato (€)</Label>
+            <Label htmlFor="expected_salary">Range Salariale Desiderato (€)</Label>
             <Input
               id="expected_salary"
               type="number"
               value={formData.expected_salary}
               onChange={(e) => onInputChange("expected_salary", e.target.value)}
-              placeholder="55000"
+              placeholder="55000-65000"
               min="0"
-            />
-          </div>
-          <div>
-            <Label htmlFor="availability_weeks">Disponibilità (settimane)</Label>
-            <Input
-              id="availability_weeks"
-              type="number"
-              value={formData.availability_weeks}
-              onChange={(e) => onInputChange("availability_weeks", e.target.value)}
-              placeholder="4"
-              min="0"
-              max="52"
             />
           </div>
         </div>

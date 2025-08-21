@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Crown, FileText, User, MessageCircle, Star, CheckCircle, XCircle } from "lucide-react";
+import { Crown, FileText, User, MessageCircle, Star, CheckCircle, XCircle, Eye } from "lucide-react";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import { useRecruiterRating } from "@/hooks/useRecruiterRating";
@@ -59,6 +59,8 @@ export default function CompactProposalCard({
   const [reviewRating, setReviewRating] = useState(0);
   const [reviewComment, setReviewComment] = useState("");
   const [isSubmittingReview, setIsSubmittingReview] = useState(false);
+  const [existingReview, setExistingReview] = useState<any>(null);
+  const [checkingReview, setCheckingReview] = useState(false);
   const { toast } = useToast();
   
   // Fetch rating and profile when recruiter email is available
@@ -67,6 +69,38 @@ export default function CompactProposalCard({
       fetchRatingByEmail(proposal.recruiter_email);
     }
   }, [proposal.recruiter_email, fetchRatingByEmail]);
+
+  // Check if review already exists
+  const checkExistingReview = async () => {
+    if (!proposal.recruiter_email) return;
+    
+    setCheckingReview(true);
+    try {
+      const { data, error } = await supabase
+        .from('recruiter_reviews')
+        .select('*')
+        .eq('recruiter_email', proposal.recruiter_email)
+        .eq('proposal_id', proposal.id)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking existing review:', error);
+        return;
+      }
+
+      setExistingReview(data);
+    } catch (error) {
+      console.error('Error checking existing review:', error);
+    } finally {
+      setCheckingReview(false);
+    }
+  };
+
+  useEffect(() => {
+    if ((proposal.status === "rejected" || proposal.status === "hired") && proposal.recruiter_email) {
+      checkExistingReview();
+    }
+  }, [proposal.status, proposal.recruiter_email, proposal.id]);
 
   const handleShowProfile = async () => {
     if (proposal.recruiter_email) {
@@ -112,6 +146,9 @@ export default function CompactProposalCard({
       if (proposal.recruiter_email) {
         fetchRatingByEmail(proposal.recruiter_email);
       }
+      
+      // Check for existing review again
+      checkExistingReview();
       
       onRecruiterReviewed?.();
     } catch (error) {
@@ -411,15 +448,35 @@ export default function CompactProposalCard({
 
             {/* Review recruiter button for closed proposals */}
             {(proposal.status === "rejected" || proposal.status === "hired") && proposal.recruiter_email && (
-              <Button
-                onClick={() => setShowReviewDialog(true)}
-                variant="outline"
-                size="sm"
-                className="text-xs bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100"
-              >
-                <Star className="h-3 w-3 mr-1" />
-                Recensisci
-              </Button>
+              existingReview ? (
+                <Button
+                  onClick={() => {
+                    // Show existing review details in a toast or dialog
+                    toast({
+                      title: "Recensione già inviata",
+                      description: `Hai già recensito questo recruiter con ${existingReview.rating} stelle.`,
+                    });
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs bg-green-50 border-green-200 text-green-700 hover:bg-green-100"
+                  disabled={checkingReview}
+                >
+                  <Eye className="h-3 w-3 mr-1" />
+                  {checkingReview ? "Controllo..." : "Già recensito"}
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setShowReviewDialog(true)}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs bg-amber-50 border-amber-200 text-amber-700 hover:bg-amber-100"
+                  disabled={checkingReview}
+                >
+                  <Star className="h-3 w-3 mr-1" />
+                  {checkingReview ? "Controllo..." : "Recensisci"}
+                </Button>
+              )
             )}
           </div>
         </CardContent>

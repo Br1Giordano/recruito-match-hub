@@ -11,6 +11,7 @@ import {
   ArrowRight,
   AlertTriangle 
 } from "lucide-react";
+import RecruiterAvatar from "./recruiter/RecruiterAvatar";
 
 const HowItWorks = () => {
   const scrollToDemo = () => {
@@ -167,7 +168,7 @@ const HowItWorks = () => {
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-2 bg-white rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                      <RecruiterAvatar name="Alessandro P." size="sm" />
                       <div className="text-left">
                         <div className="font-semibold text-gray-900 text-sm">Alessandro P.</div>
                         <div className="text-xs text-gray-600">5 anni exp.</div>
@@ -179,7 +180,7 @@ const HowItWorks = () => {
                   </div>
                   <div className="flex items-center justify-between p-2 bg-white rounded-lg opacity-50">
                     <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                      <RecruiterAvatar name="Giulia T." size="sm" />
                       <div className="text-left">
                         <div className="font-semibold text-gray-900 text-sm">Giulia T.</div>
                         <div className="text-xs text-gray-600">4 anni exp.</div>

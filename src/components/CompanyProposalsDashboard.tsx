@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { MessageSquare, Trophy } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProposals } from "@/hooks/useProposals";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
@@ -9,6 +11,8 @@ import CompactProposalCard from "./proposals/CompactProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import ProposalTabs from "./proposals/ProposalTabs";
 import { MessageCenter } from "./messaging/MessageCenter";
+import LeaderboardCard from "./gamification/LeaderboardCard";
+import { useRecruiterGamification } from "@/hooks/useRecruiterGamification";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -25,6 +29,7 @@ export default function CompanyProposalsDashboard() {
   const { user } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
+  const { leaderboard, loading: leaderboardLoading } = useRecruiterGamification();
 
   // Raggruppa le proposte per stato
   const pendingProposals = proposals.filter(p => p.status === "pending");
@@ -281,11 +286,42 @@ export default function CompanyProposalsDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Proposte Ricevute</h1>
-        <p className="text-muted-foreground">
-          Revisiona e gestisci le proposte inviate dai recruiter per le tue offerte di lavoro
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Proposte Ricevute</h1>
+          <p className="text-muted-foreground">
+            Revisiona e gestisci le proposte inviate dai recruiter per le tue offerte di lavoro
+          </p>
+        </div>
+        
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="lg" className="flex items-center gap-2">
+              <Trophy className="h-4 w-4" />
+              Classifica Recruiter
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-primary" />
+                Classifica Recruiter
+              </DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              {leaderboardLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-lg">Caricamento classifica...</div>
+                </div>
+              ) : (
+                <LeaderboardCard 
+                  leaderboard={leaderboard} 
+                  currentUserEmail={user?.email}
+                />
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Card>

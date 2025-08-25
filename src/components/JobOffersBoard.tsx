@@ -1,19 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { Search, MapPin, Euro, Clock, Building2, Send, Briefcase, Trash2, Shield, Eye, Heart } from "lucide-react";
+import { MapPin, Euro, Clock, Building2, Send, Briefcase, Trash2, Shield, Eye, Heart } from "lucide-react";
 import ProposalFormModal from "./ProposalFormModal";
 import JobOfferDetailsDialog from "./JobOfferDetailsDialog";
 import CompanyProfileViewModal from "./company/CompanyProfileViewModal";
 import { useRecruiterJobInterests } from "@/hooks/useRecruiterJobInterests";
 import { Database } from "@/integrations/supabase/types";
+import AdvancedJobFilters from "./filters/AdvancedJobFilters";
 
 type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
   company_registrations?: {
@@ -24,10 +23,11 @@ type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
 
 export default function JobOffersBoard() {
   const [jobOffers, setJobOffers] = useState<JobOfferWithCompany[]>([]);
-  const [filteredOffers, setFilteredOffers] = useState<JobOfferWithCompany[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [employmentFilter, setEmploymentFilter] = useState("all");
+  const [salaryRange, setSalaryRange] = useState<[number, number]>([0, 200000]);
+  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<JobOfferWithCompany | null>(null);
   const [showProposalModal, setShowProposalModal] = useState(false);
@@ -64,7 +64,6 @@ export default function JobOffersBoard() {
     } else {
       console.log("Job offers fetched:", data);
       setJobOffers(data || []);
-      setFilteredOffers(data || []);
     }
 
     setIsLoading(false);
@@ -74,7 +73,8 @@ export default function JobOffersBoard() {
     fetchJobOffers();
   }, []);
 
-  useEffect(() => {
+  // Memoized filtering logic for better performance
+  const filteredOffers = useMemo(() => {
     let filtered = jobOffers;
 
     // Se è un recruiter, escludi le offerte già prese in carico
@@ -83,12 +83,16 @@ export default function JobOffersBoard() {
       filtered = filtered.filter(offer => !interestedJobIds.has(offer.id));
     }
 
+    // Enhanced search - includes requirements and more detailed matching
     if (searchTerm) {
+      const searchLower = searchTerm.toLowerCase();
       filtered = filtered.filter(
         (offer) =>
-          offer.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          getCompanyName(offer).toLowerCase().includes(searchTerm.toLowerCase()) ||
-          offer.description?.toLowerCase().includes(searchTerm.toLowerCase())
+          offer.title.toLowerCase().includes(searchLower) ||
+          getCompanyName(offer).toLowerCase().includes(searchLower) ||
+          offer.description?.toLowerCase().includes(searchLower) ||
+          offer.requirements?.toLowerCase().includes(searchLower) ||
+          offer.location?.toLowerCase().includes(searchLower)
       );
     }
 
@@ -102,8 +106,27 @@ export default function JobOffersBoard() {
       filtered = filtered.filter((offer) => offer.employment_type === employmentFilter);
     }
 
-    setFilteredOffers(filtered);
-  }, [searchTerm, locationFilter, employmentFilter, jobOffers, interests, userProfile?.user_type]);
+    // Salary range filter
+    if (salaryRange[0] > 0 || salaryRange[1] < 200000) {
+      filtered = filtered.filter((offer) => {
+        const minSalary = offer.salary_min || 0;
+        const maxSalary = offer.salary_max || 200000;
+        return (
+          (minSalary >= salaryRange[0] || maxSalary >= salaryRange[0]) &&
+          (minSalary <= salaryRange[1] || maxSalary <= salaryRange[1])
+        );
+      });
+    }
+
+    // Company filter
+    if (selectedCompanies.length > 0) {
+      filtered = filtered.filter((offer) => 
+        selectedCompanies.includes(getCompanyName(offer))
+      );
+    }
+
+    return filtered;
+  }, [searchTerm, locationFilter, employmentFilter, salaryRange, selectedCompanies, jobOffers, interests, userProfile?.user_type]);
 
   const getCompanyName = (offer: JobOfferWithCompany): string => {
     // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations
@@ -224,8 +247,33 @@ export default function JobOffersBoard() {
     }
   };
 
-  // Get unique locations for filter
-  const uniqueLocations = [...new Set(jobOffers.map(offer => offer.location).filter(Boolean))];
+  // Get unique locations and companies for filters
+  const uniqueLocations = useMemo(() => 
+    [...new Set(jobOffers.map(offer => offer.location).filter(Boolean))], 
+    [jobOffers]
+  );
+  
+  const uniqueCompanies = useMemo(() => 
+    [...new Set(jobOffers.map(offer => getCompanyName(offer)).filter(Boolean))], 
+    [jobOffers]
+  );
+
+  // Filter handlers
+  const handleCompanyToggle = useCallback((company: string) => {
+    setSelectedCompanies(prev => 
+      prev.includes(company) 
+        ? prev.filter(c => c !== company)
+        : [...prev, company]
+    );
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
+    setSearchTerm("");
+    setLocationFilter("all");
+    setEmploymentFilter("all");
+    setSalaryRange([0, 200000]);
+    setSelectedCompanies([]);
+  }, []);
 
   if (isLoading) {
     return (
@@ -250,49 +298,24 @@ export default function JobOffersBoard() {
         </p>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardContent className="pt-6">
-          <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Cerca per titolo, azienda o descrizione..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Select value={locationFilter} onValueChange={setLocationFilter}>
-              <SelectTrigger className="w-full lg:w-[200px]">
-                <SelectValue placeholder="Filtra per sede" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tutte le sedi</SelectItem>
-                {uniqueLocations.map((location) => (
-                  <SelectItem key={location} value={location!}>
-                    {location}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Select value={employmentFilter} onValueChange={setEmploymentFilter}>
-              <SelectTrigger className="w-full lg:w-[200px]">
-                <SelectValue placeholder="Tipo contratto" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tutti i tipi</SelectItem>
-                <SelectItem value="full-time">Tempo Pieno</SelectItem>
-                <SelectItem value="part-time">Part-time</SelectItem>
-                <SelectItem value="contract">Contratto</SelectItem>
-                <SelectItem value="internship">Stage</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Advanced Filters */}
+      <AdvancedJobFilters
+        searchTerm={searchTerm}
+        locationFilter={locationFilter}
+        employmentFilter={employmentFilter}
+        salaryRange={salaryRange}
+        selectedCompanies={selectedCompanies}
+        uniqueLocations={uniqueLocations}
+        uniqueCompanies={uniqueCompanies}
+        onSearchChange={setSearchTerm}
+        onLocationChange={setLocationFilter}
+        onEmploymentChange={setEmploymentFilter}
+        onSalaryRangeChange={setSalaryRange}
+        onCompanyToggle={handleCompanyToggle}
+        onClearFilters={handleClearFilters}
+        totalOffers={jobOffers.length}
+        filteredCount={filteredOffers.length}
+      />
 
       {/* Job Offers Grid */}
       <div className="grid gap-6">

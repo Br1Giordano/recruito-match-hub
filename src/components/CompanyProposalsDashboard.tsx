@@ -11,6 +11,7 @@ import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import ProposalTabs from "./proposals/ProposalTabs";
 import { MessageCenter } from "./messaging/MessageCenter";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function CompanyProposalsDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,7 +19,7 @@ export default function CompanyProposalsDashboard() {
   const [activeTab, setActiveTab] = useState("pending");
   const [filteredProposals, setFilteredProposals] = useState<any[]>([]);
   const [showMessageCenter, setShowMessageCenter] = useState(false);
-  const [selectedRecruiter, setSelectedRecruiter] = useState<{email: string, name: string} | null>(null);
+  const [selectedRecruiter, setSelectedRecruiter] = useState<{email: string, name: string, conversationId?: string} | null>(null);
   const { user } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
@@ -86,10 +87,52 @@ export default function CompanyProposalsDashboard() {
     }
   };
 
-  const handleContactRecruiter = (proposalId: string, recruiterEmail: string, recruiterName: string) => {
-    setSelectedRecruiter({ email: recruiterEmail, name: recruiterName });
-    setShowMessageCenter(true);
-    toast.success(`Apertura chat con ${recruiterName}`);
+  const handleContactRecruiter = async (proposalId: string, recruiterEmail: string, recruiterName: string) => {
+    if (!user?.email) return;
+    
+    try {
+      // First check if conversation already exists
+      const { data: existingConversation } = await supabase
+        .from('conversations')
+        .select('id')
+        .eq('proposal_id', proposalId)
+        .single();
+      
+      let conversationId = existingConversation?.id;
+      
+      // If no conversation exists, create one
+      if (!conversationId) {
+        const { data: newConversation, error } = await supabase
+          .from('conversations')
+          .insert({
+            proposal_id: proposalId,
+            recruiter_email: recruiterEmail,
+            company_email: user.email
+          })
+          .select('id')
+          .single();
+          
+        if (error) {
+          console.error('Error creating conversation:', error);
+          toast.error('Errore nella creazione della chat');
+          return;
+        }
+        
+        conversationId = newConversation.id;
+      }
+      
+      setSelectedRecruiter({ 
+        email: recruiterEmail, 
+        name: recruiterName,
+        conversationId: conversationId 
+      });
+      setShowMessageCenter(true);
+      toast.success(`Chat aperta con ${recruiterName}`);
+      
+    } catch (error) {
+      console.error('Error handling recruiter contact:', error);
+      toast.error('Errore nell\'apertura della chat');
+    }
   };
 
   if (isLoading) {
@@ -212,6 +255,7 @@ export default function CompanyProposalsDashboard() {
             setShowMessageCenter(false);
             setSelectedRecruiter(null);
           }}
+          initialConversationId={selectedRecruiter?.conversationId}
         />
       )}
     </div>

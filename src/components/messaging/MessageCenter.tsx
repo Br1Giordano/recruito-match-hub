@@ -9,9 +9,10 @@ import { useMessages } from '@/hooks/useMessages';
 interface MessageCenterProps {
   isOpen: boolean;
   onClose: () => void;
+  initialConversationId?: string;
 }
 
-export const MessageCenter: React.FC<MessageCenterProps> = ({ isOpen, onClose }) => {
+export const MessageCenter: React.FC<MessageCenterProps> = ({ isOpen, onClose, initialConversationId }) => {
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const { conversations, messages, isLoading, sendMessage, fetchMessages } = useMessages();
 
@@ -21,6 +22,14 @@ export const MessageCenter: React.FC<MessageCenterProps> = ({ isOpen, onClose })
     setSelectedConversationId(conversationId);
     fetchMessages(conversationId);
   };
+
+  // Auto-select initial conversation if provided
+  React.useEffect(() => {
+    if (initialConversationId && !selectedConversationId) {
+      setSelectedConversationId(initialConversationId);
+      fetchMessages(initialConversationId);
+    }
+  }, [initialConversationId, selectedConversationId, fetchMessages]);
 
   const handleBackToList = () => {
     setSelectedConversationId(null);

@@ -63,14 +63,18 @@ export const MessageCenter: React.FC<MessageCenterProps> = ({ isOpen, onClose, i
                 onSelectConversation={handleSelectConversation}
               />
             </div>
-          ) : (
+          ) : selectedConversation ? (
             <div className="w-full flex flex-col">
               <ChatWindow
-                conversation={selectedConversation!}
+                conversation={selectedConversation}
                 messages={messages[selectedConversationId] || []}
                 onSendMessage={(content) => sendMessage(selectedConversationId, content)}
                 onBack={handleBackToList}
               />
+            </div>
+          ) : (
+            <div className="w-full flex items-center justify-center">
+              <p className="text-muted-foreground">Caricamento conversazione...</p>
             </div>
           )}
         </div>

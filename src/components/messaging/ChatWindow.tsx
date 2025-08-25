@@ -55,6 +55,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({
     }
   };
 
+  // Add safety checks for conversation data
+  if (!conversation) {
+    return <div className="flex items-center justify-center h-full">
+      <p className="text-muted-foreground">Conversazione non trovata</p>
+    </div>;
+  }
+
   const otherPartyEmail = conversation.company_email || conversation.recruiter_email;
   const otherPartyName = conversation.other_party_name || otherPartyEmail?.split('@')[0] || 'Utente';
   const isCompanyConversation = conversation.company_email && user?.email === conversation.recruiter_email;

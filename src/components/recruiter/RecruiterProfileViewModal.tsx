@@ -214,10 +214,11 @@ export default function RecruiterProfileViewModal({
 
                   {rating.totalReviews > 0 && (
                     <div className="flex items-center gap-2">
-                      <StarRating rating={Number(rating.averageRating)} size={16} />
-                      <span className="text-sm text-gray-600">
-                        {Number(rating.averageRating).toFixed(1)} ({rating.totalReviews} recensioni)
-                      </span>
+                      <StarRating 
+                        rating={Number(rating.averageRating)} 
+                        totalReviews={rating.totalReviews}
+                        size={16} 
+                      />
                     </div>
                   )}
                 </div>
@@ -410,6 +411,7 @@ export default function RecruiterProfileViewModal({
                         <div className="flex flex-col items-center gap-1">
                           <StarRating 
                             rating={Number(rating.averageRating)} 
+                            totalReviews={rating.totalReviews}
                             size={20}
                             showNumber={false}
                           />

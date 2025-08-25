@@ -1067,7 +1067,13 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      job_offer_interest_counts: {
+        Row: {
+          interested_recruiters_count: number | null
+          job_offer_id: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_level_from_points: {
@@ -1089,6 +1095,10 @@ export type Database = {
       get_current_user_registration_id: {
         Args: { table_name: string }
         Returns: string
+      }
+      get_job_interest_count: {
+        Args: { p_job_offer_id: string }
+        Returns: number
       }
       is_admin: {
         Args: { user_email: string }

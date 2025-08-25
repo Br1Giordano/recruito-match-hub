@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/useAuth";
 import { useRecruiterProposals } from "@/hooks/useRecruiterProposals";
 import { useMessages } from "@/hooks/useMessages";
@@ -10,6 +12,8 @@ import RecruiterProposalCard from "./proposals/RecruiterProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RecruiterGamificationDashboard from "./gamification/RecruiterGamificationDashboard";
+import LeaderboardCard from "./gamification/LeaderboardCard";
+import { useRecruiterGamification } from "@/hooks/useRecruiterGamification";
 import { RecruiterMessagesSection } from "./messaging/RecruiterMessagesSection";
 import { Target, Trophy, Send, MessageCircle } from "lucide-react";
 
@@ -20,6 +24,7 @@ export default function RecruiterDashboard() {
   const { user } = useAuth();
   const { proposals, isLoading } = useRecruiterProposals();
   const { unreadCount } = useMessages();
+  const { leaderboard, loading: leaderboardLoading } = useRecruiterGamification();
 
   useEffect(() => {
     let filtered = proposals;
@@ -58,11 +63,42 @@ export default function RecruiterDashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard Recruiter</h1>
-        <p className="text-muted-foreground">
-          Gestisci le tue candidature e monitora i tuoi progressi
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Dashboard Recruiter</h1>
+          <p className="text-muted-foreground">
+            Gestisci le tue candidature e monitora i tuoi progressi
+          </p>
+        </div>
+        
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="lg" className="flex items-center gap-2">
+              <Trophy className="h-4 w-4" />
+              Vedi Classifica
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Trophy className="h-5 w-5 text-primary" />
+                Classifica Recruiter
+              </DialogTitle>
+            </DialogHeader>
+            <div className="mt-4">
+              {leaderboardLoading ? (
+                <div className="flex items-center justify-center py-8">
+                  <div className="text-lg">Caricamento classifica...</div>
+                </div>
+              ) : (
+                <LeaderboardCard 
+                  leaderboard={leaderboard} 
+                  currentUserEmail={user?.email}
+                />
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Tabs defaultValue="proposals" className="space-y-6">

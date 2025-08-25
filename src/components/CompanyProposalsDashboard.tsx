@@ -10,6 +10,7 @@ import CompactProposalCard from "./proposals/CompactProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import ProposalTabs from "./proposals/ProposalTabs";
 import { MessageCenter } from "./messaging/MessageCenter";
+import { useMessages } from "@/hooks/useMessages";
 import { toast } from "sonner";
 
 export default function CompanyProposalsDashboard() {
@@ -18,10 +19,11 @@ export default function CompanyProposalsDashboard() {
   const [activeTab, setActiveTab] = useState("pending");
   const [filteredProposals, setFilteredProposals] = useState<any[]>([]);
   const [showMessageCenter, setShowMessageCenter] = useState(false);
-  const [selectedRecruiter, setSelectedRecruiter] = useState<{email: string, name: string} | null>(null);
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
   const { user } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
+  const { createConversation } = useMessages();
 
   // Raggruppa le proposte per stato
   const pendingProposals = proposals.filter(p => p.status === "pending");
@@ -86,10 +88,29 @@ export default function CompanyProposalsDashboard() {
     }
   };
 
-  const handleContactRecruiter = (proposalId: string, recruiterEmail: string, recruiterName: string) => {
-    setSelectedRecruiter({ email: recruiterEmail, name: recruiterName });
-    setShowMessageCenter(true);
-    toast.success(`Apertura chat con ${recruiterName}`);
+  const handleContactRecruiter = async (proposalId: string, recruiterEmail: string, recruiterName: string) => {
+    if (!user?.email) {
+      toast.error("Devi essere autenticato per contattare il recruiter");
+      return;
+    }
+
+    try {
+      toast.info(`Apertura chat con ${recruiterName}...`);
+      
+      // Create or get existing conversation
+      const conversationId = await createConversation(proposalId, recruiterEmail, user.email);
+      
+      if (conversationId) {
+        setSelectedConversationId(conversationId);
+        setShowMessageCenter(true);
+        toast.success(`Chat aperta con ${recruiterName}`);
+      } else {
+        toast.error("Impossibile aprire la chat. Riprova.");
+      }
+    } catch (error) {
+      console.error('Error opening chat:', error);
+      toast.error("Errore nell'apertura della chat");
+    }
   };
 
   if (isLoading) {
@@ -208,9 +229,10 @@ export default function CompanyProposalsDashboard() {
       {showMessageCenter && (
         <MessageCenter
           isOpen={showMessageCenter}
+          initialConversationId={selectedConversationId}
           onClose={() => {
             setShowMessageCenter(false);
-            setSelectedRecruiter(null);
+            setSelectedConversationId(null);
           }}
         />
       )}

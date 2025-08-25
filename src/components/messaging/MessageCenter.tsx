@@ -9,10 +9,11 @@ import { useMessages } from '@/hooks/useMessages';
 interface MessageCenterProps {
   isOpen: boolean;
   onClose: () => void;
+  initialConversationId?: string | null;
 }
 
-export const MessageCenter: React.FC<MessageCenterProps> = ({ isOpen, onClose }) => {
-  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
+export const MessageCenter: React.FC<MessageCenterProps> = ({ isOpen, onClose, initialConversationId }) => {
+  const [selectedConversationId, setSelectedConversationId] = useState<string | null>(initialConversationId || null);
   const { conversations, messages, isLoading, sendMessage, fetchMessages } = useMessages();
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
@@ -25,6 +26,14 @@ export const MessageCenter: React.FC<MessageCenterProps> = ({ isOpen, onClose })
   const handleBackToList = () => {
     setSelectedConversationId(null);
   };
+
+  // Auto-select initial conversation and fetch its messages
+  React.useEffect(() => {
+    if (initialConversationId && conversations.some(c => c.id === initialConversationId)) {
+      setSelectedConversationId(initialConversationId);
+      fetchMessages(initialConversationId);
+    }
+  }, [initialConversationId, conversations, fetchMessages]);
 
   const totalUnread = conversations.reduce((total, conv) => total + (conv.unread_count || 0), 0);
 

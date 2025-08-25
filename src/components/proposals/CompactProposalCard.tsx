@@ -437,12 +437,12 @@ export default function CompactProposalCard({
             {proposal.status === "approved" && onContactRecruiter && proposal.recruiter_email && (
               <Button
                 onClick={() => onContactRecruiter(proposal.id, proposal.recruiter_email, proposal.recruiter_name || "Recruiter")}
-                variant="default"
+                variant="outline"
                 size="sm"
-                className="text-xs bg-gradient-to-r from-primary to-primary-glow hover:from-primary-glow hover:to-primary text-white shadow-md hover:shadow-lg transition-all duration-200"
+                className="text-xs bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
               >
                 <MessageCircle className="h-3 w-3 mr-1" />
-                💬 Contatta recruiter
+                Contatta recruiter
               </Button>
             )}
 

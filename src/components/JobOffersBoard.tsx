@@ -26,8 +26,7 @@ export default function JobOffersBoard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [employmentFilter, setEmploymentFilter] = useState("all");
-  const [salaryRange, setSalaryRange] = useState<[number, number]>([0, 200000]);
-  const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
+  const [sectorFilter, setSectorFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<JobOfferWithCompany | null>(null);
   const [showProposalModal, setShowProposalModal] = useState(false);
@@ -73,6 +72,35 @@ export default function JobOffersBoard() {
     fetchJobOffers();
   }, []);
 
+  // Function to extract sector from job title and description
+  const extractSector = useCallback((offer: JobOfferWithCompany): string => {
+    const title = offer.title.toLowerCase();
+    const description = (offer.description || "").toLowerCase();
+    const text = `${title} ${description}`;
+    
+    // Define sector keywords mapping
+    const sectorKeywords = {
+      "IT & Tecnologia": ["developer", "software", "tech", "programmatore", "cloud", "architect", "frontend", "backend", "fullstack", "devops", "data", "ai", "machine learning"],
+      "Marketing & Comunicazione": ["marketing", "social media", "content", "comunicazione", "digital", "seo", "sem", "advertising", "brand"],
+      "Vendite & Commerciale": ["sales", "commerciale", "vendite", "business development", "account", "export"],
+      "Risorse Umane": ["hr", "risorse umane", "recruiter", "talent", "people", "payroll"],
+      "Finanza & Contabilità": ["finance", "contabilità", "accounting", "controller", "amministrazione", "fiscal"],
+      "Turismo & Viaggi": ["travel", "turismo", "tourism", "viaggio", "hotel", "hospitality"],
+      "Logistica & Trasporti": ["logistica", "trasporti", "supply chain", "warehouse", "spedizioni"],
+      "Sanità & Farmaceutico": ["medical", "farmaceutico", "healthcare", "sanità", "infermiere", "medico"],
+      "Educazione & Formazione": ["education", "formazione", "training", "insegnante", "tutor"],
+      "Altro": []
+    };
+
+    for (const [sector, keywords] of Object.entries(sectorKeywords)) {
+      if (keywords.some(keyword => text.includes(keyword))) {
+        return sector;
+      }
+    }
+    
+    return "Altro";
+  }, []);
+
   // Memoized filtering logic for better performance
   const filteredOffers = useMemo(() => {
     let filtered = jobOffers;
@@ -96,6 +124,10 @@ export default function JobOffersBoard() {
       );
     }
 
+    if (sectorFilter !== "all") {
+      filtered = filtered.filter((offer) => extractSector(offer) === sectorFilter);
+    }
+
     if (locationFilter !== "all") {
       filtered = filtered.filter((offer) => 
         offer.location?.toLowerCase().includes(locationFilter.toLowerCase())
@@ -106,27 +138,8 @@ export default function JobOffersBoard() {
       filtered = filtered.filter((offer) => offer.employment_type === employmentFilter);
     }
 
-    // Salary range filter
-    if (salaryRange[0] > 0 || salaryRange[1] < 200000) {
-      filtered = filtered.filter((offer) => {
-        const minSalary = offer.salary_min || 0;
-        const maxSalary = offer.salary_max || 200000;
-        return (
-          (minSalary >= salaryRange[0] || maxSalary >= salaryRange[0]) &&
-          (minSalary <= salaryRange[1] || maxSalary <= salaryRange[1])
-        );
-      });
-    }
-
-    // Company filter
-    if (selectedCompanies.length > 0) {
-      filtered = filtered.filter((offer) => 
-        selectedCompanies.includes(getCompanyName(offer))
-      );
-    }
-
     return filtered;
-  }, [searchTerm, locationFilter, employmentFilter, salaryRange, selectedCompanies, jobOffers, interests, userProfile?.user_type]);
+  }, [searchTerm, sectorFilter, locationFilter, employmentFilter, jobOffers, interests, userProfile?.user_type, extractSector]);
 
   const getCompanyName = (offer: JobOfferWithCompany): string => {
     // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations
@@ -247,32 +260,23 @@ export default function JobOffersBoard() {
     }
   };
 
-  // Get unique locations and companies for filters
+  // Get unique locations and sectors for filters
   const uniqueLocations = useMemo(() => 
     [...new Set(jobOffers.map(offer => offer.location).filter(Boolean))], 
     [jobOffers]
   );
   
-  const uniqueCompanies = useMemo(() => 
-    [...new Set(jobOffers.map(offer => getCompanyName(offer)).filter(Boolean))], 
-    [jobOffers]
+  const uniqueSectors = useMemo(() => 
+    [...new Set(jobOffers.map(offer => extractSector(offer)))].sort(), 
+    [jobOffers, extractSector]
   );
 
   // Filter handlers
-  const handleCompanyToggle = useCallback((company: string) => {
-    setSelectedCompanies(prev => 
-      prev.includes(company) 
-        ? prev.filter(c => c !== company)
-        : [...prev, company]
-    );
-  }, []);
-
   const handleClearFilters = useCallback(() => {
     setSearchTerm("");
+    setSectorFilter("all");
     setLocationFilter("all");
     setEmploymentFilter("all");
-    setSalaryRange([0, 200000]);
-    setSelectedCompanies([]);
   }, []);
 
   if (isLoading) {
@@ -303,15 +307,13 @@ export default function JobOffersBoard() {
         searchTerm={searchTerm}
         locationFilter={locationFilter}
         employmentFilter={employmentFilter}
-        salaryRange={salaryRange}
-        selectedCompanies={selectedCompanies}
+        sectorFilter={sectorFilter}
         uniqueLocations={uniqueLocations}
-        uniqueCompanies={uniqueCompanies}
+        uniqueSectors={uniqueSectors}
         onSearchChange={setSearchTerm}
         onLocationChange={setLocationFilter}
         onEmploymentChange={setEmploymentFilter}
-        onSalaryRangeChange={setSalaryRange}
-        onCompanyToggle={handleCompanyToggle}
+        onSectorChange={setSectorFilter}
         onClearFilters={handleClearFilters}
         totalOffers={jobOffers.length}
         filteredCount={filteredOffers.length}

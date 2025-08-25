@@ -13,15 +13,13 @@ interface AdvancedJobFiltersProps {
   searchTerm: string;
   locationFilter: string;
   employmentFilter: string;
-  salaryRange: [number, number];
-  selectedCompanies: string[];
+  sectorFilter: string;
   uniqueLocations: string[];
-  uniqueCompanies: string[];
+  uniqueSectors: string[];
   onSearchChange: (value: string) => void;
   onLocationChange: (value: string) => void;
   onEmploymentChange: (value: string) => void;
-  onSalaryRangeChange: (value: [number, number]) => void;
-  onCompanyToggle: (company: string) => void;
+  onSectorChange: (value: string) => void;
   onClearFilters: () => void;
   totalOffers: number;
   filteredCount: number;
@@ -31,33 +29,31 @@ export default function AdvancedJobFilters({
   searchTerm,
   locationFilter,
   employmentFilter,
-  salaryRange,
-  selectedCompanies,
+  sectorFilter,
   uniqueLocations,
-  uniqueCompanies,
+  uniqueSectors,
   onSearchChange,
   onLocationChange,
   onEmploymentChange,
-  onSalaryRangeChange,
-  onCompanyToggle,
+  onSectorChange,
   onClearFilters,
   totalOffers,
   filteredCount
 }: AdvancedJobFiltersProps) {
-  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
   const [searchFocused, setSearchFocused] = useState(false);
 
   const activeFiltersCount = [
     locationFilter !== "all",
     employmentFilter !== "all",
-    salaryRange[0] > 0 || salaryRange[1] < 200000,
-    selectedCompanies.length > 0
+    sectorFilter !== "all"
   ].filter(Boolean).length;
 
   const employmentTypes = [
     { value: "full-time", label: "Tempo Pieno", icon: "💼" },
     { value: "part-time", label: "Part-time", icon: "⏰" },
     { value: "contract", label: "Contratto", icon: "📋" },
+    { value: "contratto-progetto", label: "Contratto Progetto", icon: "📋" },
+    { value: "tempo-indeterminato", label: "Tempo Indeterminato", icon: "🏢" },
     { value: "internship", label: "Stage", icon: "🎓" }
   ];
 
@@ -99,6 +95,33 @@ export default function AdvancedJobFilters({
 
         {/* Quick Filters Row */}
         <div className="flex flex-wrap gap-3 items-center">
+          {/* Settore Filter */}
+          <Select value={sectorFilter} onValueChange={onSectorChange}>
+            <SelectTrigger className="w-auto min-w-[140px] h-10 bg-background border-2 hover:border-primary/50 transition-colors">
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-primary" />
+                <SelectValue placeholder="Settore" />
+              </div>
+            </SelectTrigger>
+            <SelectContent className="max-h-60">
+              <SelectItem value="all">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Tutti i settori
+                </div>
+              </SelectItem>
+              {uniqueSectors.map((sector) => (
+                <SelectItem key={sector} value={sector}>
+                  <div className="flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-muted-foreground" />
+                    {sector}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {/* Location Filter */}
           <Select value={locationFilter} onValueChange={onLocationChange}>
             <SelectTrigger className="w-auto min-w-[140px] h-10 bg-background border-2 hover:border-primary/50 transition-colors">
               <div className="flex items-center gap-2">
@@ -124,6 +147,7 @@ export default function AdvancedJobFilters({
             </SelectContent>
           </Select>
 
+          {/* Employment Type Filter */}
           <Select value={employmentFilter} onValueChange={onEmploymentChange}>
             <SelectTrigger className="w-auto min-w-[140px] h-10 bg-background border-2 hover:border-primary/50 transition-colors">
               <div className="flex items-center gap-2">
@@ -149,81 +173,6 @@ export default function AdvancedJobFilters({
             </SelectContent>
           </Select>
 
-          <Collapsible open={isAdvancedOpen} onOpenChange={setIsAdvancedOpen}>
-            <CollapsibleTrigger asChild>
-              <Button 
-                variant="outline" 
-                className="h-10 border-2 hover:border-primary/50 transition-colors relative"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filtri Avanzati
-                {activeFiltersCount > 0 && (
-                  <Badge 
-                    variant="secondary" 
-                    className="ml-2 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center bg-primary text-primary-foreground"
-                  >
-                    {activeFiltersCount}
-                  </Badge>
-                )}
-              </Button>
-            </CollapsibleTrigger>
-
-            <CollapsibleContent className="mt-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 border-2 border-dashed border-muted rounded-lg bg-muted/20">
-                {/* Salary Range */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Euro className="h-4 w-4 text-primary" />
-                    <label className="text-sm font-medium">Range Stipendio</label>
-                  </div>
-                  <div className="px-2">
-                    <Slider
-                      value={salaryRange}
-                      onValueChange={onSalaryRangeChange}
-                      min={0}
-                      max={200000}
-                      step={5000}
-                      className="w-full"
-                    />
-                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                      <span>€{salaryRange[0].toLocaleString()}</span>
-                      <span>€{salaryRange[1].toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Companies */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-primary" />
-                    <label className="text-sm font-medium">Aziende</label>
-                  </div>
-                  <div className="max-h-32 overflow-y-auto space-y-2">
-                    {uniqueCompanies.slice(0, 8).map((company) => (
-                      <div key={company} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={company}
-                          checked={selectedCompanies.includes(company)}
-                          onCheckedChange={() => onCompanyToggle(company)}
-                        />
-                        <label
-                          htmlFor={company}
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                        >
-                          {company}
-                        </label>
-                      </div>
-                    ))}
-                    {uniqueCompanies.length > 8 && (
-                      <p className="text-xs text-muted-foreground">
-                        +{uniqueCompanies.length - 8} altre aziende...
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
 
           {activeFiltersCount > 0 && (
             <Button 
@@ -248,7 +197,12 @@ export default function AdvancedJobFilters({
               }
             </span>
             {activeFiltersCount > 0 && (
-              <div className="flex gap-1">
+              <div className="flex gap-1 flex-wrap">
+                {sectorFilter !== "all" && (
+                  <Badge variant="secondary" className="text-xs">
+                    🏢 {sectorFilter}
+                  </Badge>
+                )}
                 {locationFilter !== "all" && (
                   <Badge variant="secondary" className="text-xs">
                     📍 {locationFilter}
@@ -257,16 +211,6 @@ export default function AdvancedJobFilters({
                 {employmentFilter !== "all" && (
                   <Badge variant="secondary" className="text-xs">
                     💼 {employmentTypes.find(t => t.value === employmentFilter)?.label}
-                  </Badge>
-                )}
-                {(salaryRange[0] > 0 || salaryRange[1] < 200000) && (
-                  <Badge variant="secondary" className="text-xs">
-                    💰 €{salaryRange[0].toLocaleString()}-{salaryRange[1].toLocaleString()}
-                  </Badge>
-                )}
-                {selectedCompanies.length > 0 && (
-                  <Badge variant="secondary" className="text-xs">
-                    🏢 {selectedCompanies.length} aziende
                   </Badge>
                 )}
               </div>

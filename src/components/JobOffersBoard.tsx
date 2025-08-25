@@ -11,6 +11,7 @@ import ProposalFormModal from "./ProposalFormModal";
 import JobOfferDetailsDialog from "./JobOfferDetailsDialog";
 import CompanyProfileViewModal from "./company/CompanyProfileViewModal";
 import { useRecruiterJobInterests } from "@/hooks/useRecruiterJobInterests";
+import { useJobOfferInterestCounts } from "@/hooks/useJobOfferInterestCounts";
 import { Database } from "@/integrations/supabase/types";
 import AdvancedJobFilters from "./filters/AdvancedJobFilters";
 
@@ -19,6 +20,40 @@ type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
     nome_azienda: string;
     id: string;
   } | null;
+};
+
+// Interest Button Component
+interface InterestButtonProps {
+  offer: JobOfferWithCompany;
+  userEmail: string;
+  interests: any[];
+  onTakeInterest: (offer: JobOfferWithCompany) => void;
+}
+
+const InterestButton = ({ offer, userEmail, interests, onTakeInterest }: InterestButtonProps) => {
+  const isAlreadyInterested = interests.some(interest => interest.job_offer_id === offer.id);
+  
+  if (isAlreadyInterested) {
+    return (
+      <Button 
+        size="sm" 
+        variant="outline"
+        disabled
+        className="text-green-600 border-green-600"
+      >
+        Già in Carico
+      </Button>
+    );
+  }
+  
+  return (
+    <Button 
+      size="sm" 
+      onClick={() => onTakeInterest(offer)}
+    >
+      Prendi in Carico
+    </Button>
+  );
 };
 
 export default function JobOffersBoard() {
@@ -38,6 +73,10 @@ export default function JobOffersBoard() {
   const { userProfile } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { addInterest, checkIfInterested, interests } = useRecruiterJobInterests();
+  
+  // Get job offer IDs for interest counting
+  const jobOfferIds = jobOffers?.map(offer => offer.id) || [];
+  const { getInterestCount } = useJobOfferInterestCounts(jobOfferIds);
 
   const fetchJobOffers = async () => {
     setIsLoading(true);
@@ -84,15 +123,9 @@ export default function JobOffersBoard() {
       .replace(/^\w/, c => c.toUpperCase()); // Capitalize first letter
   }, []);
 
-  // Simplified filtering logic
+  // Simplified filtering logic - REMOVED EXCLUSIVITY
   const filteredOffers = useMemo(() => {
     let filtered = jobOffers;
-
-    // Se è un recruiter, escludi le offerte già prese in carico
-    if (userProfile?.user_type === 'recruiter' && interests.length > 0) {
-      const interestedJobIds = new Set(interests.map(interest => interest.job_offer_id));
-      filtered = filtered.filter(offer => !interestedJobIds.has(offer.id));
-    }
 
     // Simple search in title, company, description
     if (searchTerm.trim()) {
@@ -119,7 +152,7 @@ export default function JobOffersBoard() {
     }
 
     return filtered;
-  }, [searchTerm, locationFilter, employmentFilter, jobOffers, interests, userProfile?.user_type, extractCityName]);
+  }, [searchTerm, locationFilter, employmentFilter, jobOffers, extractCityName]);
 
   const getCompanyName = (offer: JobOfferWithCompany): string => {
     // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations
@@ -345,10 +378,15 @@ export default function JobOffersBoard() {
                           {offer.location}
                         </span>
                       )}
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {getEmploymentTypeText(offer.employment_type)}
-                      </span>
+                       <span className="flex items-center gap-1">
+                         <Clock className="h-4 w-4" />
+                         {getEmploymentTypeText(offer.employment_type)}
+                       </span>
+                       {getInterestCount(offer.id) > 0 && (
+                         <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                           {getInterestCount(offer.id)} recruiter{getInterestCount(offer.id) !== 1 ? 's' : ''} interessati
+                         </Badge>
+                       )}
                     </CardDescription>
                   </div>
                   <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
@@ -397,14 +435,23 @@ export default function JobOffersBoard() {
                         <Eye className="h-4 w-4 mr-2" />
                         Vedi Dettagli
                       </Button>
-                      <Button 
-                        onClick={() => handleTakeInterest(offer)}
-                        disabled={!userProfile || userProfile.user_type !== 'recruiter'}
-                        className="bg-green-600 hover:bg-green-700"
-                      >
-                        <Heart className="h-4 w-4 mr-2" />
-                        Prendi in Carico
-                      </Button>
+                      {!isAdmin && userProfile && userProfile.user_type === 'recruiter' && (
+                        <InterestButton 
+                          offer={offer}
+                          userEmail=""
+                          interests={interests}
+                          onTakeInterest={handleTakeInterest}
+                        />
+                      )}
+                      {!isAdmin && userProfile && userProfile.user_type === 'recruiter' && (
+                        <Button 
+                          onClick={() => handleSendProposal(offer)}
+                          className="bg-primary hover:bg-primary/90"
+                        >
+                          <Send className="h-4 w-4 mr-2" />
+                          Invia Candidato
+                        </Button>
+                      )}
                       {isAdmin && (
                         <Button 
                           variant="outline" 

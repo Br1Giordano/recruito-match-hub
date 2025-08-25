@@ -52,9 +52,10 @@ export default function AdvancedJobFilters({
     { value: "full-time", label: "Tempo Pieno", icon: "💼" },
     { value: "part-time", label: "Part-time", icon: "⏰" },
     { value: "contract", label: "Contratto", icon: "📋" },
-    { value: "contratto-progetto", label: "Contratto Progetto", icon: "📋" },
+    { value: "contratto-progetto", label: "Contratto a Progetto", icon: "📋" },
     { value: "tempo-indeterminato", label: "Tempo Indeterminato", icon: "🏢" },
-    { value: "internship", label: "Stage", icon: "🎓" }
+    { value: "internship", label: "Stage", icon: "🎓" },
+    { value: "freelance", label: "Freelance", icon: "💻" }
   ];
 
   return (

@@ -78,17 +78,20 @@ export default function JobOffersBoard() {
     const description = (offer.description || "").toLowerCase();
     const text = `${title} ${description}`;
     
-    // Define sector keywords mapping
+    // Define sector keywords mapping with more comprehensive keywords
     const sectorKeywords = {
-      "IT & Tecnologia": ["developer", "software", "tech", "programmatore", "cloud", "architect", "frontend", "backend", "fullstack", "devops", "data", "ai", "machine learning"],
-      "Marketing & Comunicazione": ["marketing", "social media", "content", "comunicazione", "digital", "seo", "sem", "advertising", "brand"],
-      "Vendite & Commerciale": ["sales", "commerciale", "vendite", "business development", "account", "export"],
-      "Risorse Umane": ["hr", "risorse umane", "recruiter", "talent", "people", "payroll"],
-      "Finanza & Contabilità": ["finance", "contabilità", "accounting", "controller", "amministrazione", "fiscal"],
-      "Turismo & Viaggi": ["travel", "turismo", "tourism", "viaggio", "hotel", "hospitality"],
-      "Logistica & Trasporti": ["logistica", "trasporti", "supply chain", "warehouse", "spedizioni"],
+      "IT & Tecnologia": ["developer", "sviluppatore", "software", "tech", "programmatore", "cloud", "architect", "frontend", "backend", "fullstack", "devops", "data", "ai", "machine learning", "web", "app", "sistema", "informatico"],
+      "Marketing & Comunicazione": ["marketing", "social media", "content", "comunicazione", "digital", "seo", "sem", "advertising", "brand", "content manager"],
+      "Vendite & Commerciale": ["sales", "commerciale", "vendite", "business development", "account", "export", "venditore"],
+      "Risorse Umane": ["hr", "risorse umane", "recruiter", "talent", "people", "payroll", "paghe"],
+      "Finanza & Contabilità": ["finance", "contabilità", "accounting", "controller", "amministrazione", "fiscal", "contabile", "amministrativo"],
+      "Turismo & Viaggi": ["travel", "turismo", "tourism", "viaggio", "hotel", "hospitality", "experience manager", "leisure"],
+      "Logistica & Trasporti": ["logistica", "trasporti", "supply chain", "warehouse", "spedizioni", "corriere"],
       "Sanità & Farmaceutico": ["medical", "farmaceutico", "healthcare", "sanità", "infermiere", "medico"],
       "Educazione & Formazione": ["education", "formazione", "training", "insegnante", "tutor"],
+      "Energia & Ambiente": ["energie rinnovabili", "renewable", "ambiente", "sostenibilità", "green"],
+      "Eventi & Intrattenimento": ["event", "eventi", "luxury", "accompagnatrice", "event manager"],
+      "Project Management": ["project manager", "pm", "gestione progetti"],
       "Altro": []
     };
 
@@ -99,6 +102,22 @@ export default function JobOffersBoard() {
     }
     
     return "Altro";
+  }, []);
+
+  // Function to extract city name from location
+  const extractCityName = useCallback((location: string | null): string => {
+    if (!location) return "";
+    
+    // Remove common location suffixes and extract just the city name
+    let city = location
+      .replace(/\s*\(.*?\)/g, '') // Remove parentheses content
+      .replace(/\s*\/.*$/g, '')   // Remove everything after /
+      .replace(/\s*-.*$/g, '')    // Remove everything after -
+      .split(',')[0]              // Take only first part before comma
+      .trim();
+    
+    // Capitalize first letter
+    return city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
   }, []);
 
   // Memoized filtering logic for better performance
@@ -129,9 +148,10 @@ export default function JobOffersBoard() {
     }
 
     if (locationFilter !== "all") {
-      filtered = filtered.filter((offer) => 
-        offer.location?.toLowerCase().includes(locationFilter.toLowerCase())
-      );
+      filtered = filtered.filter((offer) => {
+        const cityName = extractCityName(offer.location);
+        return cityName.toLowerCase() === locationFilter.toLowerCase();
+      });
     }
 
     if (employmentFilter !== "all") {
@@ -139,7 +159,7 @@ export default function JobOffersBoard() {
     }
 
     return filtered;
-  }, [searchTerm, sectorFilter, locationFilter, employmentFilter, jobOffers, interests, userProfile?.user_type, extractSector]);
+  }, [searchTerm, sectorFilter, locationFilter, employmentFilter, jobOffers, interests, userProfile?.user_type, extractSector, extractCityName]);
 
   const getCompanyName = (offer: JobOfferWithCompany): string => {
     // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations
@@ -262,8 +282,8 @@ export default function JobOffersBoard() {
 
   // Get unique locations and sectors for filters
   const uniqueLocations = useMemo(() => 
-    [...new Set(jobOffers.map(offer => offer.location).filter(Boolean))], 
-    [jobOffers]
+    [...new Set(jobOffers.map(offer => extractCityName(offer.location)).filter(Boolean))].sort(), 
+    [jobOffers, extractCityName]
   );
   
   const uniqueSectors = useMemo(() => 

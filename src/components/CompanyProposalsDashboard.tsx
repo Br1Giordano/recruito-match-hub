@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -20,6 +19,9 @@ export default function CompanyProposalsDashboard() {
   const [filteredProposals, setFilteredProposals] = useState<any[]>([]);
   const [showMessageCenter, setShowMessageCenter] = useState(false);
   const [selectedRecruiter, setSelectedRecruiter] = useState<{email: string, name: string, conversationId?: string} | null>(null);
+  const [highlightedProposal, setHighlightedProposal] = useState<string | null>(null);
+  const proposalRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
+  
   const { user } = useAuth();
   const { isAdmin } = useAdminCheck();
   const { proposals, isLoading, updateProposalStatus, sendResponse, deleteProposal } = useProposals();
@@ -78,6 +80,59 @@ export default function CompanyProposalsDashboard() {
     if (confirmed && deleteProposal) {
       await deleteProposal(proposalId);
     }
+  };
+
+  // Enhanced updateProposalStatus with smooth navigation
+  const handleUpdateProposalStatus = async (proposalId: string, newStatus: string) => {
+    const success = await updateProposalStatus(proposalId, newStatus);
+    
+    if (success) {
+      // Determine the new tab based on status
+      const statusToTab = {
+        "pending": "pending",
+        "under_review": "interested", 
+        "approved": "approved",
+        "rejected": "other",
+        "hired": "other"
+      };
+      
+      const newTab = statusToTab[newStatus as keyof typeof statusToTab] || "other";
+      
+      // Set highlight effect
+      setHighlightedProposal(proposalId);
+      
+      // Switch to the new tab with a small delay for visual feedback
+      setTimeout(() => {
+        setActiveTab(newTab);
+        toast.success("Proposta aggiornata con successo!", {
+          description: `La proposta è stata spostata in "${getTabLabel(newTab)}"`
+        });
+        
+        // Scroll to the proposal after tab change
+        setTimeout(() => {
+          const proposalElement = proposalRefs.current[proposalId];
+          if (proposalElement) {
+            proposalElement.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+          }
+          
+          // Remove highlight after animation
+          setTimeout(() => setHighlightedProposal(null), 2000);
+        }, 300);
+      }, 500);
+    }
+  };
+
+  const getTabLabel = (tab: string) => {
+    const labels = {
+      "pending": "Nuove",
+      "interested": "In esame", 
+      "approved": "Short",
+      "other": "Altre"
+    };
+    return labels[tab as keyof typeof labels] || tab;
   };
 
   // Fix: Simplified sendResponse handler to match the expected signature
@@ -200,16 +255,25 @@ export default function CompanyProposalsDashboard() {
     return (
       <div className="grid gap-4">
         {proposalsToRender.map((proposal) => (
-           <CompactProposalCard
-             key={proposal.id}
-             proposal={proposal}
-             onStatusUpdate={updateProposalStatus}
-             onRequestAccess={(proposalId) => {
-               // TODO: Implementare richiesta di accesso ai dati
-               console.log('Richiesta accesso per proposta:', proposalId);
-             }}
-             onContactRecruiter={handleContactRecruiter}
-           />
+          <div 
+            key={proposal.id}
+            ref={(el) => proposalRefs.current[proposal.id] = el}
+            className={`transition-all duration-500 ${
+              highlightedProposal === proposal.id 
+                ? 'ring-2 ring-primary ring-opacity-60 bg-primary/5 scale-[1.02] shadow-lg' 
+                : ''
+            }`}
+          >
+            <CompactProposalCard
+              proposal={proposal}
+              onStatusUpdate={handleUpdateProposalStatus}
+              onRequestAccess={(proposalId) => {
+                // TODO: Implementare richiesta di accesso ai dati
+                console.log('Richiesta accesso per proposta:', proposalId);
+              }}
+              onContactRecruiter={handleContactRecruiter}
+            />
+          </div>
         ))}
       </div>
     );
@@ -234,8 +298,6 @@ export default function CompanyProposalsDashboard() {
           />
         </CardContent>
       </Card>
-
-      
 
       <ProposalTabs
         pendingProposals={pendingProposals}

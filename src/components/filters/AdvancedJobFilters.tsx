@@ -13,13 +13,10 @@ interface AdvancedJobFiltersProps {
   searchTerm: string;
   locationFilter: string;
   employmentFilter: string;
-  sectorFilter: string;
   uniqueLocations: string[];
-  uniqueSectors: string[];
   onSearchChange: (value: string) => void;
   onLocationChange: (value: string) => void;
   onEmploymentChange: (value: string) => void;
-  onSectorChange: (value: string) => void;
   onClearFilters: () => void;
   totalOffers: number;
   filteredCount: number;
@@ -29,13 +26,10 @@ export default function AdvancedJobFilters({
   searchTerm,
   locationFilter,
   employmentFilter,
-  sectorFilter,
   uniqueLocations,
-  uniqueSectors,
   onSearchChange,
   onLocationChange,
   onEmploymentChange,
-  onSectorChange,
   onClearFilters,
   totalOffers,
   filteredCount
@@ -44,8 +38,7 @@ export default function AdvancedJobFilters({
 
   const activeFiltersCount = [
     locationFilter !== "all",
-    employmentFilter !== "all",
-    sectorFilter !== "all"
+    employmentFilter !== "all"
   ].filter(Boolean).length;
 
   const employmentTypes = [
@@ -96,45 +89,19 @@ export default function AdvancedJobFilters({
 
         {/* Quick Filters Row */}
         <div className="flex flex-wrap gap-3 items-center">
-          {/* Settore Filter */}
-          <Select value={sectorFilter} onValueChange={onSectorChange}>
-            <SelectTrigger className="w-auto min-w-[140px] h-10 bg-background border-2 hover:border-primary/50 transition-colors">
-              <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-primary" />
-                <SelectValue placeholder="Settore" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="max-h-60">
-              <SelectItem value="all">
-                <div className="flex items-center gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Tutti i settori
-                </div>
-              </SelectItem>
-              {uniqueSectors.map((sector) => (
-                <SelectItem key={sector} value={sector}>
-                  <div className="flex items-center gap-2">
-                    <Building2 className="h-4 w-4 text-muted-foreground" />
-                    {sector}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
           {/* Location Filter */}
           <Select value={locationFilter} onValueChange={onLocationChange}>
             <SelectTrigger className="w-auto min-w-[140px] h-10 bg-background border-2 hover:border-primary/50 transition-colors">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4 text-primary" />
-                <SelectValue placeholder="Sede" />
+                <SelectValue placeholder="Città" />
               </div>
             </SelectTrigger>
             <SelectContent className="max-h-60">
               <SelectItem value="all">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  Tutte le sedi
+                  Tutte le città
                 </div>
               </SelectItem>
               {uniqueLocations.map((location) => (
@@ -199,11 +166,6 @@ export default function AdvancedJobFilters({
             </span>
             {activeFiltersCount > 0 && (
               <div className="flex gap-1 flex-wrap">
-                {sectorFilter !== "all" && (
-                  <Badge variant="secondary" className="text-xs">
-                    🏢 {sectorFilter}
-                  </Badge>
-                )}
                 {locationFilter !== "all" && (
                   <Badge variant="secondary" className="text-xs">
                     📍 {locationFilter}

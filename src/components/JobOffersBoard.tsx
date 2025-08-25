@@ -26,7 +26,6 @@ export default function JobOffersBoard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [locationFilter, setLocationFilter] = useState("all");
   const [employmentFilter, setEmploymentFilter] = useState("all");
-  const [sectorFilter, setSectorFilter] = useState("all");
   const [isLoading, setIsLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<JobOfferWithCompany | null>(null);
   const [showProposalModal, setShowProposalModal] = useState(false);
@@ -72,55 +71,20 @@ export default function JobOffersBoard() {
     fetchJobOffers();
   }, []);
 
-  // Function to extract sector from job title and description
-  const extractSector = useCallback((offer: JobOfferWithCompany): string => {
-    const title = offer.title.toLowerCase();
-    const description = (offer.description || "").toLowerCase();
-    const text = `${title} ${description}`;
-    
-    // Define sector keywords mapping with more comprehensive keywords
-    const sectorKeywords = {
-      "IT & Tecnologia": ["developer", "sviluppatore", "software", "tech", "programmatore", "cloud", "architect", "frontend", "backend", "fullstack", "devops", "data", "ai", "machine learning", "web", "app", "sistema", "informatico"],
-      "Marketing & Comunicazione": ["marketing", "social media", "content", "comunicazione", "digital", "seo", "sem", "advertising", "brand", "content manager"],
-      "Vendite & Commerciale": ["sales", "commerciale", "vendite", "business development", "account", "export", "venditore"],
-      "Risorse Umane": ["hr", "risorse umane", "recruiter", "talent", "people", "payroll", "paghe"],
-      "Finanza & Contabilità": ["finance", "contabilità", "accounting", "controller", "amministrazione", "fiscal", "contabile", "amministrativo"],
-      "Turismo & Viaggi": ["travel", "turismo", "tourism", "viaggio", "hotel", "hospitality", "experience manager", "leisure"],
-      "Logistica & Trasporti": ["logistica", "trasporti", "supply chain", "warehouse", "spedizioni", "corriere"],
-      "Sanità & Farmaceutico": ["medical", "farmaceutico", "healthcare", "sanità", "infermiere", "medico"],
-      "Educazione & Formazione": ["education", "formazione", "training", "insegnante", "tutor"],
-      "Energia & Ambiente": ["energie rinnovabili", "renewable", "ambiente", "sostenibilità", "green"],
-      "Eventi & Intrattenimento": ["event", "eventi", "luxury", "accompagnatrice", "event manager"],
-      "Project Management": ["project manager", "pm", "gestione progetti"],
-      "Altro": []
-    };
-
-    for (const [sector, keywords] of Object.entries(sectorKeywords)) {
-      if (keywords.some(keyword => text.includes(keyword))) {
-        return sector;
-      }
-    }
-    
-    return "Altro";
-  }, []);
-
-  // Function to extract city name from location
+  // Function to extract city name from location - simplified
   const extractCityName = useCallback((location: string | null): string => {
     if (!location) return "";
     
-    // Remove common location suffixes and extract just the city name
-    let city = location
-      .replace(/\s*\(.*?\)/g, '') // Remove parentheses content
-      .replace(/\s*\/.*$/g, '')   // Remove everything after /
-      .replace(/\s*-.*$/g, '')    // Remove everything after -
-      .split(',')[0]              // Take only first part before comma
-      .trim();
-    
-    // Capitalize first letter
-    return city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
+    // Simple extraction: get first word before parentheses, slashes, or commas
+    return location
+      .split('(')[0]        // Remove parentheses content
+      .split('/')[0]        // Remove everything after /
+      .split(',')[0]        // Remove everything after comma
+      .trim()
+      .replace(/^\w/, c => c.toUpperCase()); // Capitalize first letter
   }, []);
 
-  // Memoized filtering logic for better performance
+  // Simplified filtering logic
   const filteredOffers = useMemo(() => {
     let filtered = jobOffers;
 
@@ -130,36 +94,32 @@ export default function JobOffersBoard() {
       filtered = filtered.filter(offer => !interestedJobIds.has(offer.id));
     }
 
-    // Enhanced search - includes requirements and more detailed matching
-    if (searchTerm) {
-      const searchLower = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (offer) =>
-          offer.title.toLowerCase().includes(searchLower) ||
-          getCompanyName(offer).toLowerCase().includes(searchLower) ||
-          offer.description?.toLowerCase().includes(searchLower) ||
-          offer.requirements?.toLowerCase().includes(searchLower) ||
-          offer.location?.toLowerCase().includes(searchLower)
+    // Simple search in title, company, description
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(offer =>
+        offer.title?.toLowerCase().includes(searchLower) ||
+        getCompanyName(offer).toLowerCase().includes(searchLower) ||
+        offer.description?.toLowerCase().includes(searchLower) ||
+        offer.location?.toLowerCase().includes(searchLower)
       );
     }
 
-    if (sectorFilter !== "all") {
-      filtered = filtered.filter((offer) => extractSector(offer) === sectorFilter);
-    }
-
+    // Simple location filter by city
     if (locationFilter !== "all") {
-      filtered = filtered.filter((offer) => {
+      filtered = filtered.filter(offer => {
         const cityName = extractCityName(offer.location);
         return cityName.toLowerCase() === locationFilter.toLowerCase();
       });
     }
 
+    // Simple employment type filter - exact match
     if (employmentFilter !== "all") {
-      filtered = filtered.filter((offer) => offer.employment_type === employmentFilter);
+      filtered = filtered.filter(offer => offer.employment_type === employmentFilter);
     }
 
     return filtered;
-  }, [searchTerm, sectorFilter, locationFilter, employmentFilter, jobOffers, interests, userProfile?.user_type, extractSector, extractCityName]);
+  }, [searchTerm, locationFilter, employmentFilter, jobOffers, interests, userProfile?.user_type, extractCityName]);
 
   const getCompanyName = (offer: JobOfferWithCompany): string => {
     // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations
@@ -280,21 +240,19 @@ export default function JobOffersBoard() {
     }
   };
 
-  // Get unique locations and sectors for filters
-  const uniqueLocations = useMemo(() => 
-    [...new Set(jobOffers.map(offer => extractCityName(offer.location)).filter(Boolean))].sort(), 
-    [jobOffers, extractCityName]
-  );
-  
-  const uniqueSectors = useMemo(() => 
-    [...new Set(jobOffers.map(offer => extractSector(offer)))].sort(), 
-    [jobOffers, extractSector]
-  );
+  // Get unique locations for filters - simplified
+  const uniqueLocations = useMemo(() => {
+    const cities = jobOffers
+      .map(offer => extractCityName(offer.location))
+      .filter(city => city && city.length > 0)
+      .map(city => city.charAt(0).toUpperCase() + city.slice(1).toLowerCase());
+    
+    return [...new Set(cities)].sort();
+  }, [jobOffers, extractCityName]);
 
-  // Filter handlers
+  // Simple clear filters
   const handleClearFilters = useCallback(() => {
     setSearchTerm("");
-    setSectorFilter("all");
     setLocationFilter("all");
     setEmploymentFilter("all");
   }, []);
@@ -322,18 +280,15 @@ export default function JobOffersBoard() {
         </p>
       </div>
 
-      {/* Advanced Filters */}
+      {/* Simplified Filters */}
       <AdvancedJobFilters
         searchTerm={searchTerm}
         locationFilter={locationFilter}
         employmentFilter={employmentFilter}
-        sectorFilter={sectorFilter}
         uniqueLocations={uniqueLocations}
-        uniqueSectors={uniqueSectors}
         onSearchChange={setSearchTerm}
         onLocationChange={setLocationFilter}
         onEmploymentChange={setEmploymentFilter}
-        onSectorChange={setSectorFilter}
         onClearFilters={handleClearFilters}
         totalOffers={jobOffers.length}
         filteredCount={filteredOffers.length}

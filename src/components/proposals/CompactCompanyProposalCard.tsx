@@ -354,11 +354,11 @@ export default function CompactCompanyProposalCard({
                           <StickyNote className="h-3.5 w-3.5" />
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-64 p-3">
+                      <PopoverContent className="w-64 p-3 bg-white border border-gray-200 shadow-lg z-50">
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm">Note</h4>
                           <textarea 
-                            className="w-full h-20 p-2 border rounded text-sm resize-none"
+                            className="w-full h-20 p-2 border border-gray-300 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                             placeholder="Aggiungi note per questa proposta..."
                           />
                           <Button size="sm" className="w-full">Salva</Button>

@@ -4,8 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
-import { Building2, MapPin, Euro, Clock, Trash2, Eye, StickyNote, ExternalLink } from "lucide-react";
+import { Building2, MapPin, Euro, Clock, Trash2, Eye, StickyNote, ExternalLink, Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useJobOfferInterestCounts } from "@/hooks/useJobOfferInterestCounts";
 
 interface CompactJobInterestCardProps {
   interest: any;
@@ -25,8 +26,11 @@ export const CompactJobInterestCard = ({
   const [notes, setNotes] = useState(interest.notes || "");
   const [isNotesOpen, setIsNotesOpen] = useState(false);
   const { toast } = useToast();
-
+  
   const jobOffer = interest.job_offers;
+  
+  // Get interest count for the job offer
+  const { getInterestCount } = useJobOfferInterestCounts([jobOffer?.id || ""]);
 
   if (!jobOffer) {
     return (
@@ -110,6 +114,12 @@ export const CompactJobInterestCard = ({
                   ? `Da €${jobOffer.salary_min.toLocaleString()}`
                   : `Fino a €${jobOffer.salary_max?.toLocaleString()}`}
               </span>
+            </div>
+          )}
+          {jobOffer.id && getInterestCount(jobOffer.id) > 0 && (
+            <div className="flex items-center gap-1 text-blue-600">
+              <Users className="h-3 w-3" />
+              <span className="truncate">{getInterestCount(jobOffer.id)} recruiter interessat{getInterestCount(jobOffer.id) !== 1 ? 'i' : 'o'}</span>
             </div>
           )}
         </div>

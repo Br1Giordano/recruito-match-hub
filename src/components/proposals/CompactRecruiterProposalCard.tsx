@@ -93,7 +93,8 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
     });
   };
 
-  const truncateDescription = (text: string, limit: number = 140) => {
+  const truncateDescription = (text: string | null | undefined, limit: number = 140) => {
+    if (!text) return '';
     if (text.length <= limit) return text;
     return text.slice(0, limit) + '...';
   };
@@ -219,7 +220,7 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
                   ? proposal.proposal_description 
                   : truncateDescription(proposal.proposal_description)
                 }
-                {proposal.proposal_description.length > 140 && (
+                {proposal.proposal_description && proposal.proposal_description.length > 140 && (
                   <button 
                     onClick={() => setShowFullDescription(!showFullDescription)}
                     className="ml-1 text-primary hover:text-primary/80 font-medium"

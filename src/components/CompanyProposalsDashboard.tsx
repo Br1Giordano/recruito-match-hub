@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProposals } from "@/hooks/useProposals";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
 import ProposalFilters from "./proposals/ProposalFilters";
-import CompactProposalCard from "./proposals/CompactProposalCard";
+import CompactCompanyProposalCard from "./proposals/CompactCompanyProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import ProposalTabs from "./proposals/ProposalTabs";
 import { MessageCenter } from "./messaging/MessageCenter";
@@ -258,7 +258,7 @@ export default function CompanyProposalsDashboard() {
     }
 
     return (
-      <div className="grid gap-4">
+      <div className="grid gap-4 grid-cols-1 xl:grid-cols-2">
         {proposalsToRender.map((proposal) => (
           <div 
             key={proposal.id}
@@ -269,7 +269,7 @@ export default function CompanyProposalsDashboard() {
                 : ''
             }`}
           >
-            <CompactProposalCard
+            <CompactCompanyProposalCard
               proposal={proposal}
               onStatusUpdate={handleUpdateProposalStatus}
               onRequestAccess={(proposalId) => {

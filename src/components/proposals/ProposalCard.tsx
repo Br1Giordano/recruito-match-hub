@@ -62,7 +62,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   const StatusIcon = statusMap[proposal.status]?.icon || Clock4;
 
   return (
-    <Card className="group">
+    <Card className="group border-l-4 border-l-electric-teal bg-gradient-to-r from-electric-teal/[0.03] via-primary/[0.02] to-transparent hover:shadow-lg hover:border-l-primary transition-all duration-300 backdrop-blur-sm">
       <CardHeader className="pb-4">
         {/* Header minimale con status */}
         <div className="flex items-center justify-between mb-6">
@@ -71,7 +71,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           </div>
           <Badge 
             variant={getStatusVariant(proposal.status)}
-            className="flex items-center gap-1.5"
+            className="flex items-center gap-1.5 shadow-sm"
           >
             <StatusIcon className="h-3.5 w-3.5" />
             {getStatusLabel(proposal.status)}
@@ -80,24 +80,27 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
 
         {/* Hero candidato pulito */}
         <div className="flex items-start gap-4">
-          <Avatar className="h-14 w-14">
-            <AvatarFallback className="bg-muted text-muted-foreground text-lg font-medium">
-              {getInitials(proposal.candidate_name)}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <Avatar className="h-14 w-14 ring-2 ring-electric-teal/30 group-hover:ring-primary/40 transition-all duration-300">
+              <AvatarFallback className="bg-gradient-to-br from-electric-teal/20 to-primary/20 text-navy text-lg font-semibold border border-electric-teal/20">
+                {getInitials(proposal.candidate_name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-primary to-electric-teal rounded-full border-2 border-background shadow-sm"></div>
+          </div>
           
           <div className="flex-1 min-w-0">
-            <h2 className="text-2xl font-semibold text-foreground mb-1">
+            <h2 className="text-2xl font-semibold text-navy group-hover:text-primary transition-colors mb-1">
               {proposal.candidate_name}
             </h2>
             <div className="flex items-center gap-2 text-muted-foreground mb-3">
-              <Mail className="h-4 w-4" />
-              <span className="text-sm">{proposal.candidate_email}</span>
+              <Mail className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">{proposal.candidate_email}</span>
             </div>
             {proposal.job_offers?.title && (
               <div className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium bg-muted px-3 py-1.5 rounded-lg">
+                <Briefcase className="h-4 w-4 text-confidence" />
+                <span className="text-sm font-semibold bg-gradient-to-r from-confidence/10 to-primary/10 text-navy px-3 py-1.5 rounded-lg border border-confidence/20">
                   {proposal.job_offers.title}
                 </span>
               </div>
@@ -110,32 +113,32 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
         {/* Info cards grid pulito */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {proposal.years_experience && (
-            <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+            <div className="bg-gradient-to-br from-warm-amber/5 to-warm-amber/10 rounded-xl p-4 space-y-2 border border-warm-amber/20 hover:border-warm-amber/30 transition-colors">
               <div className="flex items-center gap-2">
-                <Briefcase className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground font-medium">Esperienza</span>
+                <Briefcase className="h-4 w-4 text-warm-amber" />
+                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Esperienza</span>
               </div>
-              <p className="text-lg font-semibold">{proposal.years_experience} anni</p>
+              <p className="text-lg font-semibold text-navy">{proposal.years_experience} anni</p>
             </div>
           )}
           
           {proposal.availability_weeks && (
-            <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+            <div className="bg-gradient-to-br from-electric-teal/5 to-electric-teal/10 rounded-xl p-4 space-y-2 border border-electric-teal/20 hover:border-electric-teal/30 transition-colors">
               <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground font-medium">Disponibilità</span>
+                <Calendar className="h-4 w-4 text-electric-teal" />
+                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Disponibilità</span>
               </div>
-              <p className="text-lg font-semibold">{proposal.availability_weeks} settimane</p>
+              <p className="text-lg font-semibold text-navy">{proposal.availability_weeks} settimane</p>
             </div>
           )}
           
           {proposal.expected_salary && (
-            <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+            <div className="bg-gradient-to-br from-confidence/5 to-confidence/10 rounded-xl p-4 space-y-2 border border-confidence/20 hover:border-confidence/30 transition-colors">
               <div className="flex items-center gap-2">
-                <Euro className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground font-medium">Stipendio</span>
+                <Euro className="h-4 w-4 text-confidence" />
+                <span className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Stipendio</span>
               </div>
-              <p className="text-lg font-semibold">€{proposal.expected_salary.toLocaleString()}</p>
+              <p className="text-lg font-semibold text-navy">€{proposal.expected_salary.toLocaleString()}</p>
             </div>
           )}
         </div>

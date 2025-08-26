@@ -19,37 +19,57 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 20% 20%;
 
-    /* Primary gradient colors - Blu #0284FF al Verde #00C853 */
-    --primary-start: 210 100% 51%; /* #0284FF */
-    --primary-end: 125 100% 39%; /* #00C853 */
+    /* Tech Forward Brand Colors */
+    --primary-start: 210 100% 51%; /* Electric Blue #0066FF */
+    --primary-end: 125 100% 39%; /* Emerald Green #00C853 */
     --primary: 210 100% 51%; /* Default primary */
     --primary-foreground: 0 0% 100%;
 
-    /* Dark Navy per titoli */
-    --navy: 213 100% 20%; /* #003366 */
+    /* Confidence Purple for leadership/expertise */
+    --confidence: 262 83% 58%; /* #7C3AED */
+    --confidence-foreground: 0 0% 100%;
+
+    /* Electric teal for tech innovation */
+    --electric-teal: 174 100% 44%; /* #00E5D4 */
+    --electric-teal-foreground: 220 26% 14%;
+
+    /* Warm amber for growth/opportunities */
+    --warm-amber: 43 100% 58%; /* #FFB800 */
+    --warm-amber-foreground: 220 26% 14%;
+
+    /* Deep navy for professionalism */
+    --navy: 220 26% 14%; /* #1E293B */
     --navy-foreground: 0 0% 100%;
 
-    /* Neutral grays */
-    --gray-50: 210 20% 98%;
-    --gray-100: 210 20% 95%;
-    --gray-200: 210 16% 88%;
-    --gray-300: 210 14% 83%;
+    /* Modern neutrals */
+    --gray-50: 220 14% 98%;
+    --gray-100: 220 13% 95%;
+    --gray-200: 220 13% 88%;
+    --gray-300: 220 13% 82%;
     
-    --secondary: 210 20% 95%;
-    --secondary-foreground: 213 100% 20%;
+    --secondary: 220 13% 95%;
+    --secondary-foreground: 220 26% 14%;
 
-    --muted: 210 20% 95%;
-    --muted-foreground: 210 10% 46%;
+    --muted: 220 13% 95%;
+    --muted-foreground: 220 9% 46%;
 
-    --accent: 210 20% 95%;
-    --accent-foreground: 213 100% 20%;
+    --accent: 174 100% 44%;
+    --accent-foreground: 220 26% 14%;
 
-    /* Error/Alert - Rosso #FF3B30 */
-    --destructive: 4 100% 59%; /* #FF3B30 */
+    /* Status system with brand alignment */
+    --status-approved: 125 100% 39%; /* Success green */
+    --status-pending: 43 100% 58%; /* Warning amber */
+    --status-rejected: 0 84% 60%; /* Error red */
+    --status-match-high: 125 100% 39%; /* High match - green */
+    --status-match-medium: 43 100% 58%; /* Medium match - amber */
+    --status-match-low: 0 84% 60%; /* Low match - red */
+
+    /* Destructive remains for alerts */
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 16% 88%;
-    --input: 210 16% 88%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
     --ring: 210 100% 51%;
 
     --radius: 1rem; /* 16px border radius */
@@ -62,11 +82,6 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-
-    /* Status colors */
-    --status-approved: 125 100% 39%; /* Verde per approvato */
-    --status-pending: 210 100% 51%; /* Blu per in valutazione */
-    --status-rejected: 4 100% 59%; /* Rosso per rifiutato */
 
     /* Shadows */
     --shadow-startup: 0 8px 16px -4px rgba(0,0,0,0.08);

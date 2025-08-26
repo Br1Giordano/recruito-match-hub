@@ -99,7 +99,8 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
   };
 
   // Extract tags from description (simplified approach)
-  const extractTags = (description: string) => {
+  const extractTags = (description: string | null | undefined) => {
+    if (!description) return [];
     const skills = ['React', 'JavaScript', 'TypeScript', 'Node.js', 'Python', 'Java', 'PHP', 'Angular', 'Vue', 'CSS', 'HTML'];
     const foundSkills = skills.filter(skill => 
       description.toLowerCase().includes(skill.toLowerCase())

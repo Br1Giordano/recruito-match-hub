@@ -73,6 +73,11 @@
     --ring: 210 100% 51%;
 
     --radius: 1rem; /* 16px border radius */
+    
+    /* Prize colors */
+    --gold: 42 78% 62%;
+    --silver: 220 13% 78%;
+    --bronze: 22 49% 58%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;

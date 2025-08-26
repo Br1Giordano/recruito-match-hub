@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRecruiterProposals } from "@/hooks/useRecruiterProposals";
 import { useMessages } from "@/hooks/useMessages";
 import ProposalFilters from "./proposals/ProposalFilters";
-import RecruiterProposalCard from "./proposals/RecruiterProposalCard";
+import CompactRecruiterProposalCard from "./proposals/CompactRecruiterProposalCard";
 import EmptyProposalsState from "./proposals/EmptyProposalsState";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import RecruiterGamificationDashboard from "./gamification/RecruiterGamificationDashboard";
@@ -137,12 +137,14 @@ export default function RecruiterDashboard() {
             </CardContent>
           </Card>
 
-          <div className="grid gap-6">
+          <div className="grid gap-4 xl:grid-cols-2">
             {filteredProposals.length === 0 ? (
-              <EmptyProposalsState type="recruiter" hasProposals={proposals.length > 0} />
+              <div className="xl:col-span-2">
+                <EmptyProposalsState type="recruiter" hasProposals={proposals.length > 0} />
+              </div>
             ) : (
               filteredProposals.map((proposal) => (
-                <RecruiterProposalCard key={proposal.id} proposal={proposal} />
+                <CompactRecruiterProposalCard key={proposal.id} proposal={proposal} />
               ))
             )}
           </div>

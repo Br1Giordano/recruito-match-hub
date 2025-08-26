@@ -64,42 +64,44 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
   return (
     <Card className="w-full border-gray-100 hover:border-gray-200 transition-all duration-200 hover:shadow-md">
       <CardHeader className="pb-4">
+        {/* CANDIDATO Label */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+            👤 CANDIDATO
+          </div>
+          <Badge 
+            variant={getStatusVariant(proposal.status)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm ml-auto"
+          >
+            <StatusIcon className="h-4 w-4" />
+            {getStatusLabel(proposal.status)}
+          </Badge>
+        </div>
+
         {/* Candidate Header Section */}
-        <div className="flex items-start gap-4">
-          <Avatar className="h-16 w-16 ring-2 ring-gray-100">
-            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-lg font-bold">
+        <div className="flex items-start gap-4 bg-blue-50/50 rounded-xl p-4 border border-blue-100">
+          <Avatar className="h-20 w-20 ring-3 ring-blue-200">
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
               {getInitials(proposal.candidate_name)}
             </AvatarFallback>
           </Avatar>
           
           <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h2 className="text-2xl font-bold text-gray-900 leading-tight">
-                  {proposal.candidate_name}
-                </h2>
-                <p className="text-gray-600 mt-1 flex items-center gap-1">
-                  <Mail className="h-4 w-4" />
-                  {proposal.candidate_email}
-                </p>
-                {proposal.job_offers?.title && (
-                  <div className="mt-2 flex items-center gap-2">
-                    <Briefcase className="h-4 w-4 text-blue-600" />
-                    <span className="text-sm font-medium text-blue-700 bg-blue-50 px-2 py-1 rounded-lg">
-                      {proposal.job_offers.title}
-                    </span>
-                  </div>
-                )}
+            <h2 className="text-3xl font-bold text-gray-900 leading-tight mb-2">
+              {proposal.candidate_name}
+            </h2>
+            <p className="text-gray-600 flex items-center gap-2 mb-3">
+              <Mail className="h-5 w-5 text-blue-600" />
+              <span className="font-medium">{proposal.candidate_email}</span>
+            </p>
+            {proposal.job_offers?.title && (
+              <div className="flex items-center gap-2">
+                <Briefcase className="h-5 w-5 text-blue-600" />
+                <span className="text-lg font-semibold text-blue-700 bg-blue-100 px-3 py-1.5 rounded-lg">
+                  {proposal.job_offers.title}
+                </span>
               </div>
-              
-              <Badge 
-                variant={getStatusVariant(proposal.status)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-sm"
-              >
-                <StatusIcon className="h-4 w-4" />
-                {getStatusLabel(proposal.status)}
-              </Badge>
-            </div>
+            )}
           </div>
         </div>
       </CardHeader>
@@ -161,24 +163,31 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           userType={userType}
         />
 
-        {/* Recruiter Information - Compact */}
+        {/* RECRUITER Section */}
         {proposal.recruiter_name && (
-          <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
-            <div className="bg-orange-100 p-1.5 rounded-full">
-              <User className="h-4 w-4 text-orange-600" />
+          <div className="border-t-2 border-gray-200 pt-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="bg-orange-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
+                🎯 RECRUITER
+              </div>
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900">{proposal.recruiter_name}</p>
-              {proposal.recruiter_email && userType === 'company' && (
-                <p className="text-xs text-gray-500">{proposal.recruiter_email}</p>
+            <div className="flex items-center gap-3 p-3 bg-orange-50/50 rounded-lg border border-orange-100">
+              <div className="bg-orange-100 p-2 rounded-full">
+                <User className="h-5 w-5 text-orange-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-gray-900">{proposal.recruiter_name}</p>
+                {proposal.recruiter_email && userType === 'company' && (
+                  <p className="text-xs text-gray-600">{proposal.recruiter_email}</p>
+                )}
+              </div>
+              {proposal.recruiter_fee_percentage && (
+                <div className="text-right bg-white px-3 py-2 rounded-lg border border-orange-200">
+                  <p className="text-xs text-orange-600 font-medium">Commissione</p>
+                  <p className="text-lg font-bold text-orange-700">{proposal.recruiter_fee_percentage}%</p>
+                </div>
               )}
             </div>
-            {proposal.recruiter_fee_percentage && (
-              <div className="text-right">
-                <p className="text-xs text-gray-500">Commissione</p>
-                <p className="text-sm font-bold text-gray-900">{proposal.recruiter_fee_percentage}%</p>
-              </div>
-            )}
           </div>
         )}
 

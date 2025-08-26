@@ -2,8 +2,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { FileText, Shield, Eye, Download, Lock } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 interface CVViewerProps {
   proposal?: {
@@ -30,6 +32,7 @@ function CVViewer({
 }: CVViewerProps) {
   const [showCV, setShowCV] = useState(false);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   // Handle both direct props and proposal-based props
   const candidateName = directCandidateName || proposal?.candidate_name || 'Candidato';
@@ -111,14 +114,102 @@ function CVViewer({
 
   const statusMessage = getStatusMessage();
 
-  // Simple trigger button for direct usage
+  // Handle actions for CV
+  const handleCVView = () => {
+    if (cvUrl) {
+      window.open(cvUrl, '_blank');
+    } else {
+      toast({
+        title: "CV non disponibile",
+        description: statusMessage || "Non è possibile accedere al CV al momento",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleCVDownload = () => {
+    if (cvUrl) {
+      const link = document.createElement('a');
+      link.href = cvUrl;
+      link.download = `CV_${candidateName}_${canViewFullCV() ? 'completo' : 'anonimizzato'}.pdf`;
+      link.click();
+    }
+  };
+
+  // When used with a trigger, show a dialog
   if (trigger) {
     return (
-      <>
-        <span onClick={() => cvUrl && window.open(cvUrl, '_blank')} className="cursor-pointer">
+      <Dialog>
+        <DialogTrigger asChild>
           {trigger}
-        </span>
-      </>
+        </DialogTrigger>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              CV di {candidateName}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {getAccessLevelBadge() && (
+              <div className="flex justify-center">
+                {getAccessLevelBadge()}
+              </div>
+            )}
+
+            {statusMessage && (
+              <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded text-center">
+                {statusMessage}
+              </p>
+            )}
+
+            {!canViewFullCV() && shouldShowAnonymizedCV() && (
+              <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
+                <div className="flex items-start gap-2">
+                  <Shield className="h-4 w-4 text-blue-600 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="font-medium text-blue-900">CV Protetto</p>
+                    <p className="text-blue-700">
+                      I dati di contatto sono stati oscurati per proteggere la privacy.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {cvUrl ? (
+              <div className="flex gap-2 justify-center">
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleCVView}
+                  className="flex-1"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Visualizza CV
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCVDownload}
+                  className="flex-1"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Scarica
+                </Button>
+              </div>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-sm text-gray-500">
+                  {statusMessage || "CV non disponibile"}
+                </p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     );
   }
 

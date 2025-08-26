@@ -21,10 +21,10 @@ export default function BadgeCard({ badge, size = 'md' }: BadgeCardProps) {
   };
 
   const iconColors = {
-    common: 'text-gray-600',
-    rare: 'text-blue-600',
-    epic: 'text-purple-600',
-    legendary: 'text-yellow-600'
+    common: 'text-gray-500',
+    rare: 'text-blue-500',
+    epic: 'text-purple-500',
+    legendary: 'text-yellow-500'
   };
 
   const sizeClasses = {
@@ -51,7 +51,7 @@ export default function BadgeCard({ badge, size = 'md' }: BadgeCardProps) {
           <IconComponent 
             size={iconSizes[size]} 
             className={cn(
-              isEarned ? iconColors[badge.rarity] : "text-gray-400"
+              isEarned ? iconColors[badge.rarity] : "text-gray-300"
             )}
           />
           <BadgeComponent 

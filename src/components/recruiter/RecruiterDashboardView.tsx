@@ -7,6 +7,7 @@ import { useRecruiterProfileByEmail } from '@/hooks/useRecruiterProfileByEmail';
 import { supabase } from '@/integrations/supabase/client';
 import RecruiterAvatar from './RecruiterAvatar';
 import { ensureHttpsProtocol } from '@/utils/urlUtils';
+import ReviewsViewDialog from '../reviews/ReviewsViewDialog';
 
 interface RecruiterDashboardViewProps {
   recruiterEmail: string;
@@ -37,6 +38,7 @@ export default function RecruiterDashboardView({ recruiterEmail, onClose }: Recr
   });
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [showReviewsDialog, setShowReviewsDialog] = useState(false);
 
   useEffect(() => {
     if (recruiterEmail) {
@@ -201,7 +203,12 @@ export default function RecruiterDashboardView({ recruiterEmail, onClose }: Recr
               <Heart className="h-3 w-3 mr-1" />
               1 interessati
             </Button>
-            <Button variant="outline" size="sm" className="flex-1">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex-1"
+              onClick={() => setShowReviewsDialog(true)}
+            >
               <Star className="h-3 w-3 mr-1" />
               {reviews.length} recensioni
             </Button>
@@ -335,6 +342,14 @@ export default function RecruiterDashboardView({ recruiterEmail, onClose }: Recr
           )}
         </div>
       </div>
+
+      {/* Reviews Dialog */}
+      <ReviewsViewDialog
+        isOpen={showReviewsDialog}
+        onClose={() => setShowReviewsDialog(false)}
+        reviews={reviews}
+        recruiterName={`${profile.nome} ${profile.cognome}`}
+      />
     </div>
   );
 }

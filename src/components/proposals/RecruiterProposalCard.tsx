@@ -1,8 +1,24 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Euro, Calendar, User, Phone, Linkedin, MapPin, Building2, MessageCircle } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { 
+  Euro, 
+  Calendar, 
+  User, 
+  Phone, 
+  Linkedin, 
+  MapPin, 
+  Building2, 
+  MessageCircle,
+  Briefcase,
+  Mail,
+  FileText,
+  Clock,
+  CheckCircle2,
+  Star
+} from "lucide-react";
 import ProposalDetailsDialog from "./ProposalDetailsDialog";
 import RecruiterAvatar from "../recruiter/RecruiterAvatar";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
@@ -52,222 +68,198 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
     }
   }, [proposal.recruiter_email, fetchProfileByEmail, recruiterProfile, fetchRatingByEmail]);
 
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "under_review":
-        return "bg-blue-100 text-blue-800";
-      case "approved":
-        return "bg-green-100 text-green-800";
-      case "rejected":
-        return "bg-red-100 text-red-800";
-      case "hired":
-        return "bg-purple-100 text-purple-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "In Attesa";
-      case "under_review":
-        return "In Revisione";
-      case "approved":
-        return "Approvata";
-      case "rejected":
-        return "Rifiutata";
-      case "hired":
-        return "Assunto";
-      default:
-        return status;
-    }
+  const statusMap: { [key: string]: { label: string; color: string; icon: any } } = {
+    pending: { label: 'In Attesa', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: Clock },
+    under_review: { label: 'In Revisione', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: Clock },
+    approved: { label: 'Approvata', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle2 },
+    rejected: { label: 'Rifiutata', color: 'bg-red-100 text-red-800 border-red-200', icon: FileText },
+    hired: { label: 'Assunto', color: 'bg-purple-100 text-purple-800 border-purple-200', icon: CheckCircle2 },
   };
+
+  const currentStatus = statusMap[proposal.status] || { 
+    label: proposal.status, 
+    color: 'bg-gray-100 text-gray-800 border-gray-200', 
+    icon: Clock 
+  };
+
+  const StatusIcon = currentStatus.icon;
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <div className="flex justify-between items-start">
-          <div className="flex items-center gap-2">
-            <User className="h-5 w-5" />
-            <CardTitle className="text-lg">{proposal.candidate_name}</CardTitle>
-          </div>
-          <Badge className={getStatusColor(proposal.status)}>
-            {getStatusText(proposal.status)}
-          </Badge>
-        </div>
-        {proposal.job_offers?.title && (
-          <div className="text-sm text-muted-foreground">
-            Proposto per {proposal.job_offers.title}
-          </div>
-        )}
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {/* Profilo Recruiter Completo */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <h4 className="font-medium mb-3 text-blue-900">Profilo Recruiter</h4>
-          {loadingRecruiter ? (
-            <div className="text-sm text-gray-500">Caricamento profilo recruiter...</div>
-          ) : recruiterProfile ? (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <RecruiterAvatar
-                  avatarUrl={recruiterProfile.avatar_url}
-                  name={`${recruiterProfile.nome} ${recruiterProfile.cognome}`}
-                  size="md"
-                />
-                <div className="flex-1">
-                  <div className="font-medium text-gray-900">
-                    {recruiterProfile.nome} {recruiterProfile.cognome}
+    <Card className="w-full border-gray-100 hover:border-gray-200 transition-all duration-200 hover:shadow-md">
+      <CardHeader className="pb-4">
+        {/* Candidate Hero Section */}
+        <div className="flex items-start gap-4">
+          <Avatar className="h-20 w-20 ring-2 ring-gray-100">
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white text-xl font-bold">
+              {getInitials(proposal.candidate_name)}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h2 className="text-3xl font-bold text-gray-900 leading-tight mb-2">
+                  {proposal.candidate_name}
+                </h2>
+                {proposal.job_offers?.title && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <Briefcase className="h-5 w-5 text-blue-600" />
+                    <span className="text-lg font-medium text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg">
+                      {proposal.job_offers.title}
+                    </span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-sm text-gray-600">
-                      {recruiterProfile.email}
-                    </div>
-                    <StarRating 
-                      rating={rating.averageRating} 
-                      totalReviews={rating.totalReviews}
-                      showNumber={rating.totalReviews > 0}
-                      size={12}
-                    />
-                  </div>
-                  {recruiterProfile.azienda && (
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <Building2 className="h-3 w-3" />
-                      {recruiterProfile.azienda}
-                    </div>
-                  )}
-                  {recruiterProfile.location && (
-                    <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <MapPin className="h-3 w-3" />
-                      {recruiterProfile.location}
-                    </div>
-                  )}
-                </div>
+                )}
               </div>
               
-              {/* Informazioni aggiuntive */}
-              <div className="flex flex-wrap gap-2">
-                {recruiterProfile.years_of_experience && (
-                  <Badge variant="secondary" className="text-xs">
-                    {recruiterProfile.years_of_experience} anni di esperienza
-                  </Badge>
-                )}
-                {recruiterProfile.specializations && recruiterProfile.specializations.length > 0 && (
-                  <Badge variant="outline" className="text-xs">
-                    {recruiterProfile.specializations.length} specializzazioni
-                  </Badge>
-                )}
-              </div>
-
-              {/* Contatti aggiuntivi */}
-              <div className="flex gap-3 text-xs">
-                {recruiterProfile.telefono && (
-                  <div className="flex items-center gap-1 text-gray-600">
-                    <Phone className="h-3 w-3" />
-                    <span>{recruiterProfile.telefono}</span>
-                  </div>
-                )}
-                {recruiterProfile.linkedin_url && (
-                  <div className="flex items-center gap-1 text-blue-600">
-                    <Linkedin className="h-3 w-3" />
-                    <span>LinkedIn</span>
-                  </div>
-                )}
-              </div>
+              <Badge 
+                className={`px-3 py-2 text-sm font-medium border ${currentStatus.color} flex items-center gap-2`}
+              >
+                <StatusIcon className="h-4 w-4" />
+                {currentStatus.label}
+              </Badge>
             </div>
-          ) : (
-            <div className="text-sm text-gray-500">
-              Profilo recruiter non trovato o non ancora completato
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-6">
+        {/* Candidate Key Information */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {proposal.years_experience && (
+            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
+              <div className="bg-blue-100 p-2 rounded-lg">
+                <Briefcase className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Esperienza</p>
+                <p className="text-lg font-bold text-gray-900">{proposal.years_experience} anni</p>
+              </div>
             </div>
           )}
+          
+          {proposal.availability_weeks && (
+            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
+              <div className="bg-green-100 p-2 rounded-lg">
+                <Calendar className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Disponibilità</p>
+                <p className="text-lg font-bold text-gray-900">{proposal.availability_weeks} settimane</p>
+              </div>
+            </div>
+          )}
+          
+          {proposal.expected_salary && (
+            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
+              <div className="bg-purple-100 p-2 rounded-lg">
+                <Euro className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Stipendio</p>
+                <p className="text-lg font-bold text-gray-900">€{proposal.expected_salary.toLocaleString()}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
+            <div className="bg-orange-100 p-2 rounded-lg">
+              <Mail className="h-5 w-5 text-orange-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">Contatto</p>
+              <p className="text-sm font-medium text-gray-900 truncate">{proposal.candidate_email}</p>
+            </div>
+          </div>
         </div>
 
-        {/* Resto del contenuto rimane uguale */}
-        {/* Descrizione del candidato */}
-        {proposal.proposal_description ? (
-          <div>
-            <h4 className="font-medium mb-2">Descrizione del candidato:</h4>
-            <p className="text-sm text-muted-foreground">
-              {proposal.proposal_description.length > 150
-                ? `${proposal.proposal_description.substring(0, 150)}...`
-                : proposal.proposal_description}
-            </p>
-          </div>
-        ) : (
-          <div>
-            <h4 className="font-medium mb-2">Descrizione del candidato:</h4>
-            <p className="text-sm text-muted-foreground">Nessuna descrizione fornita</p>
+        {/* Candidate Description */}
+        {proposal.proposal_description && (
+          <div className="bg-blue-50 rounded-xl p-4">
+            <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+              <FileText className="h-4 w-4 text-blue-600" />
+              Descrizione Candidato
+            </h4>
+            <p className="text-gray-700 leading-relaxed">{proposal.proposal_description}</p>
           </div>
         )}
 
-        {/* Contatti Candidato */}
-        <div>
-          <h4 className="font-medium mb-2">Contatti Candidato:</h4>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2 text-sm">
-              <User className="h-4 w-4" />
-              <a href={`mailto:${proposal.candidate_email}`} className="text-blue-600 hover:underline">
-                {proposal.candidate_email}
-              </a>
-            </div>
-            {proposal.candidate_phone && (
-              <div className="flex items-center gap-2 text-sm">
-                <Phone className="h-4 w-4" />
-                <a href={`tel:${proposal.candidate_phone}`} className="text-blue-600 hover:underline">
+        {/* Additional Contact Information */}
+        {(proposal.candidate_phone || proposal.candidate_linkedin) && (
+          <div className="bg-gray-50 rounded-xl p-4">
+            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Phone className="h-4 w-4 text-gray-600" />
+              Contatti Aggiuntivi
+            </h4>
+            <div className="flex flex-wrap gap-3">
+              {proposal.candidate_phone && (
+                <a 
+                  href={`tel:${proposal.candidate_phone}`} 
+                  className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors text-sm"
+                >
+                  <Phone className="h-4 w-4 text-green-600" />
                   {proposal.candidate_phone}
                 </a>
-              </div>
-            )}
-            {proposal.candidate_linkedin && (
-              <div className="flex items-center gap-2 text-sm">
-                <Linkedin className="h-4 w-4" />
-                <a href={proposal.candidate_linkedin} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                  Visualizza CV
+              )}
+              {proposal.candidate_linkedin && (
+                <a 
+                  href={proposal.candidate_linkedin} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors text-sm"
+                >
+                  <Linkedin className="h-4 w-4 text-blue-600" />
+                  LinkedIn
                 </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Recruiter Info - Compact */}
+        {proposal.recruiter_name && (
+          <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-100">
+            <RecruiterAvatar 
+              avatarUrl={recruiterProfile?.avatar_url}
+              name={`${recruiterProfile?.nome || ''} ${recruiterProfile?.cognome || ''}`}
+              size="sm"
+            />
+            <div className="flex-1">
+              <p className="text-sm font-medium text-gray-900">
+                {recruiterProfile ? `${recruiterProfile.nome} ${recruiterProfile.cognome}` : proposal.recruiter_name}
+              </p>
+              {!loadingRecruiter && rating && rating.totalReviews > 0 && (
+                <div className="flex items-center gap-2 mt-0.5">
+                  <StarRating rating={rating.averageRating} size={12} />
+                  <span className="text-xs text-gray-500">({rating.totalReviews})</span>
+                </div>
+              )}
+            </div>
+            {proposal.recruiter_fee_percentage && (
+              <div className="text-right">
+                <p className="text-xs text-gray-500">Commissione</p>
+                <p className="text-sm font-bold text-gray-900">{proposal.recruiter_fee_percentage}%</p>
               </div>
             )}
           </div>
-        </div>
+        )}
 
-        {/* Dettagli */}
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="font-medium">Fee recruiter: </span>
-            <span>{proposal.recruiter_fee_percentage}%</span>
-          </div>
-          {proposal.years_experience && (
-            <div>
-              <span className="font-medium">Esperienza: </span>
-              <span>{proposal.years_experience} anni</span>
-            </div>
-          )}
-          {proposal.expected_salary && (
-            <div className="flex items-center gap-1">
-              <Euro className="h-4 w-4" />
-              <span>€{proposal.expected_salary.toLocaleString()}</span>
-            </div>
-          )}
-          {proposal.availability_weeks && (
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              <span>{proposal.availability_weeks} settimane</span>
-            </div>
-          )}
-        </div>
-
-        {/* Data di ricezione */}
-        <div className="text-xs text-muted-foreground border-t pt-2">
-          Ricevuta il {new Date(proposal.created_at).toLocaleDateString('it-IT')} alle {new Date(proposal.created_at).toLocaleTimeString('it-IT')}
-        </div>
-
-        {/* Pulsanti azioni */}
-        <div className="flex justify-end gap-2 pt-2">
+        {/* Action Buttons */}
+        <div className="flex gap-3 pt-4 border-t border-gray-100">
           <ProposalDetailsDialog proposal={proposal} />
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-center text-xs text-gray-500 pt-2 border-t border-gray-100">
+          <span>Ricevuta il {new Date(proposal.created_at).toLocaleDateString('it-IT')} alle {new Date(proposal.created_at).toLocaleTimeString('it-IT')}</span>
         </div>
       </CardContent>
       

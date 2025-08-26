@@ -77,138 +77,130 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
       .slice(0, 2);
   };
 
-  const statusMap: { [key: string]: { label: string; color: string; icon: any } } = {
-    pending: { label: 'In Attesa', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: Clock },
-    under_review: { label: 'In Revisione', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: Clock },
-    approved: { label: 'Approvata', color: 'bg-green-100 text-green-800 border-green-200', icon: CheckCircle2 },
-    rejected: { label: 'Rifiutata', color: 'bg-red-100 text-red-800 border-red-200', icon: FileText },
-    hired: { label: 'Assunto', color: 'bg-purple-100 text-purple-800 border-purple-200', icon: CheckCircle2 },
+  const statusMap: { [key: string]: { label: string; variant: "approved" | "pending" | "rejected"; icon: any } } = {
+    pending: { label: 'In Attesa', variant: 'pending', icon: Clock },
+    under_review: { label: 'In Revisione', variant: 'pending', icon: Clock },
+    approved: { label: 'Approvata', variant: 'approved', icon: CheckCircle2 },
+    rejected: { label: 'Rifiutata', variant: 'rejected', icon: FileText },
+    hired: { label: 'Assunto', variant: 'approved', icon: CheckCircle2 },
   };
 
   const currentStatus = statusMap[proposal.status] || { 
     label: proposal.status, 
-    color: 'bg-gray-100 text-gray-800 border-gray-200', 
+    variant: 'pending' as const, 
     icon: Clock 
   };
 
   const StatusIcon = currentStatus.icon;
 
   return (
-    <Card className="w-full border-gray-100 hover:border-gray-200 transition-all duration-200 hover:shadow-md">
-      <CardHeader className="pb-6">
-        {/* CANDIDATO Hero Section */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-xs font-medium uppercase tracking-wide">
-              Candidato
-            </div>
-            <Badge 
-              className="px-3 py-2 text-sm font-medium border border-gray-300 bg-gray-50 text-gray-700 flex items-center gap-2"
-            >
-              <StatusIcon className="h-4 w-4" />
-              {currentStatus.label}
-            </Badge>
+    <Card className="group">
+      <CardHeader className="pb-4">
+        {/* Header minimale */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+            Candidato
           </div>
+          <Badge 
+            variant={currentStatus.variant}
+            className="flex items-center gap-1.5"
+          >
+            <StatusIcon className="h-3.5 w-3.5" />
+            {currentStatus.label}
+          </Badge>
+        </div>
 
-          <div className="flex items-start gap-5">
-            <Avatar className="h-24 w-24 border-2 border-gray-200">
-              <AvatarFallback className="bg-gray-100 text-gray-700 text-2xl font-semibold">
-                {getInitials(proposal.candidate_name)}
-              </AvatarFallback>
-            </Avatar>
-            
-            <div className="flex-1 min-w-0">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
-                {proposal.candidate_name}
-              </h1>
-              {proposal.job_offers?.title && (
-                <div className="flex items-center gap-3">
-                  <Briefcase className="h-5 w-5 text-gray-500" />
-                  <span className="text-xl font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-md border border-gray-200">
-                    {proposal.job_offers.title}
-                  </span>
-                </div>
-              )}
-            </div>
+        {/* Hero candidato pulito */}
+        <div className="flex items-start gap-4">
+          <Avatar className="h-14 w-14">
+            <AvatarFallback className="bg-muted text-muted-foreground text-lg font-medium">
+              {getInitials(proposal.candidate_name)}
+            </AvatarFallback>
+          </Avatar>
+          
+          <div className="flex-1 min-w-0">
+            <h2 className="text-2xl font-semibold text-foreground mb-3">
+              {proposal.candidate_name}
+            </h2>
+            {proposal.job_offers?.title && (
+              <div className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium bg-muted px-3 py-1.5 rounded-lg">
+                  {proposal.job_offers.title}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-6">
-        {/* Candidate Key Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Info grid pulito */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {proposal.years_experience && (
-            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
-              <div className="bg-blue-100 p-2 rounded-lg">
-                <Briefcase className="h-5 w-5 text-blue-600" />
+            <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+              <div className="flex items-center gap-2">
+                <Briefcase className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground font-medium">Esperienza</span>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Esperienza</p>
-                <p className="text-lg font-bold text-gray-900">{proposal.years_experience} anni</p>
-              </div>
+              <p className="text-lg font-semibold">{proposal.years_experience} anni</p>
             </div>
           )}
           
           {proposal.availability_weeks && (
-            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
-              <div className="bg-green-100 p-2 rounded-lg">
-                <Calendar className="h-5 w-5 text-green-600" />
+            <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground font-medium">Disponibilità</span>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Disponibilità</p>
-                <p className="text-lg font-bold text-gray-900">{proposal.availability_weeks} settimane</p>
-              </div>
+              <p className="text-lg font-semibold">{proposal.availability_weeks} settimane</p>
             </div>
           )}
           
           {proposal.expected_salary && (
-            <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
-              <div className="bg-purple-100 p-2 rounded-lg">
-                <Euro className="h-5 w-5 text-purple-600" />
+            <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+              <div className="flex items-center gap-2">
+                <Euro className="h-4 w-4 text-muted-foreground" />
+                <span className="text-xs text-muted-foreground font-medium">Stipendio</span>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Stipendio</p>
-                <p className="text-lg font-bold text-gray-900">€{proposal.expected_salary.toLocaleString()}</p>
-              </div>
+              <p className="text-lg font-semibold">€{proposal.expected_salary.toLocaleString()}</p>
             </div>
           )}
 
-          <div className="bg-gray-50 rounded-xl p-4 flex items-center gap-3">
-            <div className="bg-orange-100 p-2 rounded-lg">
-              <Mail className="h-5 w-5 text-orange-600" />
+          <div className="bg-muted/50 rounded-lg p-4 space-y-1">
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-medium">Email</span>
             </div>
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wide">Contatto</p>
-              <p className="text-sm font-medium text-gray-900 truncate">{proposal.candidate_email}</p>
-            </div>
+            <p className="text-sm font-medium truncate">{proposal.candidate_email}</p>
           </div>
         </div>
 
-        {/* Candidate Description */}
+        {/* Descrizione */}
         {proposal.proposal_description && (
-          <div className="bg-blue-50 rounded-xl p-4">
-            <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-              <FileText className="h-4 w-4 text-blue-600" />
-              Descrizione Candidato
+          <div className="space-y-3">
+            <h4 className="font-medium flex items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              Descrizione
             </h4>
-            <p className="text-gray-700 leading-relaxed">{proposal.proposal_description}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed">{proposal.proposal_description}</p>
           </div>
         )}
 
-        {/* Additional Contact Information */}
+        {/* Contatti aggiuntivi */}
         {(proposal.candidate_phone || proposal.candidate_linkedin) && (
-          <div className="bg-gray-50 rounded-xl p-4">
-            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Phone className="h-4 w-4 text-gray-600" />
-              Contatti Aggiuntivi
+          <div className="space-y-3">
+            <h4 className="font-medium flex items-center gap-2">
+              <Phone className="h-4 w-4 text-muted-foreground" />
+              Contatti
             </h4>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               {proposal.candidate_phone && (
                 <a 
                   href={`tel:${proposal.candidate_phone}`} 
-                  className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors text-sm"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg hover:bg-muted/80 transition-colors text-sm"
                 >
-                  <Phone className="h-4 w-4 text-green-600" />
+                  <Phone className="h-3.5 w-3.5" />
                   {proposal.candidate_phone}
                 </a>
               )}
@@ -217,9 +209,9 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
                   href={proposal.candidate_linkedin} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex items-center gap-2 px-3 py-2 bg-white rounded-lg border border-gray-200 hover:border-gray-300 transition-colors text-sm"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg hover:bg-muted/80 transition-colors text-sm"
                 >
-                  <Linkedin className="h-4 w-4 text-blue-600" />
+                  <Linkedin className="h-3.5 w-3.5" />
                   LinkedIn
                 </a>
               )}
@@ -227,53 +219,45 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
           </div>
         )}
 
-        {/* RECRUITER Section - Minimized */}
+        {/* Recruiter info minimal */}
         {proposal.recruiter_name && (
-          <div className="border-t border-gray-100 pt-4 mt-4">
-            <div className="bg-gray-50 rounded-md p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded text-xs font-medium">
-                  Recruiter
+          <div className="border-t pt-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <RecruiterAvatar 
+                  avatarUrl={recruiterProfile?.avatar_url}
+                  name={`${recruiterProfile?.nome || ''} ${recruiterProfile?.cognome || ''}`}
+                  size="sm"
+                />
+                <div>
+                  <p className="text-sm font-medium">
+                    {recruiterProfile ? `${recruiterProfile.nome} ${recruiterProfile.cognome}` : proposal.recruiter_name}
+                  </p>
+                  {!loadingRecruiter && rating && rating.totalReviews > 0 && (
+                    <div className="flex items-center gap-1">
+                      <StarRating rating={rating.averageRating} size={10} />
+                      <span className="text-xs text-muted-foreground">({rating.totalReviews})</span>
+                    </div>
+                  )}
                 </div>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <RecruiterAvatar 
-                    avatarUrl={recruiterProfile?.avatar_url}
-                    name={`${recruiterProfile?.nome || ''} ${recruiterProfile?.cognome || ''}`}
-                    size="sm"
-                  />
-                  <div>
-                    <p className="text-sm font-medium text-gray-700">
-                      {recruiterProfile ? `${recruiterProfile.nome} ${recruiterProfile.cognome}` : proposal.recruiter_name}
-                    </p>
-                    {!loadingRecruiter && rating && rating.totalReviews > 0 && (
-                      <div className="flex items-center gap-1">
-                        <StarRating rating={rating.averageRating} size={10} />
-                        <span className="text-xs text-gray-500">({rating.totalReviews})</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {proposal.recruiter_fee_percentage && (
-                  <div className="text-right">
-                    <p className="text-xs text-gray-500">Fee</p>
-                    <p className="text-sm font-semibold text-gray-700">{proposal.recruiter_fee_percentage}%</p>
-                  </div>
-                )}
-              </div>
+              {proposal.recruiter_fee_percentage && (
+                <span className="text-sm text-muted-foreground">
+                  Fee: <span className="font-medium">{proposal.recruiter_fee_percentage}%</span>
+                </span>
+              )}
             </div>
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex gap-3 pt-4 border-t border-gray-100">
+        {/* Actions */}
+        <div className="flex gap-3 pt-4 border-t">
           <ProposalDetailsDialog proposal={proposal} />
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-center text-xs text-gray-500 pt-2 border-t border-gray-100">
-          <span>Ricevuta il {new Date(proposal.created_at).toLocaleDateString('it-IT')} alle {new Date(proposal.created_at).toLocaleTimeString('it-IT')}</span>
+        <div className="text-xs text-muted-foreground text-center pt-2">
+          {new Date(proposal.created_at).toLocaleDateString('it-IT')}
         </div>
       </CardContent>
       

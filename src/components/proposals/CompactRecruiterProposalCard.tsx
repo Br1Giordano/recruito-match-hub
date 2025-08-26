@@ -17,6 +17,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "@/hooks/use-toast";
 import ProposalDetailsDrawer from "./ProposalDetailsDrawer";
+import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
+import RecruiterProfileViewModal from "@/components/recruiter/RecruiterProfileViewModal";
 
 interface CompactRecruiterProposalCardProps {
   proposal: {
@@ -45,6 +47,16 @@ interface CompactRecruiterProposalCardProps {
 export default function CompactRecruiterProposalCard({ proposal }: CompactRecruiterProposalCardProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
+  const { profile: recruiterProfile, fetchProfileByEmail } = useRecruiterProfileByEmail();
+
+  const handleShowRecruiterProfile = async () => {
+    if (proposal.recruiter_email) {
+      await fetchProfileByEmail(proposal.recruiter_email);
+      setShowRecruiterProfile(true);
+    }
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -283,10 +295,23 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm">Note</h4>
                           <textarea 
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
                             className="w-full h-20 p-2 border border-gray-300 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                             placeholder="Aggiungi note per questo candidato..."
                           />
-                          <Button size="sm" className="w-full">Salva</Button>
+                          <Button 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => {
+                              // TODO: Save notes to database
+                              toast({
+                                description: "Note salvate",
+                              });
+                            }}
+                          >
+                            Salva
+                          </Button>
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -305,6 +330,12 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
         proposal={proposal}
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
+      />
+
+      <RecruiterProfileViewModal
+        open={showRecruiterProfile}
+        onOpenChange={setShowRecruiterProfile}
+        profile={recruiterProfile}
       />
     </>
   );

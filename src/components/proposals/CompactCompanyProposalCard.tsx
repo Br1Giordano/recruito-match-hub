@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -21,8 +21,9 @@ import { toast } from "@/hooks/use-toast";
 import CompanyProposalDetailsDrawer from "./CompanyProposalDetailsDrawer";
 import { useRecruiterRanking } from "@/hooks/useRecruiterRanking";
 import { useRecruiterRating } from "@/hooks/useRecruiterRating";
+import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import { StarRating } from "@/components/ui/star-rating";
-import { useEffect } from "react";
+import RecruiterProfileViewModal from "@/components/recruiter/RecruiterProfileViewModal";
 
 interface CompactCompanyProposalCardProps {
   proposal: {
@@ -59,14 +60,25 @@ export default function CompactCompanyProposalCard({
 }: CompactCompanyProposalCardProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
   const { rankingInfo } = useRecruiterRanking(proposal.recruiter_email);
   const { rating, fetchRatingByEmail } = useRecruiterRating();
+  const { profile: recruiterProfile, fetchProfileByEmail } = useRecruiterProfileByEmail();
 
   useEffect(() => {
     if (proposal.recruiter_email) {
       fetchRatingByEmail(proposal.recruiter_email);
+      fetchProfileByEmail(proposal.recruiter_email);
     }
-  }, [proposal.recruiter_email, fetchRatingByEmail]);
+  }, [proposal.recruiter_email, fetchRatingByEmail, fetchProfileByEmail]);
+
+  const handleShowRecruiterProfile = async () => {
+    if (proposal.recruiter_email) {
+      await fetchProfileByEmail(proposal.recruiter_email);
+      setShowRecruiterProfile(true);
+    }
+  };
 
   const getInitials = (name: string) => {
     return name
@@ -187,9 +199,12 @@ export default function CompactCompanyProposalCard({
                   {proposal.recruiter_name?.charAt(0) || "R"}
                 </AvatarFallback>
               </Avatar>
-              <span className="text-xs font-medium text-blue-600">
+              <button 
+                onClick={handleShowRecruiterProfile}
+                className="text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+              >
                 {proposal.recruiter_name || "Recruiter"}
-              </span>
+              </button>
               {rankingInfo.ranking_label && (
                 <TooltipProvider>
                   <Tooltip>
@@ -358,10 +373,23 @@ export default function CompactCompanyProposalCard({
                         <div className="space-y-2">
                           <h4 className="font-medium text-sm">Note</h4>
                           <textarea 
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
                             className="w-full h-20 p-2 border border-gray-300 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                             placeholder="Aggiungi note per questa proposta..."
                           />
-                          <Button size="sm" className="w-full">Salva</Button>
+                          <Button 
+                            size="sm" 
+                            className="w-full"
+                            onClick={() => {
+                              // TODO: Save notes to database
+                              toast({
+                                description: "Note salvate",
+                              });
+                            }}
+                          >
+                            Salva
+                          </Button>
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -382,6 +410,12 @@ export default function CompactCompanyProposalCard({
         onClose={() => setIsDrawerOpen(false)}
         onStatusUpdate={onStatusUpdate}
         onContactRecruiter={onContactRecruiter}
+      />
+
+      <RecruiterProfileViewModal
+        open={showRecruiterProfile}
+        onOpenChange={setShowRecruiterProfile}
+        profile={recruiterProfile}
       />
     </>
   );

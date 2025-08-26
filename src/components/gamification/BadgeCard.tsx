@@ -86,9 +86,37 @@ export default function BadgeCard({
     if (isEarned) return 'Ottenuto';
     if (nextTierValue && currentValue !== undefined) {
       const remaining = nextTierValue - currentValue;
-      return `Mancano ${remaining} per il prossimo tier`;
+      const nextTier = badge.name.includes('Bronze') ? 'Argento' :
+                      badge.name.includes('Silver') ? 'Oro' : 'Bronzo';
+      
+      const unit = getUnitText(badge.requirement_type);
+      return `Mancano ${remaining}${unit} per ${nextTier}`;
     }
     return 'In progresso';
+  };
+
+  const getUnitText = (requirementType: string) => {
+    switch (requirementType) {
+      case 'acceptance_rate':
+      case 'shortlist_rate':
+      case 'retention_90d':
+      case 'avg_rating':
+      case 'mismatch_rate':
+        return '%';
+      case 'hires_12m':
+      case 'hard_roles_12m':
+      case 'domains_12m':
+      case 'compliance_incidents':
+        return '';
+      case 'time_to_shortlist':
+        return ' giorni';
+      case 'reply_time':
+        return ' ore';
+      case 'activity_streak':
+        return ' settimane';
+      default:
+        return '';
+    }
   };
 
   const sizeClasses = {

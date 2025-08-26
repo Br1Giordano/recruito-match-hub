@@ -133,43 +133,76 @@ export default function RecruiterGamificationDashboard() {
         </TabsList>
 
         <TabsContent value="badges" className="space-y-6">
-          {earnedBadges.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-green-600">
-                Badge Ottenuti ({earnedBadges.length})
-              </h3>
+          {/* Badge ottenuti */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 text-green-600">
+              Badge Ottenuti ({earnedBadges.length})
+            </h3>
+            {earnedBadges.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {earnedBadges.map((badge) => (
-                  <BadgeCard key={badge.id} badge={badge} />
-                ))}
+                {earnedBadges.map((badge) => {
+                  const currentTier = badge.name.includes('Bronze') ? 'bronze' :
+                                    badge.name.includes('Silver') ? 'silver' :
+                                    badge.name.includes('Gold') ? 'gold' : 'none';
+                  
+                  return (
+                    <BadgeCard 
+                      key={badge.id} 
+                      badge={badge} 
+                      currentTier={currentTier}
+                    />
+                  );
+                })}
               </div>
-            </div>
-          )}
-
-          {unEarnedBadges.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-muted-foreground">
-                Badge da Ottenere ({unEarnedBadges.length})
-              </h3>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {unEarnedBadges.map((badge) => (
-                  <BadgeCard key={badge.id} badge={badge} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {badges.length === 0 && (
-            <Card>
-              <CardContent className="p-8 text-center">
-                <Award className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">Nessun badge disponibile</h3>
-                <p className="text-muted-foreground">
-                  I badge verranno caricati automaticamente quando saranno disponibili.
+            ) : (
+              <div className="text-center py-8 px-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                <div className="text-gray-400 text-4xl mb-3">🏆</div>
+                <h4 className="text-lg font-medium text-gray-600 mb-2">Nessun badge ottenuto</h4>
+                <p className="text-sm text-gray-500">
+                  Continua a lavorare per sbloccare i tuoi primi badge!
                 </p>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            )}
+          </div>
+
+          {/* Badge da ottenere */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 text-muted-foreground">
+              Badge da Ottenere ({unEarnedBadges.length})
+            </h3>
+            {unEarnedBadges.length > 0 ? (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                {unEarnedBadges.map((badge) => {
+                  // Calcolo del progresso simulato (in futuro verrà dai dati reali)
+                  const currentValue = Math.floor(Math.random() * badge.requirement_value * 0.8);
+                  const progress = Math.min((currentValue / badge.requirement_value) * 100, 95);
+                  
+                  const currentTier = badge.name.includes('Bronze') ? 'bronze' :
+                                    badge.name.includes('Silver') ? 'silver' :
+                                    badge.name.includes('Gold') ? 'gold' : 'none';
+                  
+                  return (
+                    <BadgeCard 
+                      key={badge.id} 
+                      badge={badge}
+                      progress={progress}
+                      currentTier={currentTier}
+                      nextTierValue={badge.requirement_value}
+                      currentValue={currentValue}
+                    />
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-8 px-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                <div className="text-gray-400 text-4xl mb-3">🎯</div>
+                <h4 className="text-lg font-medium text-gray-600 mb-2">Tutti i badge ottenuti!</h4>
+                <p className="text-sm text-gray-500">
+                  Complimenti! Hai sbloccato tutti i badge disponibili.
+                </p>
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         <TabsContent value="leaderboard">

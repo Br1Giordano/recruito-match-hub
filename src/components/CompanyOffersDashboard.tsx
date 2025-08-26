@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2, Pause, Play, Shield, Users } from "lucide-react";
+import { Search, Plus, Briefcase } from "lucide-react";
 import JobOfferForm from "./JobOfferForm";
 import JobOfferEditForm from "./JobOfferEditForm";
-import { useJobOfferInterestCounts } from "@/hooks/useJobOfferInterestCounts";
+import CompactCompanyOfferCard from "./company/CompactCompanyOfferCard";
 import { Database } from "@/integrations/supabase/types";
 
 type CompanyJobOffer = Database['public']['Tables']['job_offers']['Row'];
@@ -28,9 +28,6 @@ export default function CompanyOffersDashboard() {
   const { userProfile, user } = useAuth();
   const { isAdmin } = useAdminCheck();
 
-  // Get job offer IDs for interest counting
-  const jobOfferIds = jobOffers?.map(offer => offer.id) || [];
-  const { getInterestCount } = useJobOfferInterestCounts(jobOfferIds);
 
   const fetchJobOffers = async () => {
     setIsLoading(true);
@@ -219,46 +216,6 @@ export default function CompanyOffersDashboard() {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "active":
-        return "bg-green-100 text-green-800";
-      case "paused":
-        return "bg-yellow-100 text-yellow-800";
-      case "closed":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
-
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "active":
-        return "Attiva";
-      case "paused":
-        return "In Pausa";
-      case "closed":
-        return "Chiusa";
-      default:
-        return status;
-    }
-  };
-
-  const getEmploymentTypeText = (type?: string) => {
-    switch (type) {
-      case "full-time":
-        return "Tempo Pieno";
-      case "part-time":
-        return "Part-time";
-      case "contract":
-        return "Contratto";
-      case "internship":
-        return "Stage";
-      default:
-        return type || "Non specificato";
-    }
-  };
 
   if (showNewOfferForm) {
     return (
@@ -362,160 +319,44 @@ export default function CompanyOffersDashboard() {
         </CardContent>
       </Card>
 
-      {/* Job Offers List */}
-      <div className="grid gap-6">
+      {/* Job Offers List - Compact Layout */}
+      <div className="grid md:grid-cols-2 gap-4">
         {filteredOffers.length === 0 ? (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center py-8">
-                <Briefcase className="mx-auto h-12 w-12 text-muted-foreground" />
-                <h3 className="mt-4 text-lg font-semibold">Nessuna offerta trovata</h3>
-                <p className="text-muted-foreground">
-                  {jobOffers.length === 0
-                    ? "Non hai ancora pubblicato offerte di lavoro"
-                    : "Nessuna offerta corrisponde ai filtri selezionati"}
-                </p>
-                {jobOffers.length === 0 && (
-                  <Button 
-                    onClick={() => setShowNewOfferForm(true)}
-                    className="mt-4"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Crea la tua prima offerta
-                  </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ) : (
-          filteredOffers.map((offer) => (
-            <Card key={offer.id} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <CardTitle className="flex items-center gap-2">
-                      <Briefcase className="h-5 w-5" />
-                      {offer.title}
-                      {isAdmin && (
-                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-medium">
-                          <Shield className="w-3 h-3 mr-1" />
-                          Admin
-                        </Badge>
-                      )}
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-4 mt-1">
-                      {offer.company_name && (
-                        <span>{offer.company_name}</span>
-                      )}
-                      {offer.contact_email && isAdmin && (
-                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                          {offer.contact_email}
-                        </span>
-                      )}
-                      {offer.location && (
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {offer.location}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1">
-                        <Clock className="h-4 w-4" />
-                        {getEmploymentTypeText(offer.employment_type)}
-                      </span>
-                      {getInterestCount(offer.id) > 0 && (
-                        <span className="flex items-center gap-1 text-blue-600">
-                          <Users className="h-4 w-4" />
-                          {getInterestCount(offer.id)} recruiter{getInterestCount(offer.id) !== 1 ? 's' : ''} interessat{getInterestCount(offer.id) !== 1 ? 'i' : 'o'}
-                        </span>
-                      )}
-                    </CardDescription>
-                  </div>
-                  <Badge className={getStatusColor(offer.status || 'active')}>
-                    {getStatusText(offer.status || 'active')}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {offer.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-3">
-                      {offer.description}
-                    </p>
+          <div className="md:col-span-2">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-8">
+                  <Briefcase className="mx-auto h-12 w-12 text-muted-foreground" />
+                  <h3 className="mt-4 text-lg font-semibold">Nessuna offerta trovata</h3>
+                  <p className="text-muted-foreground">
+                    {jobOffers.length === 0
+                      ? "Non hai ancora pubblicato offerte di lavoro"
+                      : "Nessuna offerta corrisponde ai filtri selezionati"}
+                  </p>
+                  {jobOffers.length === 0 && (
+                    <Button 
+                      onClick={() => setShowNewOfferForm(true)}
+                      className="mt-4"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Crea la tua prima offerta
+                    </Button>
                   )}
-
-                  {(offer.salary_min || offer.salary_max) && (
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium">
-                        {offer.salary_min && offer.salary_max
-                          ? `€${offer.salary_min.toLocaleString()} - €${offer.salary_max.toLocaleString()}`
-                          : offer.salary_min
-                          ? `Da €${offer.salary_min.toLocaleString()}`
-                          : `Fino a €${offer.salary_max?.toLocaleString()}`}
-                      </span>
-                    </div>
-                  )}
-
-                  {offer.requirements && (
-                    <div>
-                      <h4 className="text-sm font-medium mb-1">Requisiti:</h4>
-                      <p className="text-sm text-muted-foreground line-clamp-2">
-                        {offer.requirements}
-                      </p>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between pt-4 border-t">
-                    <div className="text-sm text-muted-foreground">
-                      Pubblicata il {new Date(offer.created_at).toLocaleDateString('it-IT')}
-                      {offer.updated_at !== offer.created_at && (
-                        <span> • Aggiornata il {new Date(offer.updated_at).toLocaleDateString('it-IT')}</span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleEditOffer(offer)}
-                      >
-                        <Edit className="h-4 w-4 mr-2" />
-                        Modifica
-                      </Button>
-                      {offer.status === 'active' && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleDeactivateOffer(offer.id, offer.title)}
-                          className="border-orange-200 text-orange-700 hover:bg-orange-50 hover:border-orange-300"
-                        >
-                          <Pause className="h-4 w-4 mr-2" />
-                          Disattiva
-                        </Button>
-                      )}
-                      {offer.status === 'paused' && (
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => handleReactivateOffer(offer.id, offer.title)}
-                          className="border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
-                        >
-                          <Play className="h-4 w-4 mr-2" />
-                          Riattiva
-                        </Button>
-                      )}
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => handleDeleteOffer(offer.id, offer.title)}
-                        className="border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
-                      >
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Elimina
-                      </Button>
-                    </div>
-                  </div>
                 </div>
               </CardContent>
             </Card>
+          </div>
+        ) : (
+          filteredOffers.map((offer) => (
+            <CompactCompanyOfferCard
+              key={offer.id}
+              offer={offer}
+              onEdit={handleEditOffer}
+              onDeactivate={handleDeactivateOffer}
+              onReactivate={handleReactivateOffer}
+              onDelete={handleDeleteOffer}
+              isAdmin={isAdmin}
+            />
           ))
         )}
       </div>

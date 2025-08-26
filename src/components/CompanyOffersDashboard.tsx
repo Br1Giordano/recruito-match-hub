@@ -8,9 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
-import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2, Pause, Play, Shield } from "lucide-react";
+import { Search, Plus, Edit, MapPin, Euro, Clock, Briefcase, Trash2, Pause, Play, Shield, Users } from "lucide-react";
 import JobOfferForm from "./JobOfferForm";
 import JobOfferEditForm from "./JobOfferEditForm";
+import { useJobOfferInterestCounts } from "@/hooks/useJobOfferInterestCounts";
 import { Database } from "@/integrations/supabase/types";
 
 type CompanyJobOffer = Database['public']['Tables']['job_offers']['Row'];
@@ -26,6 +27,10 @@ export default function CompanyOffersDashboard() {
   const { toast } = useToast();
   const { userProfile, user } = useAuth();
   const { isAdmin } = useAdminCheck();
+
+  // Get job offer IDs for interest counting
+  const jobOfferIds = jobOffers?.map(offer => offer.id) || [];
+  const { getInterestCount } = useJobOfferInterestCounts(jobOfferIds);
 
   const fetchJobOffers = async () => {
     setIsLoading(true);
@@ -417,6 +422,12 @@ export default function CompanyOffersDashboard() {
                         <Clock className="h-4 w-4" />
                         {getEmploymentTypeText(offer.employment_type)}
                       </span>
+                      {getInterestCount(offer.id) > 0 && (
+                        <span className="flex items-center gap-1 text-blue-600">
+                          <Users className="h-4 w-4" />
+                          {getInterestCount(offer.id)} recruiter{getInterestCount(offer.id) !== 1 ? 's' : ''} interessat{getInterestCount(offer.id) !== 1 ? 'i' : 'o'}
+                        </span>
+                      )}
                     </CardDescription>
                   </div>
                   <Badge className={getStatusColor(offer.status || 'active')}>

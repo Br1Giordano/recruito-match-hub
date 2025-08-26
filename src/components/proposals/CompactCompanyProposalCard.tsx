@@ -12,7 +12,8 @@ import {
   XCircle,
   Star,
   Crown,
-  User
+  User,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -24,6 +25,7 @@ import { useRecruiterRating } from "@/hooks/useRecruiterRating";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import { StarRating } from "@/components/ui/star-rating";
 import RecruiterProfileViewModal from "@/components/recruiter/RecruiterProfileViewModal";
+import { useJobOfferInterestCounts } from "@/hooks/useJobOfferInterestCounts";
 
 interface CompactCompanyProposalCardProps {
   proposal: {
@@ -43,6 +45,7 @@ interface CompactCompanyProposalCardProps {
     recruiter_email?: string;
     recruiter_name?: string;
     job_offers?: {
+      id?: string;
       title: string;
       company_name?: string;
     };
@@ -65,6 +68,10 @@ export default function CompactCompanyProposalCard({
   const { rankingInfo } = useRecruiterRanking(proposal.recruiter_email);
   const { rating, fetchRatingByEmail } = useRecruiterRating();
   const { profile: recruiterProfile, fetchProfileByEmail } = useRecruiterProfileByEmail();
+  
+  // Get interest count for the job offer
+  const jobOfferId = proposal.job_offers?.id;
+  const { getInterestCount } = useJobOfferInterestCounts(jobOfferId ? [jobOfferId] : []);
 
   useEffect(() => {
     if (proposal.recruiter_email) {
@@ -250,6 +257,16 @@ export default function CompactCompanyProposalCard({
                 <div className="h-3 w-px bg-[#EAEAEA]" />
                 <span className="text-xs text-gray-600">
                   💰 €{(proposal.expected_salary/1000).toFixed(0)}k
+                </span>
+              </>
+            )}
+
+            {jobOfferId && getInterestCount(jobOfferId) > 0 && (
+              <>
+                <div className="h-3 w-px bg-[#EAEAEA]" />
+                <span className="text-xs text-blue-600 flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  {getInterestCount(jobOfferId)} recruiter
                 </span>
               </>
             )}

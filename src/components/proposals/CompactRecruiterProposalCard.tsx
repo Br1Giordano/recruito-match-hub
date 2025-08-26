@@ -10,7 +10,8 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
-  MoreHorizontal
+  MoreHorizontal,
+  Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -19,6 +20,7 @@ import { toast } from "@/hooks/use-toast";
 import ProposalDetailsDrawer from "./ProposalDetailsDrawer";
 import { useRecruiterProfileByEmail } from "@/hooks/useRecruiterProfileByEmail";
 import RecruiterProfileViewModal from "@/components/recruiter/RecruiterProfileViewModal";
+import { useJobOfferInterestCounts } from "@/hooks/useJobOfferInterestCounts";
 
 interface CompactRecruiterProposalCardProps {
   proposal: {
@@ -38,6 +40,7 @@ interface CompactRecruiterProposalCardProps {
     recruiter_email?: string;
     recruiter_name?: string;
     job_offers?: {
+      id?: string;
       title: string;
       company_name?: string;
     };
@@ -50,6 +53,10 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
   const [notes, setNotes] = useState("");
   const [showRecruiterProfile, setShowRecruiterProfile] = useState(false);
   const { profile: recruiterProfile, fetchProfileByEmail } = useRecruiterProfileByEmail();
+  
+  // Get interest count for the job offer
+  const jobOfferId = proposal.job_offers?.id;
+  const { getInterestCount } = useJobOfferInterestCounts(jobOfferId ? [jobOfferId] : []);
 
   const handleShowRecruiterProfile = async () => {
     if (proposal.recruiter_email) {
@@ -193,6 +200,16 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
             <span className="text-xs text-gray-600">
               🗓️ {formatDate(proposal.created_at)}
             </span>
+
+            {jobOfferId && getInterestCount(jobOfferId) > 0 && (
+              <>
+                <div className="h-3 w-px bg-[#EAEAEA]" />
+                <span className="text-xs text-blue-600 flex items-center gap-1">
+                  <Users className="h-3 w-3" />
+                  {getInterestCount(jobOfferId)} recruiter
+                </span>
+              </>
+            )}
 
             {tags.length > 0 && (
               <>

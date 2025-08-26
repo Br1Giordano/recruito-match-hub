@@ -90,9 +90,41 @@ export default function BadgeCard({
                       badge.name.includes('Silver') ? 'Oro' : 'Bronzo';
       
       const unit = getUnitText(badge.requirement_type);
-      return `Mancano ${remaining}${unit} per ${nextTier}`;
+      const currentDisplay = currentValue % 1 === 0 ? currentValue : currentValue.toFixed(1);
+      const nextDisplay = nextTierValue % 1 === 0 ? nextTierValue : nextTierValue.toFixed(1);
+      
+      return `${currentDisplay}${unit}/${nextDisplay}${unit} - Mancano ${Math.abs(remaining)}${unit} per ${nextTier}`;
     }
     return 'In progresso';
+  };
+
+  const getThresholdText = () => {
+    // Mostra le soglie per tutti i tier del badge
+    const baseName = badge.name.replace(/ (Bronze|Silver|Gold)$/, '');
+    const requirementType = badge.requirement_type;
+    const unit = getUnitText(requirementType);
+    
+    const thresholds = {
+      'Closer': { bronze: '40%', silver: '60%', gold: '75%' },
+      'Shortlist Pro': { bronze: '25%', silver: '35%', gold: '45%' },
+      'Hires Made': { bronze: '3', silver: '8', gold: '15' },
+      'Retention 90d': { bronze: '80%', silver: '90%', gold: '95%' },
+      'Client Love': { bronze: '4.2', silver: '4.5', gold: '4.8' },
+      'Speedrunner': { bronze: '≤14g', silver: '≤10g', gold: '≤7g' },
+      'Lightning Reply': { bronze: '≤24h', silver: '≤12h', gold: '≤4h' },
+      'Clean Desk': { bronze: '0 (30g)', silver: '0 (60g)', gold: '0 (120g)' },
+      'Consistency Streak': { bronze: '4 sett', silver: '8 sett', gold: '12 sett' },
+      'Hard Role Hunter': { bronze: '1', silver: '3', gold: '6' },
+      'Multi-Domain': { bronze: '2', silver: '3', gold: '4' },
+      'Zero Spam': { bronze: '≤40%', silver: '≤30%', gold: '≤20%' }
+    };
+    
+    const threshold = thresholds[baseName];
+    if (threshold) {
+      return `Bronzo: ${threshold.bronze} | Argento: ${threshold.silver} | Oro: ${threshold.gold}`;
+    }
+    
+    return badge.description;
   };
 
   const getUnitText = (requirementType: string) => {
@@ -160,7 +192,7 @@ export default function BadgeCard({
           )}
         </div>
         
-        {/* Nome e descrizione */}
+        {/* Nome e soglie */}
         <div>
           <h3 className={cn(
             "font-semibold leading-tight",
@@ -172,7 +204,7 @@ export default function BadgeCard({
             "text-muted-foreground leading-relaxed",
             size === 'sm' ? 'text-xs' : 'text-sm'
           )}>
-            {badge.description}
+            {getThresholdText()}
           </p>
         </div>
 

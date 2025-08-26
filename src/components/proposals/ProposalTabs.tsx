@@ -8,6 +8,7 @@ interface ProposalTabsProps {
   interestedProposals: any[];
   approvedProposals: any[];
   otherProposals: any[];
+  activeTab?: string;
   onTabChange?: (value: string) => void;
   children: (proposals: any[], status: string) => React.ReactNode;
 }
@@ -17,11 +18,12 @@ export default function ProposalTabs({
   interestedProposals, 
   approvedProposals,
   otherProposals, 
+  activeTab = "pending",
   onTabChange,
   children 
 }: ProposalTabsProps) {
   return (
-    <Tabs defaultValue="pending" onValueChange={onTabChange} className="w-full">
+    <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
       <TabsList className="grid w-full grid-cols-4">
         <TabsTrigger value="pending" className="flex items-center gap-2">
           <span className="flex items-center gap-2">

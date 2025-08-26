@@ -340,6 +340,7 @@ export default function CompanyProposalsDashboard() {
         interestedProposals={evaluatingProposals}
         approvedProposals={approvedProposals}
         otherProposals={otherProposals}
+        activeTab={activeTab}
         onTabChange={setActiveTab}
       >
         {renderProposals}

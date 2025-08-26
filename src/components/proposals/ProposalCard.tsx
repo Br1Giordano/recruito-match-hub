@@ -65,14 +65,14 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
     <Card className="w-full border-gray-100 hover:border-gray-200 transition-all duration-200 hover:shadow-md">
       <CardHeader className="pb-6">
         {/* CANDIDATO Hero Section */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-              👤 CANDIDATO
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-xs font-medium uppercase tracking-wide">
+              Candidato
             </div>
             <Badge 
               variant={getStatusVariant(proposal.status)}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-white/20 border-white/30 text-white ml-auto"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm"
             >
               <StatusIcon className="h-4 w-4" />
               {getStatusLabel(proposal.status)}
@@ -80,24 +80,24 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
           </div>
 
           <div className="flex items-start gap-4">
-            <Avatar className="h-24 w-24 ring-4 ring-white/30">
-              <AvatarFallback className="bg-white text-blue-600 text-2xl font-bold">
+            <Avatar className="h-20 w-20 border-2 border-gray-200">
+              <AvatarFallback className="bg-gray-100 text-gray-700 text-xl font-semibold">
                 {getInitials(proposal.candidate_name)}
               </AvatarFallback>
             </Avatar>
             
             <div className="flex-1 min-w-0">
-              <h1 className="text-4xl font-bold mb-3 leading-tight">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2 leading-tight">
                 {proposal.candidate_name}
               </h1>
-              <div className="flex items-center gap-3 mb-3">
-                <Mail className="h-5 w-5" />
-                <span className="text-lg font-medium">{proposal.candidate_email}</span>
+              <div className="flex items-center gap-2 mb-3 text-gray-600">
+                <Mail className="h-4 w-4" />
+                <span className="font-medium">{proposal.candidate_email}</span>
               </div>
               {proposal.job_offers?.title && (
                 <div className="flex items-center gap-2">
-                  <Briefcase className="h-6 w-6" />
-                  <span className="text-xl font-semibold bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
+                  <Briefcase className="h-4 w-4 text-gray-500" />
+                  <span className="text-lg font-medium text-gray-700 bg-gray-50 px-3 py-1 rounded-md border border-gray-200">
                     {proposal.job_offers.title}
                   </span>
                 </div>
@@ -167,15 +167,15 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
         {/* RECRUITER Section - Minimized */}
         {proposal.recruiter_name && (
           <div className="border-t border-gray-100 pt-4 mt-4">
-            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+            <div className="bg-gray-50 rounded-md p-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className="bg-gray-500 text-white px-2 py-0.5 rounded text-xs font-medium uppercase tracking-wide">
+                <div className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded text-xs font-medium">
                   Recruiter
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="bg-gray-200 p-1 rounded">
+                  <div className="bg-gray-300 p-1 rounded">
                     <User className="h-3 w-3 text-gray-600" />
                   </div>
                   <div>
@@ -188,7 +188,7 @@ export const ProposalCard: React.FC<ProposalCardProps> = ({
                 {proposal.recruiter_fee_percentage && (
                   <div className="text-right">
                     <p className="text-xs text-gray-500">Fee</p>
-                    <p className="text-sm font-bold text-gray-700">{proposal.recruiter_fee_percentage}%</p>
+                    <p className="text-sm font-semibold text-gray-700">{proposal.recruiter_fee_percentage}%</p>
                   </div>
                 )}
               </div>

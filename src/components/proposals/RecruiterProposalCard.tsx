@@ -97,13 +97,13 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
     <Card className="w-full border-gray-100 hover:border-gray-200 transition-all duration-200 hover:shadow-md">
       <CardHeader className="pb-6">
         {/* CANDIDATO Hero Section */}
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 text-white mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide">
-              👤 CANDIDATO
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="bg-gray-100 text-gray-700 px-3 py-1 rounded-md text-xs font-medium uppercase tracking-wide">
+              Candidato
             </div>
             <Badge 
-              className="px-3 py-2 text-sm font-medium bg-white/20 border-white/30 text-white flex items-center gap-2 ml-auto"
+              className="px-3 py-2 text-sm font-medium border border-gray-300 bg-gray-50 text-gray-700 flex items-center gap-2"
             >
               <StatusIcon className="h-4 w-4" />
               {currentStatus.label}
@@ -111,20 +111,20 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
           </div>
 
           <div className="flex items-start gap-5">
-            <Avatar className="h-28 w-28 ring-4 ring-white/30">
-              <AvatarFallback className="bg-white text-blue-600 text-3xl font-bold">
+            <Avatar className="h-24 w-24 border-2 border-gray-200">
+              <AvatarFallback className="bg-gray-100 text-gray-700 text-2xl font-semibold">
                 {getInitials(proposal.candidate_name)}
               </AvatarFallback>
             </Avatar>
             
             <div className="flex-1 min-w-0">
-              <h1 className="text-5xl font-bold mb-4 leading-tight">
+              <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
                 {proposal.candidate_name}
               </h1>
               {proposal.job_offers?.title && (
                 <div className="flex items-center gap-3">
-                  <Briefcase className="h-7 w-7" />
-                  <span className="text-2xl font-semibold bg-white/20 backdrop-blur-sm px-4 py-2 rounded-lg">
+                  <Briefcase className="h-5 w-5 text-gray-500" />
+                  <span className="text-xl font-medium text-gray-700 bg-gray-50 px-4 py-2 rounded-md border border-gray-200">
                     {proposal.job_offers.title}
                   </span>
                 </div>
@@ -230,9 +230,9 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
         {/* RECRUITER Section - Minimized */}
         {proposal.recruiter_name && (
           <div className="border-t border-gray-100 pt-4 mt-4">
-            <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+            <div className="bg-gray-50 rounded-md p-3">
               <div className="flex items-center gap-2 mb-2">
-                <div className="bg-gray-500 text-white px-2 py-0.5 rounded text-xs font-medium uppercase tracking-wide">
+                <div className="bg-gray-200 text-gray-600 px-2 py-0.5 rounded text-xs font-medium">
                   Recruiter
                 </div>
               </div>
@@ -258,7 +258,7 @@ export default function RecruiterProposalCard({ proposal }: RecruiterProposalCar
                 {proposal.recruiter_fee_percentage && (
                   <div className="text-right">
                     <p className="text-xs text-gray-500">Fee</p>
-                    <p className="text-sm font-bold text-gray-700">{proposal.recruiter_fee_percentage}%</p>
+                    <p className="text-sm font-semibold text-gray-700">{proposal.recruiter_fee_percentage}%</p>
                   </div>
                 )}
               </div>

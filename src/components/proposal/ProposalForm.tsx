@@ -51,20 +51,21 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
       setFormData(prev => ({
         ...prev,
         recruiter_name: `${profile.nome} ${profile.cognome}`,
-        recruiter_email: profile.email,
+        recruiter_email: profile.email?.toLowerCase(),
         recruiter_phone: profile.telefono || "",
       }));
     } else if (user && !profile) {
       // Se abbiamo l'utente ma non il profilo, usa almeno l'email
       setFormData(prev => ({
         ...prev,
-        recruiter_email: user.email || "",
+        recruiter_email: (user.email || "").toLowerCase(),
       }));
     }
   }, [profile, user]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    const normalized = field === "recruiter_email" ? value.toLowerCase() : value;
+    setFormData(prev => ({ ...prev, [field]: normalized }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -101,7 +102,7 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         recruiter_fee_percentage: parseInt(formData.recruiter_fee_percentage),
         proposal_description: formData.proposal_description || null,
         recruiter_name: formData.recruiter_name,
-        recruiter_email: formData.recruiter_email,
+        recruiter_email: formData.recruiter_email.toLowerCase(),
         recruiter_phone: formData.recruiter_phone || null,
         user_id: user?.id || null,
         submitted_by_user_id: user?.id || null,
@@ -128,6 +129,8 @@ export default function ProposalForm({ jobOffer, onClose, onSuccess }: ProposalF
         title: "Successo",
         description: "Proposta inviata con successo",
       });
+      // Aggiorna le liste in tempo reale
+      window.dispatchEvent(new CustomEvent('proposalCreated'));
       onSuccess();
     } catch (error) {
       console.error("Error submitting proposal:", error);

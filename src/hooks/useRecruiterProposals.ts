@@ -37,13 +37,15 @@ export function useRecruiterProposals() {
     console.log('Fetching proposals for recruiter:', user?.email);
 
     try {
+      const userEmail = (user?.email || '').toLowerCase();
+
       const { data, error } = await supabase
         .from("proposals")
         .select(`
           *,
           job_offers(title, company_name)
         `)
-        .eq("recruiter_email", user?.email)
+        .ilike("recruiter_email", userEmail)
         .order("created_at", { ascending: false });
 
       console.log('Recruiter proposals data:', data);

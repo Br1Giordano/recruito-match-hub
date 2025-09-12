@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "./useAuth";
@@ -74,15 +74,32 @@ export function useRecruiterProposals() {
     }
   };
 
+  // Add fetchProposals to dependencies for the event listener
+  const memoizedFetchProposals = useCallback(fetchProposals, [user?.email, toast]);
+
   useEffect(() => {
     if (user?.email) {
-      fetchProposals();
+      memoizedFetchProposals();
     }
-  }, [user?.email]);
+  }, [user?.email, memoizedFetchProposals]);
+
+  // Listen for custom events to refresh proposals
+  useEffect(() => {
+    const handleProposalCreated = () => {
+      console.log('Proposal created event received, refreshing proposals...');
+      memoizedFetchProposals();
+    };
+
+    window.addEventListener('proposalCreated', handleProposalCreated);
+    
+    return () => {
+      window.removeEventListener('proposalCreated', handleProposalCreated);
+    };
+  }, [memoizedFetchProposals]);
 
   return {
     proposals,
     isLoading,
-    fetchProposals
+    fetchProposals: memoizedFetchProposals
   };
 }

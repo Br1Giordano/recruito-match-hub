@@ -176,9 +176,13 @@ export default function JobOffersBoard() {
   const handleProposalSuccess = () => {
     setShowProposalModal(false);
     setSelectedOffer(null);
+    
+    // Trigger a custom event to refresh recruiter proposals
+    window.dispatchEvent(new CustomEvent('proposalCreated'));
+    
     toast({
       title: "Successo",
-      description: "Proposta inviata con successo!",
+      description: "Proposta inviata con successo! Puoi vederla nella sezione 'Le Mie Candidature'.",
     });
   };
 

@@ -66,6 +66,10 @@ export const RecruiterJobInterests = () => {
   const handleProposalSuccess = () => {
     setShowProposalForm(false);
     setSelectedJobOffer(null);
+    
+    // Trigger a custom event to refresh recruiter proposals
+    window.dispatchEvent(new CustomEvent('proposalCreated'));
+    
     refetch(); // Ricarica le offerte di interesse
   };
 

@@ -75,10 +75,12 @@ export default function AdminProposalsManagement() {
   }, []);
 
   useEffect(() => {
+    console.log('Proposals changed, total:', proposals.length);
     // Group proposals by recruiter when proposals data changes
     const grouped = proposals.reduce((acc, proposal) => {
       const recruiterEmailRaw = proposal.recruiter_email || 'unknown';
       const recruiterEmail = recruiterEmailRaw.toLowerCase().trim();
+      console.log('Processing proposal for recruiter:', recruiterEmail, proposal.candidate_name);
       if (!acc[recruiterEmail]) {
         acc[recruiterEmail] = {
           recruiter_name: proposal.recruiter_name,
@@ -89,6 +91,10 @@ export default function AdminProposalsManagement() {
       return acc;
     }, {} as GroupedProposals);
 
+    console.log('Grouped proposals:', Object.keys(grouped).map(email => ({ 
+      email, 
+      count: grouped[email].proposals.length 
+    })));
     setGroupedProposals(grouped);
   }, [proposals]);
 
@@ -105,6 +111,8 @@ export default function AdminProposalsManagement() {
 
       if (error) throw error;
 
+      console.log('Admin fetched proposals:', data?.length, data);
+      console.log('Sample proposal:', data?.[0]);
       setProposals(data || []);
     } catch (error) {
       console.error("Error fetching proposals:", error);

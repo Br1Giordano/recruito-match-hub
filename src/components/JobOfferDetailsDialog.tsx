@@ -1,8 +1,9 @@
+import { useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Building2, MapPin, Clock, Euro, Send, Calendar, User, FileText, Award } from "lucide-react";
+import { Building2, MapPin, Clock, Euro, Send, Calendar, User, FileText, Award, X } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
 type JobOfferWithCompany = Database['public']['Tables']['job_offers']['Row'] & {
@@ -73,12 +74,35 @@ export default function JobOfferDetailsDialog({
     ));
   };
 
+  // Emergency escape key handler
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
+    }
+  }, [isOpen, onClose]);
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        {/* Emergency close button */}
+        <button 
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 z-50 bg-background"
+        >
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </button>
+
         <DialogHeader className="space-y-4">
           <div className="flex items-start justify-between">
-            <div className="flex-1">
+            <div className="flex-1 pr-8">
               <DialogTitle className="text-2xl font-bold mb-2 flex items-center gap-2">
                 <Building2 className="h-6 w-6" />
                 {jobOffer.title}
@@ -196,6 +220,17 @@ export default function JobOfferDetailsDialog({
               </div>
             </div>
           )}
+
+          {/* Emergency close button at bottom */}
+          <div className="pt-4 border-t">
+            <Button 
+              variant="outline" 
+              onClick={onClose}
+              className="w-full"
+            >
+              Chiudi
+            </Button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

@@ -123,13 +123,13 @@ export const useRecruiterGamification = () => {
         recruiters?.map(r => [r.email, `${r.nome} ${r.cognome}`]) || []
       );
 
-      const enrichedLeaderboard = leaderboardData?.map(entry => ({
+      const enrichedLeaderboard = (leaderboardData?.map(entry => ({
         ...entry,
         recruiter_name: recruitersMap.get(entry.recruiter_email),
         acceptance_rate: entry.total_proposals > 0 
           ? Math.round((entry.accepted_proposals / entry.total_proposals) * 100)
           : 0
-      })) || [];
+      })) || []).filter(entry => recruitersMap.has(entry.recruiter_email));
 
       setLeaderboard(enrichedLeaderboard);
     } catch (error) {

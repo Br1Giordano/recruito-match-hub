@@ -68,7 +68,7 @@ export const CompactJobInterestCard = ({
   };
 
   return (
-    <Card className="group hover:shadow-startup transition-all duration-200 border-gray-100">
+    <Card className="group hover:shadow-startup transition-all duration-200 border-gray-100 overflow-hidden">
       <CardContent className="p-4">
         {/* Riga 1: Titolo, Azienda e Badge */}
         <div className="flex items-start justify-between mb-3">
@@ -93,15 +93,15 @@ export const CompactJobInterestCard = ({
         </div>
 
         {/* Riga 2: Informazioni principali */}
-        <div className="flex items-center gap-3 mb-3 text-xs text-muted-foreground">
+        <div className="flex items-center gap-3 mb-3 text-xs text-muted-foreground flex-wrap">
           {jobOffer.location && (
-            <div className="flex items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              <span className="truncate">{jobOffer.location}</span>
+            <div className="flex items-center gap-1 min-w-0 flex-1">
+              <MapPin className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate block max-w-full">{jobOffer.location}</span>
             </div>
           )}
           {(jobOffer.salary_min || jobOffer.salary_max) && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-shrink-0">
               <Euro className="h-3 w-3" />
               <span className="truncate">
                 {jobOffer.salary_min && jobOffer.salary_max

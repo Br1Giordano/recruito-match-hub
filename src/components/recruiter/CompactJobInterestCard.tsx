@@ -102,7 +102,6 @@ export const CompactJobInterestCard = ({
           )}
           {(jobOffer.salary_min || jobOffer.salary_max) && (
             <div className="flex items-center gap-1 flex-shrink-0">
-              <Euro className="h-3 w-3" />
               <span className="truncate">
                 {jobOffer.salary_min && jobOffer.salary_max
                   ? `€${jobOffer.salary_min.toLocaleString()} - €${jobOffer.salary_max.toLocaleString()}`

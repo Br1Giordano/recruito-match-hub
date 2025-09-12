@@ -246,15 +246,15 @@ export default function CompactProposalCard({
                 {statusInfo.tooltip}
               </TooltipContent>
             </Tooltip>
-            <h3 className="font-bold text-base leading-tight">
+            <h3 className="font-bold text-base leading-tight truncate max-w-[200px]">
               {proposal.job_offers?.title || "Posizione non specificata"}
             </h3>
           </div>
 
           {/* Body: Two Columns */}
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-2">
             {/* Left Column: Recruiter + Candidate */}
-            <div className="flex-1 space-y-3">
+            <div className="flex-1 space-y-3 min-w-0">
               {/* Recruiter Info */}
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
@@ -266,7 +266,7 @@ export default function CompactProposalCard({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={handleShowProfile}
-                      className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                      className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline cursor-pointer truncate max-w-[120px]"
                     >
                       {proposal.recruiter_name || "Recruiter"}
                     </button>
@@ -296,9 +296,9 @@ export default function CompactProposalCard({
               </div>
               
               {/* Candidate Info */}
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">
+              <div className="flex items-center gap-2 min-w-0">
+                <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+                <span className="text-sm font-medium truncate max-w-[140px]">
                   {formatCandidateName(proposal.candidate_name)}
                 </span>
                 {hasCv ? (

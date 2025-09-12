@@ -136,7 +136,7 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
       <Card className="p-3 hover:shadow-md hover:border-[#D9D9D9] transition-all duration-200 group">
         <CardContent className="p-0 space-y-2">
           {/* Riga 1: Avatar, Nome, Ruolo, Stato */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5 min-w-0 flex-1">
               <Avatar className="h-8 w-8 flex-shrink-0">
                 <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
@@ -145,39 +145,39 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
               </Avatar>
               
               <div className="min-w-0 flex-1">
-                <h3 className="font-semibold text-base leading-tight truncate">
+                <h3 className="font-semibold text-base leading-tight truncate max-w-[180px]">
                   {proposal.candidate_name}
                 </h3>
               </div>
 
               {proposal.job_offers?.title && (
-                <div className="hidden sm:block flex-shrink-0">
-                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                <div className="hidden sm:block flex-shrink-0 max-w-[120px]">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 truncate">
                     {proposal.job_offers.title}
                   </span>
                 </div>
               )}
             </div>
             
-            <div className="flex-shrink-0">
-              <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${currentStatus.bgColor} ${currentStatus.color}`}>
-                <StatusIcon className="h-3 w-3" />
-                {currentStatus.label}
+            <div className="flex-shrink-0 ml-2">
+              <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${currentStatus.bgColor} ${currentStatus.color} whitespace-nowrap`}>
+                <StatusIcon className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{currentStatus.label}</span>
               </div>
             </div>
           </div>
 
           {/* Riga 2: Email, Fee, Data, Tags */}
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-2 text-sm flex-wrap">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button 
                     onClick={copyEmail}
-                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors"
+                    className="flex items-center gap-1 text-blue-600 hover:text-blue-800 transition-colors min-w-0 flex-shrink-0"
                   >
-                    <Mail className="h-3.5 w-3.5" />
-                    <span className="text-xs">{proposal.candidate_email}</span>
+                    <Mail className="h-3.5 w-3.5 flex-shrink-0" />
+                    <span className="text-xs truncate max-w-[150px]">{proposal.candidate_email}</span>
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -186,25 +186,25 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
               </Tooltip>
             </TooltipProvider>
 
-            <div className="h-3 w-px bg-[#EAEAEA]" />
+            <div className="h-3 w-px bg-[#EAEAEA] flex-shrink-0" />
 
             {proposal.recruiter_fee_percentage && (
               <>
-                <span className="text-xs text-gray-600">
+                <span className="text-xs text-gray-600 flex-shrink-0 whitespace-nowrap">
                   🏷️ Fee {proposal.recruiter_fee_percentage}%
                 </span>
-                <div className="h-3 w-px bg-[#EAEAEA]" />
+                <div className="h-3 w-px bg-[#EAEAEA] flex-shrink-0" />
               </>
             )}
 
-            <span className="text-xs text-gray-600">
+            <span className="text-xs text-gray-600 flex-shrink-0 whitespace-nowrap">
               🗓️ {formatDate(proposal.created_at)}
             </span>
 
             {jobOfferId && getInterestCount(jobOfferId) > 0 && (
               <>
-                <div className="h-3 w-px bg-[#EAEAEA]" />
-                <span className="text-xs text-blue-600 flex items-center gap-1">
+                <div className="h-3 w-px bg-[#EAEAEA] flex-shrink-0" />
+                <span className="text-xs text-blue-600 flex items-center gap-1 flex-shrink-0 whitespace-nowrap">
                   <Users className="h-3 w-3" />
                   {getInterestCount(jobOfferId)} recruiter
                 </span>
@@ -213,23 +213,23 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
 
             {tags.length > 0 && (
               <>
-                <div className="h-3 w-px bg-[#EAEAEA]" />
-                <div className="flex items-center gap-1">
-                  {tags.slice(0, 2).map((tag, index) => (
-                    <span key={index} className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
+                <div className="h-3 w-px bg-[#EAEAEA] flex-shrink-0" />
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  {tags.slice(0, 1).map((tag, index) => (
+                    <span key={index} className="inline-flex items-center px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-700 whitespace-nowrap">
                       🧩 {tag}
                     </span>
                   ))}
-                  {remainingTags > 0 && (
+                  {(tags.length > 1 || remainingTags > 0) && (
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="ghost" size="sm" className="h-5 px-1 text-xs">
-                          +{remainingTags}
+                        <Button variant="ghost" size="sm" className="h-5 px-1 text-xs flex-shrink-0">
+                          +{tags.length - 1}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-2">
                         <div className="space-y-1">
-                          {tags.slice(2).map((tag, index) => (
+                          {tags.slice(1).map((tag, index) => (
                             <div key={index} className="text-xs">{tag}</div>
                           ))}
                         </div>
@@ -242,9 +242,9 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
           </div>
 
           {/* Riga 3: Descrizione e Azioni */}
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 break-words">
                 {showFullDescription 
                   ? proposal.proposal_description 
                   : truncateDescription(proposal.proposal_description)
@@ -252,15 +252,15 @@ export default function CompactRecruiterProposalCard({ proposal }: CompactRecrui
                 {proposal.proposal_description && proposal.proposal_description.length > 140 && (
                   <button 
                     onClick={() => setShowFullDescription(!showFullDescription)}
-                    className="ml-1 text-primary hover:text-primary/80 font-medium"
+                    className="ml-1 text-primary hover:text-primary/80 font-medium whitespace-nowrap"
                   >
-                    {showFullDescription ? 'Chiudi dettagli' : 'Mostra dettagli'}
+                    {showFullDescription ? 'Chiudi' : 'Altro'}
                   </button>
                 )}
               </p>
             </div>
             
-            <div className="flex items-center gap-1 flex-shrink-0">
+            <div className="flex items-center gap-1 flex-shrink-0 ml-2">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>

@@ -125,19 +125,24 @@ export default function CompactCompanyOfferCard({
           </div>
 
           {/* Seconda riga: Informazioni chiave */}
-          <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-            {offer.location && (
-              <div className="flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                <span className="truncate">{offer.location}</span>
+          <div className="space-y-2 mb-3">
+            {/* Location and employment type on first line */}
+            <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
+              {offer.location && (
+                <div className="flex items-center gap-1 min-w-0">
+                  <MapPin className="h-4 w-4 flex-shrink-0" />
+                  <span className="truncate max-w-[180px]">{offer.location}</span>
+                </div>
+              )}
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <Clock className="h-4 w-4" />
+                <span>{getEmploymentTypeText(offer.employment_type)}</span>
               </div>
-            )}
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              <span>{getEmploymentTypeText(offer.employment_type)}</span>
             </div>
+            
+            {/* Interest count on second line if present */}
             {interestCount > 0 && (
-              <div className="flex items-center gap-1 text-blue-600">
+              <div className="flex items-center gap-1 text-blue-600 text-sm">
                 <Users className="h-4 w-4" />
                 <span>{interestCount} interessat{interestCount !== 1 ? 'i' : 'o'}</span>
               </div>
@@ -145,18 +150,16 @@ export default function CompactCompanyOfferCard({
           </div>
 
           {/* Terza riga: Salary e data */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-4 text-sm">
-              {getSalaryText() && (
-                <div className="flex items-center gap-1 text-green-700 font-medium">
-                  <Euro className="h-4 w-4" />
-                  <span>{getSalaryText()}</span>
-                </div>
-              )}
-              <div className="flex items-center gap-1 text-gray-500">
-                <Calendar className="h-4 w-4" />
-                <span>{new Date(offer.created_at).toLocaleDateString('it-IT')}</span>
+          <div className="space-y-2 mb-4">
+            {getSalaryText() && (
+              <div className="flex items-center gap-1 text-green-700 font-medium text-sm">
+                <Euro className="h-4 w-4 flex-shrink-0" />
+                <span className="break-words">{getSalaryText()}</span>
               </div>
+            )}
+            <div className="flex items-center gap-1 text-gray-500 text-sm">
+              <Calendar className="h-4 w-4 flex-shrink-0" />
+              <span>{new Date(offer.created_at).toLocaleDateString('it-IT')}</span>
             </div>
           </div>
 

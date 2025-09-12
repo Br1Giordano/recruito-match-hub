@@ -347,49 +347,56 @@ export default function JobOffersBoard() {
           filteredOffers.map((offer) => (
             <Card key={offer.id} className="hover:shadow-md transition-shadow">
               <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="flex items-center gap-2 mb-2">
-                      <Briefcase className="h-5 w-5" />
-                      {offer.title}
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <CardTitle className="flex items-start gap-2 mb-2 flex-wrap">
+                      <Briefcase className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                      <span className="text-base md:text-lg leading-tight break-words">{offer.title}</span>
                       {isAdmin && (
-                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-medium">
+                        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200 font-medium flex-shrink-0">
                           <Shield className="w-3 h-3 mr-1" />
                           Admin
                         </Badge>
                       )}
                     </CardTitle>
-                    <CardDescription className="flex items-center gap-4">
-                      <button 
-                        onClick={() => handleShowCompanyProfile(offer)}
-                        className="flex items-center gap-1 text-primary hover:text-primary/80 hover:underline transition-colors cursor-pointer"
-                      >
-                        <Building2 className="h-4 w-4" />
-                        {getCompanyName(offer)}
-                      </button>
-                      {isAdmin && offer.contact_email && (
-                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
-                          {offer.contact_email}
+                    <CardDescription className="space-y-2">
+                      {/* Company info on its own line */}
+                      <div className="flex items-center gap-2">
+                        <button 
+                          onClick={() => handleShowCompanyProfile(offer)}
+                          className="flex items-center gap-1 text-primary hover:text-primary/80 hover:underline transition-colors cursor-pointer min-w-0"
+                        >
+                          <Building2 className="h-4 w-4 flex-shrink-0" />
+                          <span className="truncate">{getCompanyName(offer)}</span>
+                        </button>
+                        {isAdmin && offer.contact_email && (
+                          <span className="text-xs bg-gray-100 px-2 py-1 rounded truncate">
+                            {offer.contact_email}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Location and employment type on separate line */}
+                      <div className="flex items-center gap-4 flex-wrap">
+                        {offer.location && (
+                          <span className="flex items-center gap-1 min-w-0">
+                            <MapPin className="h-4 w-4 flex-shrink-0" />
+                            <span className="text-sm truncate max-w-[200px]">{offer.location}</span>
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1 flex-shrink-0">
+                          <Clock className="h-4 w-4" />
+                          <span className="text-sm">{getEmploymentTypeText(offer.employment_type)}</span>
                         </span>
-                      )}
-                      {offer.location && (
-                        <span className="flex items-center gap-1">
-                          <MapPin className="h-4 w-4" />
-                          {offer.location}
-                        </span>
-                      )}
-                       <span className="flex items-center gap-1">
-                         <Clock className="h-4 w-4" />
-                         {getEmploymentTypeText(offer.employment_type)}
-                       </span>
-                       {getInterestCount(offer.id) > 0 && (
-                         <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                           {getInterestCount(offer.id)} recruiter{getInterestCount(offer.id) !== 1 ? 's' : ''} interessati
-                         </Badge>
-                       )}
+                        {getInterestCount(offer.id) > 0 && (
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 flex-shrink-0">
+                            {getInterestCount(offer.id)} recruiter{getInterestCount(offer.id) !== 1 ? 's' : ''} interessati
+                          </Badge>
+                        )}
+                      </div>
                     </CardDescription>
                   </div>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 flex-shrink-0">
                     Attiva
                   </Badge>
                 </div>

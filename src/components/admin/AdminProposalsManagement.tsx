@@ -77,7 +77,8 @@ export default function AdminProposalsManagement() {
   useEffect(() => {
     // Group proposals by recruiter when proposals data changes
     const grouped = proposals.reduce((acc, proposal) => {
-      const recruiterEmail = proposal.recruiter_email || 'unknown';
+      const recruiterEmailRaw = proposal.recruiter_email || 'unknown';
+      const recruiterEmail = recruiterEmailRaw.toLowerCase().trim();
       if (!acc[recruiterEmail]) {
         acc[recruiterEmail] = {
           recruiter_name: proposal.recruiter_name,

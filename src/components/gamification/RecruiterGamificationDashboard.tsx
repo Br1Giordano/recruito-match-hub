@@ -140,19 +140,12 @@ export default function RecruiterGamificationDashboard() {
             </h3>
             {earnedBadges.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {earnedBadges.map((badge) => {
-                  const currentTier = badge.name.includes('Bronze') ? 'bronze' :
-                                    badge.name.includes('Silver') ? 'silver' :
-                                    badge.name.includes('Gold') ? 'gold' : 'none';
-                  
-                  return (
-                    <BadgeCard 
-                      key={badge.id} 
-                      badge={badge} 
-                      currentTier={currentTier}
-                    />
-                  );
-                })}
+                {earnedBadges.map((badge) => (
+                  <BadgeCard 
+                    key={badge.id} 
+                    badge={badge}
+                  />
+                ))}
               </div>
             ) : (
               <div className="text-center py-8 px-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
@@ -172,26 +165,12 @@ export default function RecruiterGamificationDashboard() {
             </h3>
             {unEarnedBadges.length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                {unEarnedBadges.map((badge) => {
-                  // Calcolo del progresso simulato (in futuro verrà dai dati reali)
-                  const currentValue = Math.floor(Math.random() * badge.requirement_value * 0.8);
-                  const progress = Math.min((currentValue / badge.requirement_value) * 100, 95);
-                  
-                  const currentTier = badge.name.includes('Bronze') ? 'bronze' :
-                                    badge.name.includes('Silver') ? 'silver' :
-                                    badge.name.includes('Gold') ? 'gold' : 'none';
-                  
-                  return (
-                    <BadgeCard 
-                      key={badge.id} 
-                      badge={badge}
-                      progress={progress}
-                      currentTier={currentTier}
-                      nextTierValue={badge.requirement_value}
-                      currentValue={currentValue}
-                    />
-                  );
-                })}
+                {unEarnedBadges.map((badge) => (
+                  <BadgeCard 
+                    key={badge.id} 
+                    badge={badge}
+                  />
+                ))}
               </div>
             ) : (
               <div className="text-center py-8 px-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">

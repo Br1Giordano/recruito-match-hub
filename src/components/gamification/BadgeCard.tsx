@@ -1,243 +1,184 @@
 import { Badge } from '@/hooks/useRecruiterGamification';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge as BadgeComponent } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface BadgeCardProps {
   badge: Badge;
   size?: 'sm' | 'md' | 'lg';
-  progress?: number; // Progress verso il prossimo tier (0-100)
-  currentTier?: 'bronze' | 'silver' | 'gold' | 'none';
-  nextTierValue?: number; // Valore per raggiungere il prossimo tier
-  currentValue?: number; // Valore attuale
 }
 
 export default function BadgeCard({ 
   badge, 
-  size = 'md', 
-  progress = 0, 
-  currentTier = 'none',
-  nextTierValue,
-  currentValue 
+  size = 'md'
 }: BadgeCardProps) {
   const IconComponent = (LucideIcons as any)[badge.icon] || LucideIcons.Award;
   const isEarned = !!badge.earned_at;
 
-  // Colori tier specifici
-  const tierColors = {
-    bronze: {
-      bg: 'bg-gradient-to-br from-[#C98A55]/10 to-[#C98A55]/20',
-      border: 'border-[#C98A55]/30',
-      icon: 'text-[#C98A55]',
-      badge: 'bg-[#C98A55] text-white'
+  // Simplified color system for earned vs unearned
+  const colors = isEarned ? {
+    bg: 'bg-gradient-to-br from-emerald-50 to-green-100',
+    border: 'border-emerald-200',
+    icon: 'text-emerald-600',
+    badge: 'bg-emerald-600 text-white'
+  } : {
+    bg: 'bg-gray-50',
+    border: 'border-gray-200',
+    icon: 'text-gray-400',
+    badge: 'bg-gray-300 text-gray-600'
+  };
+
+  // Italian achievement names and descriptions
+  const achievementTranslations = {
+    'Closer': {
+      name: 'Chiusure di Successo',
+      description: 'Dimostra eccellenza nel finalizzare le posizioni con candidati di qualità'
     },
-    silver: {
-      bg: 'bg-gradient-to-br from-[#C8CCD4]/10 to-[#C8CCD4]/20',
-      border: 'border-[#C8CCD4]/30',
-      icon: 'text-[#C8CCD4]',
-      badge: 'bg-[#C8CCD4] text-gray-800'
+    'Shortlist Pro': {
+      name: 'Selezioni Precise',
+      description: 'Esperto nel presentare candidati che vengono selezionati dalle aziende'
     },
-    gold: {
-      bg: 'bg-gradient-to-br from-[#F6C34A]/10 to-[#F6C34A]/20',
-      border: 'border-[#F6C34A]/30',
-      icon: 'text-[#F6C34A]',
-      badge: 'bg-[#F6C34A] text-gray-800'
+    'Hires Made': {
+      name: 'Esperto di Assunzioni',
+      description: 'Ha completato con successo numerose assunzioni'
     },
-    none: {
-      bg: 'bg-gray-50',
-      border: 'border-gray-200',
-      icon: 'text-gray-400',
-      badge: 'bg-gray-300 text-gray-600'
+    'Retention 90d': {
+      name: 'Candidati Duraturi',
+      description: 'I tuoi candidati dimostrano grande stabilità nelle nuove posizioni'
+    },
+    'Client Love': {
+      name: 'Apprezzato dai Clienti',
+      description: 'Riceve costantemente valutazioni eccellenti dalle aziende'
+    },
+    'Speedrunner': {
+      name: 'Velocità di Risposta',
+      description: 'Risponde rapidamente alle richieste e gestisce i processi con efficienza'
+    },
+    'Lightning Reply': {
+      name: 'Comunicazione Immediata',
+      description: 'Mantiene una comunicazione costante e tempestiva con tutti i contatti'
+    },
+    'Clean Desk': {
+      name: 'Organizzazione Impeccabile',
+      description: 'Gestisce i propri processi con ordine e precisione'
+    },
+    'Consistency Streak': {
+      name: 'Costanza nel Lavoro',
+      description: 'Mantiene un rendimento costante e affidabile nel tempo'
+    },
+    'Hard Role Hunter': {
+      name: 'Sfide Complesse',
+      description: 'Specializzato nel gestire posizioni difficili e ricerche complesse'
+    },
+    'Multi-Domain': {
+      name: 'Versatilità Settoriale',
+      description: 'Opera con successo in diversi settori e ambiti professionali'
+    },
+    'Zero Spam': {
+      name: 'Candidature di Qualità',
+      description: 'Presenta solo candidati altamente qualificati e pertinenti'
     }
   };
 
   const categoryLabels = {
     outcome: 'Risultati',
-    quality: 'Qualità',
+    quality: 'Qualità', 
     efficiency: 'Efficienza',
     reliability: 'Affidabilità',
     specialty: 'Specialità'
   };
 
-  const getTierLabel = (name: string) => {
-    if (name.includes('Bronze')) return 'Bronzo';
-    if (name.includes('Silver')) return 'Argento';
-    if (name.includes('Gold')) return 'Oro';
-    return '';
-  };
-
-  const getBadgeBaseName = (name: string) => {
+  // Get clean badge name without tier suffixes
+  const getCleanBadgeName = (name: string) => {
     return name.replace(/ (Bronze|Silver|Gold)$/, '');
   };
 
-  const getPeriodLabel = (requirementType: string) => {
-    if (['hires_12m', 'hard_roles_12m', 'domains_12m'].includes(requirementType)) {
-      return 'Rolling 365g';
-    }
-    if (['time_to_shortlist', 'reply_time', 'compliance_incidents', 'activity_streak'].includes(requirementType)) {
-      return 'Rolling 90g';
-    }
-    return 'Continuo';
-  };
-
-  const getProgressText = () => {
-    if (isEarned) return 'Ottenuto';
-    if (nextTierValue && currentValue !== undefined) {
-      const remaining = nextTierValue - currentValue;
-      const nextTier = badge.name.includes('Bronze') ? 'Argento' :
-                      badge.name.includes('Silver') ? 'Oro' : 'Bronzo';
-      
-      const unit = getUnitText(badge.requirement_type);
-      const currentDisplay = currentValue % 1 === 0 ? currentValue : currentValue.toFixed(1);
-      const nextDisplay = nextTierValue % 1 === 0 ? nextTierValue : nextTierValue.toFixed(1);
-      
-      return `${currentDisplay}${unit}/${nextDisplay}${unit} - Mancano ${Math.abs(remaining)}${unit} per ${nextTier}`;
-    }
-    return 'In progresso';
-  };
-
-  const getThresholdText = () => {
-    // Mostra le soglie per tutti i tier del badge
-    const baseName = badge.name.replace(/ (Bronze|Silver|Gold)$/, '');
-    const requirementType = badge.requirement_type;
-    const unit = getUnitText(requirementType);
+  // Get Italian name and description
+  const getAchievementInfo = (name: string) => {
+    const cleanName = getCleanBadgeName(name);
+    const translation = achievementTranslations[cleanName];
     
-    const thresholds = {
-      'Closer': { bronze: '40%', silver: '60%', gold: '75%' },
-      'Shortlist Pro': { bronze: '25%', silver: '35%', gold: '45%' },
-      'Hires Made': { bronze: '3', silver: '8', gold: '15' },
-      'Retention 90d': { bronze: '80%', silver: '90%', gold: '95%' },
-      'Client Love': { bronze: '4.2', silver: '4.5', gold: '4.8' },
-      'Speedrunner': { bronze: '≤14g', silver: '≤10g', gold: '≤7g' },
-      'Lightning Reply': { bronze: '≤24h', silver: '≤12h', gold: '≤4h' },
-      'Clean Desk': { bronze: '0 (30g)', silver: '0 (60g)', gold: '0 (120g)' },
-      'Consistency Streak': { bronze: '4 sett', silver: '8 sett', gold: '12 sett' },
-      'Hard Role Hunter': { bronze: '1', silver: '3', gold: '6' },
-      'Multi-Domain': { bronze: '2', silver: '3', gold: '4' },
-      'Zero Spam': { bronze: '≤40%', silver: '≤30%', gold: '≤20%' }
+    return {
+      name: translation?.name || cleanName,
+      description: translation?.description || badge.description
     };
-    
-    const threshold = thresholds[baseName];
-    if (threshold) {
-      return `Bronzo: ${threshold.bronze} | Argento: ${threshold.silver} | Oro: ${threshold.gold}`;
-    }
-    
-    return badge.description;
   };
 
-  const getUnitText = (requirementType: string) => {
-    switch (requirementType) {
-      case 'acceptance_rate':
-      case 'shortlist_rate':
-      case 'retention_90d':
-      case 'avg_rating':
-      case 'mismatch_rate':
-        return '%';
-      case 'hires_12m':
-      case 'hard_roles_12m':
-      case 'domains_12m':
-      case 'compliance_incidents':
-        return '';
-      case 'time_to_shortlist':
-        return ' giorni';
-      case 'reply_time':
-        return ' ore';
-      case 'activity_streak':
-        return ' settimane';
-      default:
-        return '';
-    }
-  };
+  const achievementInfo = getAchievementInfo(badge.name);
 
   const sizeClasses = {
     sm: 'p-3',
-    md: 'p-4',
+    md: 'p-4', 
     lg: 'p-6'
   };
 
   const iconSizes = {
-    sm: 16,
-    md: 20,
-    lg: 24
+    sm: 20,
+    md: 24,
+    lg: 28
   };
-
-  const currentTierStyle = isEarned ? tierColors[currentTier] : tierColors.none;
 
   return (
     <Card className={cn(
-      "transition-all duration-200 hover:shadow-md",
-      currentTierStyle.bg,
-      currentTierStyle.border,
-      !isEarned && "opacity-60",
+      "transition-all duration-200 hover:shadow-lg hover:scale-105",
+      colors.bg,
+      colors.border,
+      !isEarned && "opacity-70",
       sizeClasses[size]
     )}>
-      <CardContent className="p-0 space-y-3">
-        {/* Header con icona categoria e tier */}
+      <CardContent className="p-0 space-y-4">
+        {/* Header with icon and category */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <IconComponent 
-              size={iconSizes[size]} 
-              className={currentTierStyle.icon}
-            />
-            <div className="text-xs text-muted-foreground font-medium">
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "p-2 rounded-full",
+              isEarned ? "bg-emerald-100" : "bg-gray-100"
+            )}>
+              <IconComponent 
+                size={iconSizes[size]} 
+                className={colors.icon}
+              />
+            </div>
+            <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
               {categoryLabels[badge.category] || badge.category}
             </div>
           </div>
+          
           {isEarned && (
-            <BadgeComponent className={`text-xs font-semibold ${currentTierStyle.badge}`}>
-              {getTierLabel(badge.name)}
+            <BadgeComponent className={`text-xs font-semibold ${colors.badge}`}>
+              Ottenuto
             </BadgeComponent>
           )}
         </div>
         
-        {/* Nome e soglie */}
-        <div>
+        {/* Achievement name and description */}
+        <div className="space-y-2">
           <h3 className={cn(
-            "font-semibold leading-tight",
+            "font-bold leading-tight text-navy",
             size === 'sm' ? 'text-sm' : size === 'md' ? 'text-base' : 'text-lg'
           )}>
-            {getBadgeBaseName(badge.name)}
+            {achievementInfo.name}
           </h3>
+          
           <p className={cn(
             "text-muted-foreground leading-relaxed",
             size === 'sm' ? 'text-xs' : 'text-sm'
           )}>
-            {getThresholdText()}
+            {achievementInfo.description}
           </p>
         </div>
 
-        {/* Periodo e punti */}
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span className="font-medium">
-            {getPeriodLabel(badge.requirement_type)}
-          </span>
-          <span className="font-semibold text-primary">
-            {badge.points} punti
-          </span>
-        </div>
-
-        {/* Progress bar e status */}
-        <div className="space-y-2">
-          {!isEarned && (
-            <div className="space-y-1">
-              <Progress 
-                value={progress} 
-                className="h-2"
-              />
-              <div className="text-xs text-muted-foreground text-center">
-                {getProgressText()}
-              </div>
+        {/* Status indicator */}
+        <div className="pt-2 border-t border-current/10">
+          {isEarned ? (
+            <div className="flex items-center justify-center gap-2 text-emerald-600 font-medium text-sm">
+              <LucideIcons.CheckCircle2 className="h-4 w-4" />
+              Achievement Completato
             </div>
-          )}
-          
-          {isEarned && (
-            <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-green-600 font-medium text-sm">
-                <LucideIcons.CheckCircle2 className="h-4 w-4" />
-                Completato
-              </div>
+          ) : (
+            <div className="text-center text-gray-500 text-sm font-medium">
+              In Progresso
             </div>
           )}
         </div>

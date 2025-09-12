@@ -86,7 +86,7 @@ export const JobInterestDetailsDrawer = ({
 
   return (
     <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DrawerContent>
+      <DrawerContent className="max-h-[85vh] flex flex-col">
         {/* Emergency close button */}
         <button 
           onClick={onClose}
@@ -95,7 +95,8 @@ export const JobInterestDetailsDrawer = ({
           <X className="h-4 w-4" />
           <span className="sr-only">Close</span>
         </button>
-        <DrawerHeader>
+
+        <DrawerHeader className="flex-shrink-0">
           <DrawerTitle className="text-left">{jobOffer.title}</DrawerTitle>
           {jobOffer.company_name && (
             <DrawerDescription className="text-left">
@@ -110,89 +111,94 @@ export const JobInterestDetailsDrawer = ({
           )}
         </DrawerHeader>
 
-        <div className="px-6 pb-6 space-y-6">
-          {/* Informazioni principali */}
-          <div className="grid grid-cols-2 gap-4">
-            {jobOffer.location && (
+        {/* Content with scroll */}
+        <div className="flex-1 overflow-y-auto px-6">
+          <div className="space-y-4">
+            {/* Informazioni principali */}
+            <div className="grid grid-cols-2 gap-4">
+              {jobOffer.location && (
+                <div className="flex items-center gap-2 text-sm">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span>{jobOffer.location}</span>
+                </div>
+              )}
+              
               <div className="flex items-center gap-2 text-sm">
-                <MapPin className="h-4 w-4 text-muted-foreground" />
-                <span>{jobOffer.location}</span>
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                <span>{getEmploymentTypeText(jobOffer.employment_type || 'full-time')}</span>
+              </div>
+
+              {(jobOffer.salary_min || jobOffer.salary_max) && (
+                <div className="flex items-center gap-2 text-sm col-span-2">
+                  <Euro className="h-4 w-4 text-muted-foreground" />
+                  <span>
+                    {jobOffer.salary_min && jobOffer.salary_max
+                      ? `€${jobOffer.salary_min.toLocaleString()} - €${jobOffer.salary_max.toLocaleString()}`
+                      : jobOffer.salary_min
+                      ? `Da €${jobOffer.salary_min.toLocaleString()}`
+                      : `Fino a €${jobOffer.salary_max?.toLocaleString()}`}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <Separator />
+
+            {/* Descrizione */}
+            {jobOffer.description && (
+              <div className="space-y-2">
+                <h3 className="font-semibold">Descrizione</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {jobOffer.description}
+                </p>
               </div>
             )}
-            
-            <div className="flex items-center gap-2 text-sm">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              <span>{getEmploymentTypeText(jobOffer.employment_type || 'full-time')}</span>
-            </div>
 
-            {(jobOffer.salary_min || jobOffer.salary_max) && (
-              <div className="flex items-center gap-2 text-sm col-span-2">
-                <Euro className="h-4 w-4 text-muted-foreground" />
-                <span>
-                  {jobOffer.salary_min && jobOffer.salary_max
-                    ? `€${jobOffer.salary_min.toLocaleString()} - €${jobOffer.salary_max.toLocaleString()}`
-                    : jobOffer.salary_min
-                    ? `Da €${jobOffer.salary_min.toLocaleString()}`
-                    : `Fino a €${jobOffer.salary_max?.toLocaleString()}`}
-                </span>
+            {/* Requisiti */}
+            {jobOffer.requirements && (
+              <div className="space-y-2">
+                <h3 className="font-semibold">Requisiti</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {jobOffer.requirements}
+                </p>
               </div>
             )}
+
+            {/* Benefici */}
+            {jobOffer.benefits && (
+              <div className="space-y-2">
+                <h3 className="font-semibold">Benefici</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {jobOffer.benefits}
+                </p>
+              </div>
+            )}
+
+            {/* Note personali */}
+            {interest.notes && (
+              <div className="space-y-2">
+                <h3 className="font-semibold">Le mie note</h3>
+                <p className="text-sm text-muted-foreground italic bg-muted/50 p-3 rounded-lg">
+                  {interest.notes}
+                </p>
+              </div>
+            )}
+
+            <Separator />
+
+            {/* Data interesse */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Calendar className="h-3 w-3" />
+              <span>
+                Presa in carico il {new Date(interest.created_at).toLocaleDateString('it-IT')} 
+                alle {new Date(interest.created_at).toLocaleTimeString('it-IT')}
+              </span>
+            </div>
           </div>
+        </div>
 
-          <Separator />
-
-          {/* Descrizione */}
-          {jobOffer.description && (
-            <div className="space-y-2">
-              <h3 className="font-semibold">Descrizione</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {jobOffer.description}
-              </p>
-            </div>
-          )}
-
-          {/* Requisiti */}
-          {jobOffer.requirements && (
-            <div className="space-y-2">
-              <h3 className="font-semibold">Requisiti</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {jobOffer.requirements}
-              </p>
-            </div>
-          )}
-
-          {/* Benefici */}
-          {jobOffer.benefits && (
-            <div className="space-y-2">
-              <h3 className="font-semibold">Benefici</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {jobOffer.benefits}
-              </p>
-            </div>
-          )}
-
-          {/* Note personali */}
-          {interest.notes && (
-            <div className="space-y-2">
-              <h3 className="font-semibold">Le mie note</h3>
-              <p className="text-sm text-muted-foreground italic bg-muted/50 p-3 rounded-lg">
-                {interest.notes}
-              </p>
-            </div>
-          )}
-
-          <Separator />
-
-          {/* Data interesse */}
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Calendar className="h-3 w-3" />
-            <span>
-              Presa in carico il {new Date(interest.created_at).toLocaleDateString('it-IT')} 
-              alle {new Date(interest.created_at).toLocaleTimeString('it-IT')}
-            </span>
-          </div>
-
-          {/* Azioni */}
+        {/* Fixed action buttons at bottom */}
+        <div className="flex-shrink-0 px-6 py-4 border-t bg-background">
           <div className="flex gap-3">
             <Button
               variant="outline"

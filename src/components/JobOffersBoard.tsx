@@ -123,6 +123,11 @@ export default function JobOffersBoard() {
       .replace(/^\w/, c => c.toUpperCase()); // Capitalize first letter
   }, []);
 
+  const getCompanyName = useCallback((offer: JobOfferWithCompany): string => {
+    // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations
+    return offer.company_name || offer.company_registrations?.nome_azienda || "Azienda non specificata";
+  }, []);
+
   // Simplified filtering logic - REMOVED EXCLUSIVITY
   const filteredOffers = useMemo(() => {
     let filtered = jobOffers;
@@ -152,12 +157,7 @@ export default function JobOffersBoard() {
     }
 
     return filtered;
-  }, [searchTerm, locationFilter, employmentFilter, jobOffers, extractCityName]);
-
-  const getCompanyName = (offer: JobOfferWithCompany): string => {
-    // Usa company_name se disponibile, altrimenti nome_azienda da company_registrations
-    return offer.company_name || offer.company_registrations?.nome_azienda || "Azienda non specificata";
-  };
+  }, [searchTerm, locationFilter, employmentFilter, jobOffers, extractCityName, getCompanyName]);
 
   const handleSendProposal = (offer: JobOfferWithCompany) => {
     if (!userProfile || userProfile.user_type !== 'recruiter') {

@@ -71,7 +71,7 @@ export const CompactJobInterestCard = ({
     <Card className="group hover:shadow-startup transition-all duration-200 border-gray-100 overflow-hidden">
       <CardContent className="p-4">
         {/* Riga 1: Titolo, Azienda e Badge */}
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between gap-3 mb-3">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-sm text-navy truncate mb-1">
               {jobOffer.title}
@@ -79,14 +79,14 @@ export const CompactJobInterestCard = ({
             {jobOffer.company_name && (
               <button
                 onClick={() => onCompanyClick(jobOffer.contact_email)}
-                className="text-xs text-muted-foreground hover:text-primary hover:underline transition-colors flex items-center gap-1"
+                className="text-xs text-muted-foreground hover:text-primary hover:underline transition-colors flex items-center gap-1 truncate"
               >
-                <Building2 className="h-3 w-3" />
-                {jobOffer.company_name}
+                <Building2 className="h-3 w-3 flex-shrink-0" />
+                <span className="truncate">{jobOffer.company_name}</span>
               </button>
             )}
           </div>
-          <Badge variant="outline" className="text-xs ml-2 shrink-0">
+          <Badge variant="outline" className="text-xs ml-2 shrink-0 whitespace-nowrap">
             <Clock className="h-3 w-3 mr-1" />
             {getEmploymentTypeText(jobOffer.employment_type || 'full-time')}
           </Badge>

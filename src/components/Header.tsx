@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import MobileMenu from "./MobileMenu";
@@ -16,7 +16,7 @@ interface HeaderProps {
 
 const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
   const location = useLocation();
-  const navigate = useNavigate();
+  const isHomePage = location.pathname === '/';
   const { user, userProfile } = useAuth();
   const [isMessageCenterOpen, setIsMessageCenterOpen] = useState(false);
   const { hasNewMessages, clearMessageNotifications } = useRealTimeNotifications();
@@ -24,6 +24,54 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
   const handleOpenMessageCenter = () => {
     setIsMessageCenterOpen(true);
     clearMessageNotifications();
+  };
+
+  const scrollToSection = (sectionId: string) => {
+    if (isHomePage) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  };
+
+  const handleNavClick = (sectionId: string) => {
+    if (isHomePage) {
+      scrollToSection(sectionId);
+    } else {
+      // Se non siamo nella homepage, naviga prima alla homepage e poi scrolla
+      window.location.href = `/#${sectionId}`;
+    }
+  };
+
+  const handleDemoNavigation = () => {
+    if (isHomePage) {
+      // Cerca l'elemento con data-demo-section
+      const demoElement = document.querySelector('[data-demo-section]');
+      if (demoElement) {
+        demoElement.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      window.location.href = '/#demo';
+    }
+  };
+
+  const handleCompanyButtonClick = () => {
+    console.log('Company button clicked in header', { user });
+    if (user) {
+      onShowDashboard?.();
+    } else {
+      onShowAuth?.();
+    }
+  };
+
+  const handleRecruiterButtonClick = () => {
+    console.log('Recruiter button clicked in header', { user });
+    if (user) {
+      onShowDashboard?.();
+    } else {
+      onShowAuth?.();
+    }
   };
 
   return (
@@ -41,22 +89,34 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
         
         <nav className="hidden md:flex items-center space-x-8">
           <button 
-            onClick={() => navigate('/')} 
+            onClick={() => handleNavClick('come-funziona')} 
             className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
-            Home
+            Come Funziona
           </button>
           <button 
-            onClick={() => navigate('/recruiter')} 
+            onClick={() => handleNavClick('problema')} 
             className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
-            Per Recruiter
+            Problema
           </button>
           <button 
-            onClick={() => navigate('/aziende')} 
+            onClick={() => handleNavClick('soluzione')} 
             className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
-            Per Aziende
+            Soluzione
+          </button>
+          <button 
+            onClick={() => handleNavClick('mercato')} 
+            className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+          >
+            Mercato
+          </button>
+          <button 
+            onClick={() => handleNavClick('business')} 
+            className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
+          >
+            Business
           </button>
           
           <div className="flex items-center space-x-4 ml-8">
@@ -80,11 +140,19 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
             ) : (
               <>
                 <Button
-                  onClick={user ? onShowDashboard : onShowAuth}
+                  onClick={handleCompanyButtonClick}
                   size="sm"
-                  className="gradient-primary text-white border-0 hover:opacity-90"
+                  className="gradient-recruito text-white border-0 hover:opacity-90"
                 >
-                  {user ? "Dashboard" : "Registrati"}
+                  Prova Beta - Azienda
+                </Button>
+                <Button
+                  onClick={handleRecruiterButtonClick}
+                  size="sm"
+                  variant="outline"
+                  className="hover:bg-gray-50"
+                >
+                  Demo Recruiter
                 </Button>
               </>
             )}

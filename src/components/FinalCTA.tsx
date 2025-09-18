@@ -12,9 +12,9 @@ const FinalCTA = ({ onShowAuth }: FinalCTAProps) => {
   };
 
   return (
-    <section className="py-24 gradient-primary text-white">
+    <section className="py-20 gradient-primary text-white">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8">
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">
           Inizia Ora
         </h2>
         <p className="text-xl mb-12 text-white/90 max-w-2xl mx-auto leading-relaxed">
@@ -27,7 +27,7 @@ const FinalCTA = ({ onShowAuth }: FinalCTAProps) => {
             size="lg" 
             variant="secondary"
             onClick={handleClick}
-            className="w-full sm:w-auto min-w-[220px]"
+            className="w-full sm:w-auto min-w-[220px] bg-white text-primary hover:bg-gray-100"
           >
             Sono un'Azienda
           </Button>
@@ -35,7 +35,7 @@ const FinalCTA = ({ onShowAuth }: FinalCTAProps) => {
             size="lg" 
             variant="outline"
             onClick={handleClick}
-            className="w-full sm:w-auto min-w-[220px]"
+            className="w-full sm:w-auto min-w-[220px] border-2 border-white text-white hover:bg-white hover:text-primary"
           >
             Sono un Recruiter
           </Button>

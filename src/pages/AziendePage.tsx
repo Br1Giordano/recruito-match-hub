@@ -36,20 +36,20 @@ const AziendePage = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-heading">
             Trova i talenti giusti<br />
             <span className="text-gradient">in meno tempo</span>.
           </h1>
-          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+          <p className="text-xl text-readable mb-12 max-w-2xl mx-auto">
             Connettiti con i migliori recruiter freelance d'Italia. 
             Assumi più velocemente, spendi solo a successo.
           </p>
           <Button size="lg" className="mb-8">
             Inizia a Cercare Talenti
           </Button>
-          <div className="flex justify-center items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex justify-center items-center gap-4 text-sm text-readable">
             <CheckCircle className="h-4 w-4 text-primary" />
             <span>Setup gratuito</span>
             <CheckCircle className="h-4 w-4 text-primary" />

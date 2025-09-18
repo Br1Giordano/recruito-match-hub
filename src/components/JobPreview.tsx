@@ -42,13 +42,13 @@ const JobPreview = () => {
   ];
 
   return (
-    <section className="py-24 bg-gradient-to-b from-gray-50/50 to-white">
+    <section className="py-20 bg-gray-50">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-20">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">
-            Posizioni Aperte e Top Recruiter
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-heading">
+            Posizioni Aperte e <span className="text-gradient">Top Recruiter</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-readable max-w-3xl mx-auto leading-relaxed">
             Scopri alcune delle opportunità attive sulla piattaforma e i recruiter 
             con le performance migliori.
           </p>

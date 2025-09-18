@@ -27,13 +27,13 @@ const SharedBenefits = () => {
   ];
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-20">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">
-            Perché Scegliere Recruito
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-heading">
+            Perché Scegliere <span className="text-gradient">Recruito</span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-readable max-w-3xl mx-auto leading-relaxed">
             Vantaggi concreti per aziende e recruiter. Una piattaforma pensata 
             per massimizzare i risultati di entrambe le parti.
           </p>
@@ -41,15 +41,13 @@ const SharedBenefits = () => {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {benefits.map((benefit, index) => (
-            <Card key={index} className="border-0 shadow-startup hover-startup">
-              <CardContent className="p-6 text-center">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-full gradient-primary text-white mb-4">
-                  {benefit.icon}
-                </div>
-                <h3 className="text-lg font-semibold mb-2">{benefit.title}</h3>
-                <p className="text-muted-foreground">{benefit.description}</p>
-              </CardContent>
-            </Card>
+            <div key={index} className="bg-white p-6 rounded-2xl shadow-clean hover:shadow-clean-lg transition-shadow text-center">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary text-white mb-4">
+                {benefit.icon}
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-heading">{benefit.title}</h3>
+              <p className="text-readable">{benefit.description}</p>
+            </div>
           ))}
         </div>
       </div>

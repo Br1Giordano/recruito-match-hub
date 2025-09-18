@@ -36,21 +36,21 @@ const RecruiterPage = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight text-heading">
             Più opportunità,<br />
             <span className="text-gradient">più guadagni</span>,<br />
             più visibilità.
           </h1>
-          <p className="text-xl text-muted-foreground mb-12 max-w-2xl mx-auto">
+          <p className="text-xl text-readable mb-12 max-w-2xl mx-auto">
             Unisciti alla rete di recruiter freelance più qualificata d'Italia. 
             Lavora con le migliori aziende e costruisci la tua reputazione.
           </p>
           <Button size="lg" className="mb-8">
             Registrati come Recruiter
           </Button>
-          <div className="flex justify-center items-center gap-4 text-sm text-muted-foreground">
+          <div className="flex justify-center items-center gap-4 text-sm text-readable">
             <CheckCircle className="h-4 w-4 text-primary" />
             <span>Registrazione gratuita</span>
             <CheckCircle className="h-4 w-4 text-primary" />

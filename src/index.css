@@ -10,87 +10,46 @@
 
 @layer base {
   :root {
+    /* Clean Base Colors - More White */
     --background: 0 0% 100%;
-    --foreground: 210 20% 20%;
-
+    --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
-    --card-foreground: 210 20% 20%;
-
+    --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
-    --popover-foreground: 210 20% 20%;
+    --popover-foreground: 222.2 84% 4.9%;
 
-    /* Tech Forward Brand Colors */
-    --primary-start: 210 100% 51%; /* Electric Blue #0066FF */
-    --primary-end: 125 100% 39%; /* Emerald Green #00C853 */
-    --primary: 210 100% 51%; /* Default primary */
-    --primary-foreground: 0 0% 100%;
+    /* Logo Colors - Blue to Green Gradient */
+    --primary: 210 90% 50%;
+    --primary-foreground: 210 40% 98%;
+    --primary-variant: 160 84% 39%;
 
-    /* Confidence Purple for leadership/expertise */
-    --confidence: 262 83% 58%; /* #7C3AED */
-    --confidence-foreground: 0 0% 100%;
+    /* Neutral Grays for Text */
+    --muted: 210 40% 98%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 98%;
+    --accent-foreground: 222.2 84% 4.9%;
 
-    /* Electric teal for tech innovation */
-    --electric-teal: 174 100% 44%; /* #00E5D4 */
-    --electric-teal-foreground: 220 26% 14%;
+    /* UI Elements */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 210 90% 50%;
+    --radius: 1rem;
 
-    /* Warm amber for growth/opportunities */
-    --warm-amber: 43 100% 58%; /* #FFB800 */
-    --warm-amber-foreground: 220 26% 14%;
+    /* Status Colors */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 222.2 84% 4.9%;
 
-    /* Deep navy for professionalism */
-    --navy: 220 26% 14%; /* #1E293B */
-    --navy-foreground: 0 0% 100%;
-
-    /* Modern neutrals */
-    --gray-50: 220 14% 98%;
-    --gray-100: 220 13% 95%;
-    --gray-200: 220 13% 88%;
-    --gray-300: 220 13% 82%;
-    
-    --secondary: 220 13% 95%;
-    --secondary-foreground: 220 26% 14%;
-
-    --muted: 220 13% 95%;
-    --muted-foreground: 220 9% 46%;
-
-    --accent: 174 100% 44%;
-    --accent-foreground: 220 26% 14%;
-
-    /* Status system with brand alignment */
-    --status-approved: 125 100% 39%; /* Success green */
-    --status-pending: 43 100% 58%; /* Warning amber */
-    --status-rejected: 0 84% 60%; /* Error red */
-    --status-match-high: 125 100% 39%; /* High match - green */
-    --status-match-medium: 43 100% 58%; /* Medium match - amber */
-    --status-match-low: 0 84% 60%; /* Low match - red */
-
-    /* Destructive remains for alerts */
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 220 13% 88%;
-    --input: 220 13% 88%;
-    --ring: 210 100% 51%;
-
-    --radius: 1rem; /* 16px border radius */
-    
-    /* Prize colors */
-    --gold: 42 78% 62%;
-    --silver: 220 13% 78%;
-    --bronze: 22 49% 58%;
-
+    /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary: 210 90% 50%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent: 220 14.3% 95.9%;
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-
-    /* Shadows */
-    --shadow-startup: 0 8px 16px -4px rgba(0,0,0,0.08);
-    --shadow-hover: 0 16px 32px -8px rgba(0,0,0,0.12);
   }
 
   .dark {
@@ -100,8 +59,8 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 210 90% 50%;
+    --primary-foreground: 222.2 84% 4.9%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217.2 32.6% 17.5%;
@@ -113,14 +72,6 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
@@ -135,105 +86,40 @@
   }
 }
 
-@layer utilities {
-  /* Primary gradient - 45° dal Blu #0284FF al Verde #00C853 */
+/* Utility Classes */
+@layer components {
+  /* Clean Gradients using Logo Colors */
   .gradient-primary {
-    background: linear-gradient(45deg, hsl(var(--primary-start)) 0%, hsl(var(--primary-end)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));
   }
   
   .text-gradient {
-    background: linear-gradient(45deg, hsl(var(--primary-start)) 0%, hsl(var(--primary-end)) 100%);
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-variant)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
-  
-  /* Card shadows startup style */
-  .shadow-startup {
-    box-shadow: var(--shadow-startup);
+
+  /* Clean Shadows */
+  .shadow-clean {
+    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
   }
   
-  .shadow-startup-hover {
-    box-shadow: var(--shadow-hover);
-  }
-  
-  /* Hover effects con micro-interazioni */
-  .hover-startup {
-    transition: all 180ms cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  
-  .hover-startup:hover {
-    transform: scale(1.03);
-    box-shadow: var(--shadow-hover);
-  }
-  
-  /* Ripple effect per CTA */
-  .ripple {
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .ripple::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.3s, height 0.3s;
-  }
-  
-  .ripple:active::before {
-    width: 300px;
-    height: 300px;
+  .shadow-clean-lg {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 
-  /* Layout utilities */
-  .container-startup {
-    max-width: 1240px;
-    margin: 0 auto;
-    padding: 0 1rem;
+  /* Container for consistent spacing */
+  .container-clean {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Text utilities */
+  .text-readable {
+    @apply text-gray-700 dark:text-gray-300;
   }
   
-  @media (min-width: 768px) {
-    .container-startup {
-      padding: 0 2rem;
-    }
+  .text-heading {
+    @apply text-gray-900 dark:text-gray-100;
   }
-}
-
-/* Custom loading animations */
-@keyframes slide-in {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Text utilities for better responsive behavior */
-.text-ellipsis {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.break-words {
-  overflow-wrap: break-word;
-  word-wrap: break-word;
-  hyphens: auto;
-}
-
-.line-clamp-2 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-}
-
-.line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
 }

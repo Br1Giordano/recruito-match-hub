@@ -1,65 +1,58 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Briefcase, Users, CheckCircle } from "lucide-react";
+import { Target, Users, CheckCircle, ArrowRight } from "lucide-react";
 
 const NewHowItWorks = () => {
   const steps = [
     {
-      step: "01",
-      icon: <Briefcase className="h-8 w-8" />,
-      title: "L'Azienda Pubblica",
-      description: "Crea un annuncio di lavoro dettagliato con requisiti specifici e budget trasparente.",
-      color: "bg-blue-500"
+      icon: <Target className="h-10 w-10" />,
+      title: "Pubblica la tua ricerca",
+      description: "Le aziende pubblicano le posizioni aperte dettagliando i requisiti e il budget disponibile."
     },
     {
-      step: "02", 
-      icon: <Users className="h-8 w-8" />,
-      title: "I Recruiter si Attivano",
-      description: "I migliori recruiter della rete valutano l'opportunità e inviano le loro proposte.",
-      color: "bg-purple-500"
+      icon: <Users className="h-10 w-10" />,
+      title: "I recruiter si attivano",
+      description: "I recruiter verificati della nostra rete competono per trovare il candidato perfetto."
     },
     {
-      step: "03",
-      icon: <CheckCircle className="h-8 w-8" />,
-      title: "Il Candidato viene Selezionato",
-      description: "L'azienda sceglie il recruiter e il candidato perfetto per la posizione.",
-      color: "bg-green-500"
+      icon: <CheckCircle className="h-10 w-10" />,
+      title: "Scegli e assumi",
+      description: "Ricevi le proposte migliori, scegli il candidato e procedi con l'assunzione in pochi giorni."
     }
   ];
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-24 bg-gradient-to-b from-gray-50/50 to-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">Come Funziona</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            3 Semplici Passi
+        <div className="text-center mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8 text-gray-900">
+            Come Funziona
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Il processo ottimizzato che connette aziende e recruiter in modo efficace
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Il processo è semplice e trasparente. In soli 3 passaggi puoi trovare 
+            il talento che stai cercando attraverso la nostra rete di recruiter verificati.
           </p>
         </div>
         
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 max-w-6xl mx-auto">
           {steps.map((step, index) => (
-            <Card key={index} className="border-0 shadow-startup hover-startup relative">
-              <CardContent className="p-8 text-center">
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
-                    {step.step}
-                  </div>
-                </div>
-                
-                <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${step.color} text-white mb-6 mt-4`}>
+            <div key={index} className="flex flex-col lg:flex-row items-center gap-8">
+              <div className="flex flex-col items-center text-center max-w-xs">
+                <div className="w-20 h-20 gradient-primary rounded-full flex items-center justify-center mb-6 shadow-lg">
                   {step.icon}
                 </div>
-                
-                <h3 className="text-xl font-bold mb-4">{step.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <h3 className="text-xl font-semibold mb-4 text-gray-900">
+                  {step.title}
+                </h3>
+                <p className="text-gray-600 leading-relaxed text-sm">
                   {step.description}
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+              
+              {index < steps.length - 1 && (
+                <div className="hidden lg:block">
+                  <ArrowRight className="h-8 w-8 text-gray-400" />
+                </div>
+              )}
+            </div>
           ))}
         </div>
       </div>

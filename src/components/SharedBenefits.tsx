@@ -27,15 +27,15 @@ const SharedBenefits = () => {
   ];
 
   return (
-    <section className="py-20">
+    <section className="py-24 bg-white">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">Vantaggi Condivisi</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Perché Funziona per Tutti
+        <div className="text-center mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold mb-8">
+            Perché Scegliere Recruito
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            I benefici che rendono Recruito la scelta migliore per aziende e recruiter
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Vantaggi concreti per aziende e recruiter. Una piattaforma pensata 
+            per massimizzare i risultati di entrambe le parti.
           </p>
         </div>
         

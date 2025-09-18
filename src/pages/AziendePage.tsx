@@ -130,62 +130,22 @@ const AziendePage = () => {
         </div>
       </section>
 
-      {/* Pricing Info */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Prezzi Trasparenti
-            </h2>
-            <p className="text-xl text-muted-foreground mb-12">
-              Nessun costo fisso, paghi solo quando assumi con successo
-            </p>
-            
-            <Card className="border-0 shadow-startup overflow-hidden">
-              <CardContent className="p-8 gradient-primary text-white">
-                <div className="text-center">
-                  <h3 className="text-2xl font-bold mb-4">Solo a Successo</h3>
-                  <div className="text-4xl font-bold mb-2">15-20%</div>
-                  <p className="text-white/90 mb-6">del salario annuo lordo</p>
-                  <ul className="text-left space-y-3 mb-8">
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 flex-shrink-0" />
-                      <span>Nessun costo di setup o abbonamento</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 flex-shrink-0" />
-                      <span>Fee competitive e trasparenti</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 flex-shrink-0" />
-                      <span>Garanzia di sostituzione inclusa</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <CheckCircle className="h-5 w-5 flex-shrink-0" />
-                      <span>Supporto dedicato incluso</span>
-                    </li>
-                  </ul>
-                  <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-gray-100">
-                    Inizia Subito
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Final */}
-      <section className="py-20 gradient-primary text-white">
+      {/* Final CTA */}
+      <section className="py-24 gradient-primary text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Pronto ad Assumere?
+          <h2 className="text-3xl md:text-4xl font-bold mb-8">
+            Inizia a Cercare Talenti
           </h2>
-          <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-            Migliaia di aziende hanno già trovato i loro talenti con Recruito. Unisciti a loro oggi stesso.
+          <p className="text-xl mb-12 text-white/90 max-w-2xl mx-auto leading-relaxed">
+            Pubblica la tua prima posizione e scopri quanto può essere semplice 
+            trovare il candidato perfetto con Recruito.
           </p>
-          <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-gray-100">
-            Pubblica la Prima Offerta
+          <Button 
+            size="lg" 
+            variant="secondary"
+            className="min-w-[250px]"
+          >
+            Inizia Ora - È Gratuito
           </Button>
         </div>
       </section>

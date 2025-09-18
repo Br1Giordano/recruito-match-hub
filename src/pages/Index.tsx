@@ -113,11 +113,11 @@ const Index = () => {
     <div className="min-h-screen bg-background relative">
       <BrandedGradient />
       <Header onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />
-      <NewHero />
+      <NewHero onShowAuth={handleShowAuth} />
       <NewHowItWorks />
       <SharedBenefits />
       <JobPreview />
-      <FinalCTA />
+      <FinalCTA onShowAuth={handleShowAuth} />
       <Footer />
     </div>
   );

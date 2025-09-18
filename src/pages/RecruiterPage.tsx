@@ -131,17 +131,22 @@ const RecruiterPage = () => {
         </div>
       </section>
 
-      {/* CTA Final */}
-      <section className="py-20 gradient-primary text-white">
+      {/* Final CTA */}
+      <section className="py-24 gradient-primary text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Pronto a Iniziare?
+          <h2 className="text-3xl md:text-4xl font-bold mb-8">
+            Unisciti ai Migliori Recruiter
           </h2>
-          <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-            Unisciti a centinaia di recruiter che hanno già scelto Recruito per far crescere il loro business.
+          <p className="text-xl mb-12 text-white/90 max-w-2xl mx-auto leading-relaxed">
+            Registrati gratuitamente e inizia a guadagnare con le tue competenze 
+            di scouting. La tua prossima opportunità ti aspetta.
           </p>
-          <Button size="lg" variant="secondary" className="bg-white text-primary hover:bg-gray-100">
-            Registrati Ora - È Gratis
+          <Button 
+            size="lg" 
+            variant="secondary"
+            className="min-w-[250px]"
+          >
+            Registrati come Recruiter
           </Button>
         </div>
       </section>

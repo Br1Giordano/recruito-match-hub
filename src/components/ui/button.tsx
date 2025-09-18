@@ -11,9 +11,9 @@ const buttonVariants = cva(
       variant: {
         default: "gradient-primary text-white shadow-startup hover:shadow-startup-hover hover:scale-[1.02] ripple rounded-full",
         destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-full shadow-startup",
-        outline: "border border-gray-200 bg-background hover:bg-gray-50 hover:shadow-startup rounded-full",
-        secondary: "bg-gray-100 text-navy hover:bg-gray-200 rounded-full shadow-sm",
-        ghost: "hover:bg-gray-100 hover:text-navy rounded-full",
+        outline: "border-2 border-white bg-transparent text-white hover:bg-white hover:text-primary rounded-full transition-all",
+        secondary: "bg-white text-primary hover:bg-white/90 rounded-full shadow-sm border border-gray-100",
+        ghost: "hover:bg-white/10 hover:text-white rounded-full",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

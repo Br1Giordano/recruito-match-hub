@@ -49,67 +49,70 @@ const AziendePage = () => {
       
       <main>
         {/* Hero Section */}
-        <section className="py-20 bg-gradient-to-br from-green-50 to-blue-50">
+        <section className="py-32 bg-gradient-to-br from-green-50 via-white to-blue-50 relative overflow-hidden">
           <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="max-w-5xl mx-auto text-center">
               <div className="space-y-8">
-                <div className="space-y-6">
-                  <Badge className="bg-green-100 text-green-800 px-4 py-2">
-                    Per Aziende
-                  </Badge>
-                  <h1 className="text-5xl font-bold text-gray-900 leading-tight">
-                    Trova i{" "}
+                <Badge className="bg-green-100 text-green-800 px-6 py-3 text-lg font-medium">
+                  Per Aziende
+                </Badge>
+                
+                <div className="space-y-8">
+                  <h1 className="text-7xl font-bold leading-tight">
+                    <span className="text-gray-900">Trova</span>{" "}
+                    <span className="text-gray-900">i</span>{" "}
                     <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                       talenti giusti
-                    </span>{" "}
-                    in meno tempo.
+                    </span>
+                    <br />
+                    <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+                      in meno tempo
+                    </span>
+                    <span className="text-gray-900">.</span>
                   </h1>
-                  <p className="text-xl text-gray-600 leading-relaxed">
+                  
+                  <p className="text-2xl text-gray-600 leading-relaxed max-w-4xl mx-auto">
                     Accedi alla rete di recruiter più qualificata d'Italia. Zero costi fissi, 
                     paghi solo a successo e riduci drasticamente i tempi di assunzione.
                   </p>
                 </div>
                 
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-6 justify-center pt-8">
                   <Button 
                     onClick={handleCTAClick}
                     size="lg" 
-                    className="bg-gradient-to-r from-green-600 to-blue-600 text-white hover:opacity-90"
+                    className="bg-gradient-to-r from-green-600 to-blue-600 text-white hover:opacity-90 text-xl px-12 py-6"
                   >
                     Inizia a cercare talenti
                   </Button>
-                  <Button variant="outline" size="lg">
+                  <Button variant="outline" size="lg" className="text-xl px-12 py-6 border-2">
                     Richiedi demo
                   </Button>
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-3 gap-6 pt-8">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-green-600">15</div>
-                    <div className="text-sm text-gray-600">Giorni medi</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-16">
+                  <div className="text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
+                    <div className="text-5xl font-bold text-green-600 mb-2">15</div>
+                    <div className="text-lg text-gray-600 font-medium">Giorni medi</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-blue-600">€0</div>
-                    <div className="text-sm text-gray-600">Costi fissi</div>
+                  <div className="text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
+                    <div className="text-5xl font-bold text-blue-600 mb-2">€0</div>
+                    <div className="text-lg text-gray-600 font-medium">Costi fissi</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-purple-600">500+</div>
-                    <div className="text-sm text-gray-600">Recruiter attivi</div>
+                  <div className="text-center p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
+                    <div className="text-5xl font-bold text-purple-600 mb-2">500+</div>
+                    <div className="text-lg text-gray-600 font-medium">Recruiter attivi</div>
                   </div>
                 </div>
               </div>
-              
-              <div className="relative">
-                <img 
-                  src="/assets/company-mockup.jpg" 
-                  alt="Dashboard Azienda" 
-                  className="w-full h-auto rounded-2xl shadow-2xl"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent rounded-2xl"></div>
-              </div>
             </div>
           </div>
+          
+          {/* Decorative elements */}
+          <div className="absolute top-20 right-10 w-32 h-32 bg-green-200 rounded-full opacity-20 animate-pulse"></div>
+          <div className="absolute bottom-20 left-10 w-24 h-24 bg-blue-200 rounded-full opacity-20 animate-pulse delay-700"></div>
+          <div className="absolute top-1/2 left-20 w-16 h-16 bg-purple-200 rounded-full opacity-20 animate-pulse delay-1000"></div>
         </section>
 
         {/* Benefits Section */}
@@ -231,54 +234,66 @@ const AziendePage = () => {
         </section>
 
         {/* How it works */}
-        <section className="py-20 bg-gray-50">
+        <section className="py-24 bg-white">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <div className="text-center mb-20">
+              <h2 className="text-5xl font-bold text-gray-900 mb-6">
                 Come funziona Recruito per le aziende
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-2xl text-gray-600 max-w-3xl mx-auto">
                 Un processo semplice e trasparente per trovare i migliori talenti
               </p>
             </div>
 
-            <div className="grid md:grid-cols-4 gap-8">
-              <div className="text-center">
-                <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                  1
+            <div className="grid md:grid-cols-4 gap-8 max-w-7xl mx-auto">
+              <div className="text-center group">
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    1
+                  </div>
+                  <div className="absolute -inset-3 bg-green-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Pubblica l'Annuncio</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Pubblica l'Annuncio</h3>
+                <p className="text-gray-600 leading-relaxed">
                   Crea il job posting con l'aiuto della nostra AI per massimizzare la visibilità.
                 </p>
               </div>
 
-              <div className="text-center">
-                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                  2
+              <div className="text-center group">
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    2
+                  </div>
+                  <div className="absolute -inset-3 bg-blue-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Ricevi Proposte</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Ricevi Proposte</h3>
+                <p className="text-gray-600 leading-relaxed">
                   I recruiter specializzati nel tuo settore si proporranno per lavorare sulla posizione.
                 </p>
               </div>
 
-              <div className="text-center">
-                <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                  3
+              <div className="text-center group">
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    3
+                  </div>
+                  <div className="absolute -inset-3 bg-purple-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Seleziona i Candidati</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Seleziona i Candidati</h3>
+                <p className="text-gray-600 leading-relaxed">
                   Ricevi candidati pre-screened e valuta i profili direttamente in piattaforma.
                 </p>
               </div>
 
-              <div className="text-center">
-                <div className="w-16 h-16 bg-orange-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                  4
+              <div className="text-center group">
+                <div className="relative mb-8">
+                  <div className="w-20 h-20 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    4
+                  </div>
+                  <div className="absolute -inset-3 bg-orange-100 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
                 </div>
-                <h3 className="text-xl font-semibold mb-4">Assumi e Paga</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-4 text-gray-900">Assumi e Paga</h3>
+                <p className="text-gray-600 leading-relaxed">
                   Finalizza l'assunzione e paga la fee solo a successo completato.
                 </p>
               </div>

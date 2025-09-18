@@ -88,36 +88,24 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
         </div>
         
         <nav className="hidden md:flex items-center space-x-8">
-          <button 
-            onClick={() => handleNavClick('come-funziona')} 
+          <Link 
+            to="/" 
             className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
-            Come Funziona
-          </button>
-          <button 
-            onClick={() => handleNavClick('problema')} 
+            Home
+          </Link>
+          <Link 
+            to="/recruiter" 
             className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
-            Problema
-          </button>
-          <button 
-            onClick={() => handleNavClick('soluzione')} 
+            Per Recruiter
+          </Link>
+          <Link 
+            to="/aziende" 
             className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
           >
-            Soluzione
-          </button>
-          <button 
-            onClick={() => handleNavClick('mercato')} 
-            className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
-          >
-            Mercato
-          </button>
-          <button 
-            onClick={() => handleNavClick('business')} 
-            className="text-gray-600 hover:text-gray-900 transition-colors cursor-pointer"
-          >
-            Business
-          </button>
+            Per Aziende
+          </Link>
           
           <div className="flex items-center space-x-4 ml-8">
             {/* Se l'utente è autenticato, mostra il profilo o i pulsanti in base al tipo utente */}

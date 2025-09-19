@@ -116,11 +116,16 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
                   <p className="text-gray-600 text-sm">Profili qualificati in giorni, non mesi</p>
                 </div>
               </div>
-              <div className="space-y-6 pt-12">
+              <div className="space-y-6">
                 <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
                   <Target className="h-12 w-12 text-primary mb-4" />
                   <h3 className="font-semibold text-gradient mb-2">Solo a Successo</h3>
                   <p className="text-gray-600 text-sm">Paghi solo quando trovi e assumi il candidato giusto</p>
+                </div>
+                <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
+                  <TrendingUp className="h-12 w-12 text-primary-end mb-4" />
+                  <h3 className="font-semibold text-gradient mb-2">Crescita Continua</h3>
+                  <p className="text-gray-600 text-sm">Supporto e formazione per migliorare sempre</p>
                 </div>
               </div>
             </div>

@@ -46,11 +46,11 @@ const ForRecruiters = () => {
         <div className="text-center mb-16">
           <div className="mb-8">
             <h1 className="text-4xl md:text-7xl font-bold leading-tight">
-              <span className="bg-gradient-to-r from-foreground via-[hsl(174,100%,44%)] to-[hsl(125,100%,39%)] bg-clip-text text-transparent">Più opportunità,</span>
+              <span className="text-foreground">Più opportunità,</span>
               <br />
-              <span className="bg-gradient-to-r from-[hsl(174,100%,44%)] to-[hsl(125,100%,39%)] bg-clip-text text-transparent">più guadagni,</span>
+              <span className="bg-gradient-to-r from-[hsl(var(--primary-start))] to-[hsl(var(--primary-end))] bg-clip-text text-transparent">più guadagni,</span>
               <br />
-              <span className="bg-gradient-to-r from-[hsl(125,100%,39%)] to-foreground bg-clip-text text-transparent">più visibilità.</span>
+              <span className="text-foreground">più visibilità.</span>
             </h1>
           </div>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
@@ -83,7 +83,7 @@ const ForRecruiters = () => {
 
         {/* Features Section */}
         <div className="bg-card/50 rounded-2xl p-8 mb-16">
-          <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-[hsl(174,100%,44%)] to-[hsl(125,100%,39%)] bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold text-center mb-8">
             Funzionalità Dedicate
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -100,7 +100,7 @@ const ForRecruiters = () => {
         <div className="text-center">
           <Card className="border-0 bg-gradient-to-r from-primary/10 to-primary/5 p-8">
             <CardHeader>
-              <CardTitle className="text-2xl mb-4 bg-gradient-to-r from-[hsl(174,100%,44%)] to-[hsl(125,100%,39%)] bg-clip-text text-transparent">
+              <CardTitle className="text-2xl mb-4">
                 Pronto a Rivoluzionare il Tuo Recruiting?
               </CardTitle>
               <CardDescription className="text-lg mb-6">

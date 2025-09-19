@@ -78,16 +78,16 @@ const ForCompanies = () => {
               <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
                 Vantaggi per la Tua Azienda
               </h2>
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
                 {benefits.map((benefit, index) => (
-                  <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card/80 backdrop-blur-sm">
+                  <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card/80 backdrop-blur-sm h-full">
                     <CardHeader className="text-center pb-4">
-                      <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-primary group-hover:scale-110 transition-transform duration-300">
+                      <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-primary transition-transform duration-300 hover:scale-110">
                         {benefit.icon}
                       </div>
                       <CardTitle className="text-xl mb-3">{benefit.title}</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1">
                       <CardDescription className="text-center text-base leading-relaxed">
                         {benefit.description}
                       </CardDescription>

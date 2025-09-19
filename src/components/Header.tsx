@@ -126,23 +126,14 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
                 )}
               </>
             ) : (
-              <>
+              <Link to="/auth">
                 <Button
-                  onClick={handleCompanyButtonClick}
                   size="sm"
                   className="gradient-recruito text-white border-0 hover:opacity-90"
                 >
-                  Prova Beta - Azienda
+                  Join Us
                 </Button>
-                <Button
-                  onClick={handleRecruiterButtonClick}
-                  size="sm"
-                  variant="outline"
-                  className="hover:bg-gray-50"
-                >
-                  Demo Recruiter
-                </Button>
-              </>
+              </Link>
             )}
           </div>
         </nav>

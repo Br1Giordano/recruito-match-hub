@@ -92,48 +92,69 @@ const Hero = ({
           </div>
 
           <div className="relative animate-slide-in">
-            {/* Visual elements per la sezione destra */}
+            {/* Recruiting Process Visualization */}
             <div className="relative flex items-center justify-center min-h-[500px]">
-              {/* Floating cards con statistiche */}
-              <div className="relative z-10 space-y-6">
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium text-gray-600">Recruiter attivo</span>
+              
+              {/* Central Connection Flow */}
+              <div className="relative z-10 flex items-center justify-center">
+                
+                {/* Company Side */}
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="w-20 h-20 bg-gradient-to-br from-primary to-primary-end rounded-2xl flex items-center justify-center shadow-lg animate-float-slow">
+                    <Building2 className="w-10 h-10 text-white" />
                   </div>
-                  <div className="mt-2">
-                    <div className="text-2xl font-bold text-gray-900">+500</div>
-                    <div className="text-sm text-gray-500">candidati trovati</div>
+                  <div className="text-sm font-medium text-gray-700">Aziende</div>
+                </div>
+
+                {/* Connection Flow */}
+                <div className="mx-8 flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse [animation-delay:0.2s]"></div>
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse [animation-delay:0.4s]"></div>
+                  </div>
+                  
+                  <div className="w-16 h-16 bg-white/90 backdrop-blur-sm rounded-full border-2 border-primary/20 flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300">
+                    <Zap className="w-8 h-8 text-primary animate-pulse" />
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-secondary rounded-full animate-pulse [animation-delay:0.6s]"></div>
+                    <div className="w-2 h-2 bg-secondary rounded-full animate-pulse [animation-delay:0.8s]"></div>
+                    <div className="w-2 h-2 bg-secondary rounded-full animate-pulse [animation-delay:1s]"></div>
                   </div>
                 </div>
 
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 transform -rotate-2 hover:rotate-0 transition-transform duration-300 ml-8">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium text-gray-600">Match perfetto</span>
+                {/* Recruiter Side */}
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="w-20 h-20 bg-gradient-to-br from-secondary to-accent rounded-2xl flex items-center justify-center shadow-lg animate-float-slow [animation-delay:1s]">
+                    <Users className="w-10 h-10 text-white" />
                   </div>
-                  <div className="mt-2">
-                    <div className="text-2xl font-bold text-gray-900">98%</div>
-                    <div className="text-sm text-gray-500">successo placement</div>
-                  </div>
-                </div>
-
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-white/20 transform rotate-1 hover:rotate-0 transition-transform duration-300">
-                  <div className="flex items-center gap-3">
-                    <div className="w-3 h-3 bg-purple-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm font-medium text-gray-600">Tempo medio</span>
-                  </div>
-                  <div className="mt-2">
-                    <div className="text-2xl font-bold text-gray-900">15</div>
-                    <div className="text-sm text-gray-500">giorni per assunzione</div>
-                  </div>
+                  <div className="text-sm font-medium text-gray-700">Recruiter</div>
                 </div>
               </div>
 
-              {/* Background decorative elements */}
-              <div className="absolute top-10 right-10 w-24 h-24 bg-primary/20 rounded-full blur-xl"></div>
-              <div className="absolute bottom-20 left-10 w-32 h-32 bg-secondary/20 rounded-full blur-xl"></div>
-              <div className="absolute top-1/2 right-1/4 w-16 h-16 bg-accent/20 rounded-full blur-lg"></div>
+              {/* Floating Process Icons */}
+              <div className="absolute top-16 left-16 w-12 h-12 bg-white/80 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg animate-float-slow border border-primary/10">
+                <Target className="w-6 h-6 text-primary" />
+              </div>
+
+              <div className="absolute bottom-20 right-16 w-12 h-12 bg-white/80 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg animate-float-slow [animation-delay:2s] border border-secondary/10">
+                <TrendingUp className="w-6 h-6 text-secondary" />
+              </div>
+
+              <div className="absolute top-32 right-20 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-lg flex items-center justify-center shadow-md animate-float-slow [animation-delay:1.5s] border border-accent/10">
+                <Sparkles className="w-5 h-5 text-accent" />
+              </div>
+
+              {/* Abstract Brand Elements */}
+              <div className="absolute top-8 right-8 w-32 h-32 bg-gradient-to-br from-primary/10 to-primary-end/10 rounded-full blur-2xl"></div>
+              <div className="absolute bottom-12 left-12 w-40 h-40 bg-gradient-to-tr from-secondary/10 to-accent/10 rounded-full blur-3xl"></div>
+              <div className="absolute top-1/2 left-8 w-20 h-20 bg-gradient-to-br from-accent/15 to-primary/15 rounded-full blur-xl"></div>
+              
+              {/* Geometric Shapes */}
+              <div className="absolute top-20 left-1/3 w-6 h-6 border-2 border-primary/30 rotate-45 animate-spin-slow"></div>
+              <div className="absolute bottom-24 right-1/3 w-4 h-4 bg-secondary/40 rounded-full animate-bounce-slow"></div>
             </div>
           </div>
         </div>

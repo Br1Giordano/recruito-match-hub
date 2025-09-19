@@ -1,38 +1,24 @@
-
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  Building2, 
-  Users, 
-  Target, 
-  Clock, 
-  DollarSign, 
-  CheckCircle,
-  ArrowRight,
-  AlertTriangle 
-} from "lucide-react";
+import { Building2, Users, Target, Clock, DollarSign, CheckCircle, ArrowRight, AlertTriangle } from "lucide-react";
 import RecruiterAvatar from "./recruiter/RecruiterAvatar";
-
 const HowItWorks = () => {
   const scrollToDemo = () => {
     console.log('scrollToDemo called from HowItWorks - looking for demo section');
-    
+
     // Try multiple selectors to find the demo section
     let demoElement = document.querySelector('[data-demo-section]');
-    
     if (!demoElement) {
       console.log('data-demo-section not found, trying #demo');
       demoElement = document.getElementById('demo');
     }
-    
     if (!demoElement) {
       console.log('#demo not found, trying .demo-section');
       demoElement = document.querySelector('.demo-section');
     }
-    
     if (demoElement) {
       console.log('Demo section found, scrolling...', demoElement);
-      demoElement.scrollIntoView({ 
+      demoElement.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
@@ -45,9 +31,7 @@ const HowItWorks = () => {
       });
     }
   };
-
-  return (
-    <section id="come-funziona" className="py-20 bg-white">
+  return <section id="come-funziona" className="py-20 bg-white">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold text-gray-900 mb-6">
@@ -268,29 +252,13 @@ const HowItWorks = () => {
 
           <div className="text-center mt-12">
             <div className="flex justify-center gap-4">
-              <button 
-                onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer"
-              >
-                <Building2 className="h-4 w-4" />
-                Unisciti come azienda
-                <ArrowRight className="h-4 w-4" />
-              </button>
               
-              <button 
-                onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white px-6 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer"
-              >
-                <Users className="h-4 w-4" />
-                Unisciti come recruiter
-                <ArrowRight className="h-4 w-4" />
-              </button>
+              
+              
             </div>
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default HowItWorks;

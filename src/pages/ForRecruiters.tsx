@@ -80,9 +80,9 @@ const ForRecruiters = () => {
               <h2 className="text-3xl md:text-4xl font-bold text-center mb-16">
                 Perché Scegliere la Nostra Piattaforma
               </h2>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 auto-rows-fr items-stretch">
                 {benefits.map((benefit, index) => (
-                  <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-card/80 backdrop-blur-sm h-full">
+                  <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-card/80 backdrop-blur-sm h-full flex flex-col">
                     <CardHeader className="text-center pb-4">
                       <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-6 text-primary transition-transform duration-300 hover:scale-110">
                         {benefit.icon}

@@ -43,20 +43,20 @@ const HowItWorks = () => {
         </div>
 
         {/* Process Steps */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-20">
-          <div className="relative">
-            <div className="text-center">
+        <div className="grid lg:grid-cols-3 gap-8 mb-20 items-stretch">
+          <div className="relative flex flex-col">
+            <div className="text-center flex-1 flex flex-col">
               <div className="w-16 h-16 bg-gradient-to-r from-recruito-blue to-recruito-teal rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6">
                 1
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 Pubblica la tua ricerca
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 flex-1">
                 Descrivi il profilo che cerchi in 5 minuti. Specifiche tecniche, 
                 esperienza richiesta, RAL e modalità di lavoro.
               </p>
-              <div className="bg-gray-50 p-4 rounded-xl">
+              <div className="bg-gray-50 p-4 rounded-xl h-48 flex flex-col justify-center">
                 <div className="flex items-center space-x-3 mb-3">
                   <Building2 className="h-5 w-5 text-recruito-blue" />
                   <span className="font-semibold text-gray-900">Senior Frontend Developer</span>
@@ -83,46 +83,46 @@ const HowItWorks = () => {
             </div>
           </div>
 
-          <div className="relative">
-            <div className="text-center">
+          <div className="relative flex flex-col">
+            <div className="text-center flex-1 flex flex-col">
               <div className="w-16 h-16 bg-gradient-to-r from-recruito-teal to-recruito-green rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6">
                 2
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 I recruiter si attivano
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 flex-1">
                 Almeno 3 recruiter specializzati nel tuo settore iniziano la ricerca 
                 in parallelo, utilizzando i loro network e competenze.
               </p>
-              <div className="bg-gray-50 p-4 rounded-xl">
-                <div className="space-y-3">
+              <div className="bg-gray-50 p-4 rounded-xl h-48 flex flex-col justify-center">
+                <div className="space-y-2">
                   <div className="flex items-center space-x-3 p-2 bg-white rounded-lg">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Users className="h-4 w-4 text-blue-600" />
+                    <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Users className="h-3 w-3 text-blue-600" />
                     </div>
                     <div className="flex-1 text-left">
-                      <div className="font-semibold text-gray-900 text-sm">Marco R.</div>
+                      <div className="font-semibold text-gray-900 text-xs">Marco R.</div>
                       <div className="text-xs text-gray-600">Tech Recruiter</div>
                     </div>
                     <div className="text-xs text-green-600 font-semibold">Attivo</div>
                   </div>
                   <div className="flex items-center space-x-3 p-2 bg-white rounded-lg">
-                    <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center">
-                      <Users className="h-4 w-4 text-teal-600" />
+                    <div className="w-6 h-6 bg-teal-100 rounded-full flex items-center justify-center">
+                      <Users className="h-3 w-3 text-teal-600" />
                     </div>
                     <div className="flex-1 text-left">
-                      <div className="font-semibold text-gray-900 text-sm">Sara M.</div>
+                      <div className="font-semibold text-gray-900 text-xs">Sara M.</div>
                       <div className="text-xs text-gray-600">IT Specialist</div>
                     </div>
                     <div className="text-xs text-green-600 font-semibold">Attivo</div>
                   </div>
                   <div className="flex items-center space-x-3 p-2 bg-white rounded-lg">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Users className="h-4 w-4 text-green-600" />
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center">
+                      <Users className="h-3 w-3 text-green-600" />
                     </div>
                     <div className="flex-1 text-left">
-                      <div className="font-semibold text-gray-900 text-sm">Luca F.</div>
+                      <div className="font-semibold text-gray-900 text-xs">Luca F.</div>
                       <div className="text-xs text-gray-600">Frontend Expert</div>
                     </div>
                     <div className="text-xs text-green-600 font-semibold">Attivo</div>
@@ -136,25 +136,25 @@ const HowItWorks = () => {
             </div>
           </div>
 
-          <div className="relative">
-            <div className="text-center">
+          <div className="relative flex flex-col">
+            <div className="text-center flex-1 flex flex-col">
               <div className="w-16 h-16 bg-gradient-to-r from-recruito-green to-recruito-blue rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-6">
                 3
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 Scegli e assumi
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-gray-600 mb-6 flex-1">
                 Ricevi profili pre-qualificati, intervista i candidati migliori 
                 e assumi. Paghi solo quando l'assunzione va a buon fine.
               </p>
-              <div className="bg-gray-50 p-4 rounded-xl">
+              <div className="bg-gray-50 p-4 rounded-xl h-48 flex flex-col justify-center">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between p-2 bg-white rounded-lg">
                     <div className="flex items-center space-x-3">
                       <RecruiterAvatar name="Alessandro P." size="sm" />
                       <div className="text-left">
-                        <div className="font-semibold text-gray-900 text-sm">Alessandro P.</div>
+                        <div className="font-semibold text-gray-900 text-xs">Alessandro P.</div>
                         <div className="text-xs text-gray-600">5 anni exp.</div>
                       </div>
                     </div>
@@ -166,7 +166,7 @@ const HowItWorks = () => {
                     <div className="flex items-center space-x-3">
                       <RecruiterAvatar name="Giulia T." size="sm" />
                       <div className="text-left">
-                        <div className="font-semibold text-gray-900 text-sm">Giulia T.</div>
+                        <div className="font-semibold text-gray-900 text-xs">Giulia T.</div>
                         <div className="text-xs text-gray-600">4 anni exp.</div>
                       </div>
                     </div>

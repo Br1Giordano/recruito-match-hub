@@ -44,9 +44,15 @@ const ForRecruiters = () => {
       <main className="container mx-auto px-4 py-16">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-            Per Recruiter
-          </h1>
+          <div className="mb-8">
+            <h1 className="text-4xl md:text-7xl font-bold leading-tight">
+              <span className="text-foreground">Più opportunità,</span>
+              <br />
+              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">più guadagni,</span>
+              <br />
+              <span className="text-foreground">più visibilità.</span>
+            </h1>
+          </div>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Trasforma il tuo modo di fare recruiting. Accedi a una piattaforma innovativa 
             che ti permette di trovare i candidati migliori in modo più efficiente.

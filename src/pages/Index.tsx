@@ -1,6 +1,5 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
@@ -117,65 +116,25 @@ const Index = () => {
       <main>
         <Hero onShowAuth={handleShowAuth} onShowDashboard={handleShowDashboard} />
         
-        {/* Target Audience Section */}
-        <section className="py-20 bg-gradient-to-r from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 relative overflow-hidden">
-          <div className="container mx-auto px-4 text-center relative z-10">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-4xl font-bold mb-12 text-gradient">Chi siamo qui per servire</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Recruiter Card */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift group">
-                  <div className="text-6xl mb-6">🎯</div>
-                  <h3 className="text-2xl font-bold mb-4">Sei un Recruiter?</h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
-                    Marginalità più vantaggiose, portafoglio di posizioni aperte, 
-                    ranking pubblico basato sul merito e sistema di gamification.
-                  </p>
-                  <Link to="/recruiter">
-                    <Button className="gradient-recruito text-white w-full py-3 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 group-hover:scale-105">
-                      Scopri di più
-                    </Button>
-                  </Link>
-                </div>
-                
-                {/* Azienda Card */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift group">
-                  <div className="text-6xl mb-6">🏢</div>
-                  <h3 className="text-2xl font-bold mb-4">Sei un'Azienda?</h3>
-                  <p className="text-gray-600 mb-6 leading-relaxed">
-                    Network di recruiter verificati, zero costi fissi, 
-                    time-to-hire ridotto e AI per ottimizzare gli annunci.
-                  </p>
-                  <Link to="/aziende">
-                    <Button variant="outline" className="w-full py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-300 group-hover:scale-105">
-                      Scopri di più
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-          
+        {/* Demo Section with improved styling */}
+        <div className="py-20 bg-gradient-to-r from-recruito-blue/5 via-recruito-teal/5 to-recruito-green/5 relative overflow-hidden" data-demo-section id="demo">
           {/* Background decoration */}
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="absolute top-10 left-10 w-32 h-32 bg-recruito-blue/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-10 right-10 w-40 h-40 bg-recruito-teal/10 rounded-full blur-3xl"></div>
-        </section>
-
-        {/* Demo Section */}
-        <section className="py-20" data-demo-section id="demo">
-          <div className="container mx-auto px-4 text-center">
+          
+          <div className="container mx-auto px-4 text-center relative z-10">
             <div className="max-w-3xl mx-auto">
-              <h2 className="text-4xl font-bold mb-6">🚀 Testa la piattaforma</h2>
+              <h2 className="text-4xl font-bold mb-6 text-gradient">🚀 Join the Beta</h2>
               <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-                La piattaforma che connette aziende e recruiter freelance verificati. 
-                Accesso a rete di top recruiter specializzati per settore.
+                Esplora in anteprima il sistema completo di gestione proposte e candidature. 
+                Testa tutte le funzionalità per recruiter e aziende in un ambiente completamente funzionale.
               </p>
               
-              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20">
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift">
                 {user ? (
                   <Button onClick={() => setShowDashboard(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Accedi alla Dashboard
+                    Accedi ai primi test
                   </Button>
                 ) : (
                   <div className="space-y-4">
@@ -188,10 +147,27 @@ const Index = () => {
                     </p>
                   </div>
                 )}
+                
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-recruito-blue rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Dashboard Recruiter</h4>
+                      <p className="text-sm text-muted-foreground">Invia proposte e gestisci candidature</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-recruito-teal rounded-full mt-2 flex-shrink-0"></div>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Dashboard Azienda</h4>
+                      <p className="text-sm text-muted-foreground">Ricevi proposte e gestisci offerte</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
         
         <HowItWorks />
         <ProblemSolution />

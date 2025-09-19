@@ -34,10 +34,6 @@ export default {
 				start: 'hsl(var(--primary-start))',
 				end: 'hsl(var(--primary-end))'
 			},
-			// Brand colors
-			'recruito-blue': 'hsl(var(--primary-start))',
-			'recruito-teal': 'hsl(var(--electric-teal))',
-			'recruito-green': 'hsl(var(--primary-end))',
 			navy: {
 				DEFAULT: 'hsl(var(--navy))',
 				foreground: 'hsl(var(--navy-foreground))'

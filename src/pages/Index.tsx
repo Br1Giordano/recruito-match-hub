@@ -3,9 +3,6 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/Hero";
 import HowItWorks from "@/components/HowItWorks";
-import ProblemSolution from "@/components/ProblemSolution";
-import Market from "@/components/Market";
-import BusinessModel from "@/components/BusinessModel";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DashboardNavigation from "@/components/DashboardNavigation";
@@ -170,9 +167,6 @@ const Index = () => {
         </div>
         
         <HowItWorks />
-        <ProblemSolution />
-        <Market />
-        <BusinessModel />
       </main>
       <Footer />
     </div>

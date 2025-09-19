@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { useRealTimeNotifications } from "@/hooks/useRealTimeNotifications";
 import Index from "./pages/Index";
+import ForRecruiters from "./pages/ForRecruiters";
+import ForCompanies from "./pages/ForCompanies";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
@@ -21,6 +23,8 @@ const AppContent = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
+        <Route path="/for-recruiters" element={<ForRecruiters />} />
+        <Route path="/for-companies" element={<ForCompanies />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/cookie-policy" element={<CookiePolicy />} />

@@ -13,6 +13,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
 import NotFound from "./pages/NotFound";
+import AuthPage from "./components/auth/AuthPage";
 import MaintenancePage from "./components/MaintenancePage";
 import CookieBanner from "./components/CookieBanner";
 
@@ -25,6 +26,7 @@ const AppContent = () => {
         <Route path="/" element={<Index />} />
         <Route path="/for-recruiters" element={<ForRecruiters />} />
         <Route path="/for-companies" element={<ForCompanies />} />
+        <Route path="/auth" element={<AuthPage onBack={() => window.history.back()} />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/cookie-policy" element={<CookiePolicy />} />

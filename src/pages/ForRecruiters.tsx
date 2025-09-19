@@ -3,8 +3,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CheckCircle, Users, Target, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ForRecruiters = () => {
+  const navigate = useNavigate();
+
+  const handleRegisterClick = () => {
+    navigate('/auth');
+  };
   const benefits = [
     {
       icon: <Users className="h-6 w-6" />,
@@ -45,7 +51,7 @@ const ForRecruiters = () => {
             Trasforma il tuo modo di fare recruiting. Accedi a una piattaforma innovativa 
             che ti permette di trovare i candidati migliori in modo più efficiente.
           </p>
-          <Button size="lg" className="text-lg px-8 py-3">
+          <Button size="lg" className="text-lg px-8 py-3" onClick={handleRegisterClick}>
             Inizia Ora
           </Button>
         </div>
@@ -96,7 +102,7 @@ const ForRecruiters = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button size="lg" className="text-lg px-8 py-3">
+              <Button size="lg" className="text-lg px-8 py-3" onClick={handleRegisterClick}>
                 Registrati Come Recruiter
               </Button>
             </CardContent>

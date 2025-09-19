@@ -3,8 +3,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CheckCircle, Building, Clock, Shield } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ForCompanies = () => {
+  const navigate = useNavigate();
+
+  const handleRegisterClick = () => {
+    navigate('/auth');
+  };
   const benefits = [
     {
       icon: <Building className="h-6 w-6" />,
@@ -45,7 +51,7 @@ const ForCompanies = () => {
             Trova i migliori recruiter per la tua azienda. Una piattaforma innovativa 
             che mette in contatto le aziende con recruiter qualificati e verificati.
           </p>
-          <Button size="lg" className="text-lg px-8 py-3">
+          <Button size="lg" className="text-lg px-8 py-3" onClick={handleRegisterClick}>
             Inizia Ora
           </Button>
         </div>
@@ -96,7 +102,7 @@ const ForCompanies = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button size="lg" className="text-lg px-8 py-3">
+              <Button size="lg" className="text-lg px-8 py-3" onClick={handleRegisterClick}>
                 Registra la Tua Azienda
               </Button>
             </CardContent>

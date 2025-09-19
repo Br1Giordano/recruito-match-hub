@@ -1,33 +1,29 @@
-
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Users, Target, Zap, Sparkles, TrendingUp, Building2 } from "lucide-react";
-
-
 interface HeroProps {
   onShowAuth?: () => void;
   onShowDashboard?: () => void;
 }
-
-const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
+const Hero = ({
+  onShowAuth,
+  onShowDashboard
+}: HeroProps) => {
   const scrollToDemo = () => {
     console.log('scrollToDemo called - looking for demo section');
-    
+
     // Try multiple selectors to find the demo section
     let demoElement = document.querySelector('[data-demo-section]');
-    
     if (!demoElement) {
       console.log('data-demo-section not found, trying #demo');
       demoElement = document.getElementById('demo');
     }
-    
     if (!demoElement) {
       console.log('#demo not found, trying .demo-section');
       demoElement = document.querySelector('.demo-section');
     }
-    
     if (demoElement) {
       console.log('Demo section found, scrolling...', demoElement);
-      demoElement.scrollIntoView({ 
+      demoElement.scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
@@ -40,16 +36,15 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
       });
     }
   };
-
   const scrollToHowItWorks = () => {
     const element = document.getElementById('come-funziona');
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
-  return (
-    <section className="relative min-h-screen flex items-center overflow-hidden">
+  return <section className="relative min-h-screen flex items-center overflow-hidden">
       {/* Background handled globally on Index page */}
       <div className="container mx-auto px-4 py-20">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -67,19 +62,13 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
 
             {/* Pulsanti con i colori del brand Recruito */}
             <div className="flex justify-center gap-4 pt-8">
-              <button 
-                onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 gradient-primary text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-startup hover:shadow-startup-hover transform hover:scale-105 ripple"
-              >
+              <button onClick={scrollToDemo} className="inline-flex items-center gap-2 gradient-primary text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-startup hover:shadow-startup-hover transform hover:scale-105 ripple">
                 <Building2 className="h-5 w-5" />
                 Unisciti come azienda
                 <ArrowRight className="h-5 w-5" />
               </button>
               
-              <button 
-                onClick={scrollToDemo}
-                className="inline-flex items-center gap-2 gradient-primary text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-startup hover:shadow-startup-hover transform hover:scale-105 ripple"
-              >
+              <button onClick={scrollToDemo} className="inline-flex items-center gap-2 gradient-primary text-white px-8 py-3 rounded-full text-base font-semibold transition-all duration-300 cursor-pointer shadow-startup hover:shadow-startup-hover transform hover:scale-105 ripple">
                 <Users className="h-5 w-5" />
                 Unisciti come recruiter
                 <ArrowRight className="h-5 w-5" />
@@ -103,37 +92,10 @@ const Hero = ({ onShowAuth, onShowDashboard }: HeroProps) => {
           </div>
 
           <div className="relative animate-slide-in">
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
-                  <Users className="h-12 w-12 text-primary mb-4" />
-                  <h3 className="font-semibold text-gradient mb-2">Recruiter Verificati</h3>
-                  <p className="text-gray-600 text-sm">Solo i migliori professionisti, selezionati e valutati</p>
-                </div>
-                <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
-                  <Zap className="h-12 w-12 text-primary-end mb-4" />
-                  <h3 className="font-semibold text-gradient mb-2">Risultati Rapidi</h3>
-                  <p className="text-gray-600 text-sm">Profili qualificati in giorni, non mesi</p>
-                </div>
-              </div>
-              <div className="space-y-6">
-                <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
-                  <Target className="h-12 w-12 text-primary mb-4" />
-                  <h3 className="font-semibold text-gradient mb-2">Solo a Successo</h3>
-                  <p className="text-gray-600 text-sm">Paghi solo quando trovi e assumi il candidato giusto</p>
-                </div>
-                <div className="bg-white p-6 rounded-2xl shadow-lg hover-lift">
-                  <TrendingUp className="h-12 w-12 text-primary-end mb-4" />
-                  <h3 className="font-semibold text-gradient mb-2">Crescita Continua</h3>
-                  <p className="text-gray-600 text-sm">Supporto e formazione per migliorare sempre</p>
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;

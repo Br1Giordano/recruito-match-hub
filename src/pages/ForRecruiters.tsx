@@ -38,7 +38,7 @@ const ForRecruiters = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-white to-recruito-blue/5">
+    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20">
       <Header />
       
       <main className="container mx-auto px-4 py-16">
@@ -46,18 +46,18 @@ const ForRecruiters = () => {
         <div className="text-center mb-16">
           <div className="mb-8">
             <h1 className="text-4xl md:text-7xl font-bold leading-tight">
-              <span className="bg-gradient-to-r from-recruito-blue to-recruito-teal bg-clip-text text-transparent">Più opportunità,</span>
+              <span className="text-foreground">Più opportunità,</span>
               <br />
-              <span className="bg-gradient-to-r from-recruito-teal to-recruito-green bg-clip-text text-transparent">più guadagni,</span>
+              <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">più guadagni,</span>
               <br />
-              <span className="bg-gradient-to-r from-recruito-green to-recruito-blue bg-clip-text text-transparent">più visibilità.</span>
+              <span className="text-foreground">più visibilità.</span>
             </h1>
           </div>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Trasforma il tuo modo di fare recruiting. Accedi a una piattaforma innovativa 
             che ti permette di trovare i candidati migliori in modo più efficiente.
           </p>
-          <Button size="lg" className="text-lg px-8 py-3 bg-gradient-to-r from-recruito-blue to-recruito-teal hover:from-recruito-blue/90 hover:to-recruito-teal/90" onClick={handleRegisterClick}>
+          <Button size="lg" className="text-lg px-8 py-3" onClick={handleRegisterClick}>
             Inizia Ora
           </Button>
         </div>
@@ -65,12 +65,12 @@ const ForRecruiters = () => {
         {/* Benefits Section */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           {benefits.map((benefit, index) => (
-            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all hover:scale-105 bg-gradient-to-br from-white to-recruito-blue/5">
+            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-shadow">
               <CardHeader className="text-center">
-                <div className="w-12 h-12 bg-gradient-to-r from-recruito-blue/10 to-recruito-teal/10 rounded-lg flex items-center justify-center mx-auto mb-4 text-recruito-blue">
+                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-4 text-primary">
                   {benefit.icon}
                 </div>
-                <CardTitle className="text-xl bg-gradient-to-r from-recruito-blue to-recruito-teal bg-clip-text text-transparent">{benefit.title}</CardTitle>
+                <CardTitle className="text-xl">{benefit.title}</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-center">
@@ -82,14 +82,14 @@ const ForRecruiters = () => {
         </div>
 
         {/* Features Section */}
-        <div className="bg-gradient-to-br from-recruito-blue/5 via-white to-recruito-teal/5 rounded-2xl p-8 mb-16 border border-recruito-blue/10">
-          <h2 className="text-3xl font-bold text-center mb-8 bg-gradient-to-r from-recruito-blue to-recruito-green bg-clip-text text-transparent">
+        <div className="bg-card/50 rounded-2xl p-8 mb-16">
+          <h2 className="text-3xl font-bold text-center mb-8">
             Funzionalità Dedicate
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
             {features.map((feature, index) => (
               <div key={index} className="flex items-start gap-3">
-                <CheckCircle className="h-6 w-6 text-recruito-green mt-1 flex-shrink-0" />
+                <CheckCircle className="h-6 w-6 text-primary mt-1 flex-shrink-0" />
                 <span className="text-muted-foreground">{feature}</span>
               </div>
             ))}
@@ -98,9 +98,9 @@ const ForRecruiters = () => {
 
         {/* CTA Section */}
         <div className="text-center">
-          <Card className="border-0 bg-gradient-to-r from-recruito-blue/10 via-white to-recruito-teal/10 p-8 border border-recruito-blue/20">
+          <Card className="border-0 bg-gradient-to-r from-primary/10 to-primary/5 p-8">
             <CardHeader>
-              <CardTitle className="text-2xl mb-4 bg-gradient-to-r from-recruito-blue to-recruito-green bg-clip-text text-transparent">
+              <CardTitle className="text-2xl mb-4">
                 Pronto a Rivoluzionare il Tuo Recruiting?
               </CardTitle>
               <CardDescription className="text-lg mb-6">
@@ -108,7 +108,7 @@ const ForRecruiters = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button size="lg" className="text-lg px-8 py-3 bg-gradient-to-r from-recruito-teal to-recruito-green hover:from-recruito-teal/90 hover:to-recruito-green/90" onClick={handleRegisterClick}>
+              <Button size="lg" className="text-lg px-8 py-3" onClick={handleRegisterClick}>
                 Registrati Come Recruiter
               </Button>
             </CardContent>

@@ -170,7 +170,7 @@ export const CompactJobInterestCard = ({
               size="sm"
               className="h-7 px-3 text-xs"
             >
-              Candidato
+              Invia candidato
             </Button>
           </div>
         </div>

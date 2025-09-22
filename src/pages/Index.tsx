@@ -77,6 +77,14 @@ const Index = () => {
     return () => clearTimeout(timer);
   }, [loading]);
 
+  // Auto-redirect alla dashboard se l'utente è già autenticato
+  useEffect(() => {
+    if (user && !showAuth && !showDashboard) {
+      console.log('User authenticated, auto-redirecting to dashboard');
+      setShowDashboard(true);
+    }
+  }, [user, showAuth, showDashboard]);
+
   // Mostra il loading screen solo per i primi 2 secondi massimo
   if (loading && !loadingTimeout) {
     return <LoadingScreen />;
@@ -85,7 +93,10 @@ const Index = () => {
   const handleAuthSuccess = () => {
     console.log('Auth success, redirecting to dashboard');
     setShowAuth(false);
-    setShowDashboard(true);
+    // Aspetta un piccolo delay per permettere al useAuth di aggiornare lo stato
+    setTimeout(() => {
+      setShowDashboard(true);
+    }, 100);
   };
 
   const handleShowAuth = () => {

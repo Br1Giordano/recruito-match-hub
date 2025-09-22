@@ -91,10 +91,7 @@ const HowItWorks = () => {
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
                 I recruiter si attivano
               </h3>
-              <p className="text-gray-600 mb-6 flex-1">
-                Almeno 3 recruiter specializzati nel tuo settore iniziano la ricerca 
-                in parallelo, utilizzando i loro network e competenze.
-              </p>
+              <p className="text-gray-600 mb-6 flex-1">Molteplici recruiter specializzati nel tuo settore iniziano la ricerca in parallelo, utilizzando i loro network e competenze.</p>
               <div className="bg-gray-50 p-4 rounded-xl h-48 flex flex-col justify-center">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-3 p-2 bg-white rounded-lg">
@@ -198,21 +195,21 @@ const HowItWorks = () => {
                   <Clock className="h-6 w-6 text-red-500 mt-1" />
                   <div>
                     <h5 className="font-semibold text-gray-900">Tempi lunghi</h5>
-                    <p className="text-gray-600 text-sm">3-6 mesi per trovare il candidato giusto</p>
+                    <p className="text-gray-600 text-sm">La selezione di ruoli specialistici richiede mesi di ricerca</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 p-4 bg-red-50 rounded-xl">
                   <DollarSign className="h-6 w-6 text-red-500 mt-1" />
                   <div>
                     <h5 className="font-semibold text-gray-900">Costi elevati</h5>
-                    <p className="text-gray-600 text-sm">Fee del 18-20% + costi fissi e anticipi</p>
+                    <p className="text-gray-600 text-sm">Le fees, tra 15-25% della RAL, prevedono anticipi e trattenute</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 p-4 bg-red-50 rounded-xl">
                   <Target className="h-6 w-6 text-red-500 mt-1" />
                   <div>
                     <h5 className="font-semibold text-gray-900">Qualità incerta</h5>
-                    <p className="text-gray-600 text-sm">Profili generici senza pre-selezione accurata</p>
+                    <p className="text-gray-600 text-sm">I portali di annunci online sono self-service e generano grandi volumi non filtrati</p>
                   </div>
                 </div>
               </div>
@@ -229,21 +226,21 @@ const HowItWorks = () => {
                   <Clock className="h-6 w-6 text-green-500 mt-1" />
                   <div>
                     <h5 className="font-semibold text-gray-900">Velocità garantita</h5>
-                    <p className="text-gray-600 text-sm">Prime proposte entro una settimana</p>
+                    <p className="text-gray-600 text-sm"> grazie a più recruiter che lavorano sulla stessa posizione</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 p-4 bg-green-50 rounded-xl">
                   <DollarSign className="h-6 w-6 text-green-500 mt-1" />
                   <div>
                     <h5 className="font-semibold text-gray-900">Solo a successo</h5>
-                    <p className="text-gray-600 text-sm">15% della RAL, paghi solo se assumi</p>
+                    <p className="text-gray-600 text-sm"> Unica fee pagata a successo</p>
                   </div>
                 </div>
                 <div className="flex items-start space-x-3 p-4 bg-green-50 rounded-xl">
                   <Target className="h-6 w-6 text-green-500 mt-1" />
                   <div>
                     <h5 className="font-semibold text-gray-900">Qualità certificata</h5>
-                    <p className="text-gray-600 text-sm">Recruiter specializzati e profili pre-qualificati</p>
+                    <p className="text-gray-600 text-sm">Accesso a rete di top recruiter specializzati per settore</p>
                   </div>
                 </div>
               </div>

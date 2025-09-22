@@ -150,7 +150,10 @@ export const CompactJobInterestCard = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onViewDetails(jobOffer)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewDetails(jobOffer);
+              }}
               className="h-7 w-7 p-0"
             >
               <ExternalLink className="h-3 w-3" />
@@ -159,14 +162,20 @@ export const CompactJobInterestCard = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onRemoveInterest(interest.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onRemoveInterest(interest.id);
+              }}
               className="h-7 w-7 p-0 text-destructive hover:text-destructive"
             >
               <Trash2 className="h-3 w-3" />
             </Button>
 
             <Button
-              onClick={() => onSendProposal(jobOffer)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onSendProposal(jobOffer);
+              }}
               size="sm"
               className="h-7 px-3 text-xs"
             >

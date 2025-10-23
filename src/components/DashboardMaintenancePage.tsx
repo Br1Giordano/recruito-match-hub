@@ -36,11 +36,12 @@ const DashboardMaintenancePage = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3">
-            <Button asChild className="flex-1">
-              <Link to="/">
-                <Home className="h-4 w-4 mr-2" />
-                Torna alla Home
-              </Link>
+            <Button 
+              onClick={() => window.location.href = '/'}
+              className="flex-1"
+            >
+              <Home className="h-4 w-4 mr-2" />
+              Torna alla Home
             </Button>
             <Button asChild variant="outline" className="flex-1">
               <a href="mailto:contact.recruito@gmail.com">

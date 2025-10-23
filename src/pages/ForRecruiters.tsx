@@ -70,9 +70,6 @@ const ForRecruiters = () => {
               Inizia Ora
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <p className="text-sm text-muted-foreground mt-4">
-              Accesso in pausa per manutenzione
-            </p>
           </div>
         </section>
 
@@ -148,9 +145,6 @@ const ForRecruiters = () => {
                     Registrati Come Recruiter
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
-                  <p className="text-sm text-muted-foreground mt-4">
-                    Accesso in pausa per manutenzione
-                  </p>
                 </CardContent>
               </Card>
             </div>

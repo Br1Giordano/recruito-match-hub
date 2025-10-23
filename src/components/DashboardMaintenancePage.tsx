@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Wrench, Mail, Home } from "lucide-react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const DashboardMaintenancePage = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-accent/5 p-4">
       <Card className="w-full max-w-2xl border-2">
@@ -37,7 +38,7 @@ const DashboardMaintenancePage = () => {
 
           <div className="flex flex-col sm:flex-row gap-3">
             <Button 
-              onClick={() => window.location.href = '/'}
+              onClick={() => navigate('/?closeDashboard=1')}
               className="flex-1"
             >
               <Home className="h-4 w-4 mr-2" />

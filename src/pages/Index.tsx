@@ -20,6 +20,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DASHBOARD_MAINTENANCE_MODE } from "@/App";
 
 const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -86,7 +87,7 @@ const Index = () => {
 
   // Auto-redirect alla dashboard se l'utente è già autenticato
   useEffect(() => {
-    if (user && !showAuth && !showDashboard) {
+    if (user && !showAuth && !showDashboard && !DASHBOARD_MAINTENANCE_MODE) {
       console.log('User authenticated, auto-redirecting to dashboard');
       setShowDashboard(true);
     }
@@ -148,9 +149,34 @@ const Index = () => {
               
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift">
                 {user ? (
-                  <Button onClick={() => setShowDashboard(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                    Accedi ai primi test
-                  </Button>
+                  DASHBOARD_MAINTENANCE_MODE ? (
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-block">
+                            <Button 
+                              disabled
+                              size="lg" 
+                              className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg opacity-60 cursor-not-allowed flex items-center gap-2"
+                            >
+                              <Wrench className="h-5 w-5" />
+                              Accedi ai primi test
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs text-center">
+                            Dashboard temporaneamente sospese per gestire le numerose richieste.<br/>
+                            Usa il form "Prenota una Demo" qui sotto!
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  ) : (
+                    <Button onClick={() => setShowDashboard(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                      Accedi ai primi test
+                    </Button>
+                  )
                 ) : (
                   <div className="space-y-4">
                     <TooltipProvider>

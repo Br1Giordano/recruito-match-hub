@@ -12,6 +12,15 @@ const TermsOfService = () => {
           <div className="prose prose-lg max-w-none">
             <p className="text-gray-600 mb-6">Ultimo aggiornamento: 25 giugno 2025</p>
             
+            <div className="bg-amber-50 border-l-4 border-amber-500 p-6 mb-8">
+              <p className="font-semibold text-amber-900 mb-2">⚠️ Avviso Importante</p>
+              <p className="text-amber-800">
+                Recruito è un progetto sperimentale a scopo formativo e dimostrativo.
+                Non offre servizi di collocamento o intermediazione lavorativa ai sensi del D.Lgs. 276/2003.
+                I dati eventualmente raccolti servono solo per test e contatti informativi.
+              </p>
+            </div>
+            
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">1. Accettazione dei Termini</h2>
               <p className="mb-4">

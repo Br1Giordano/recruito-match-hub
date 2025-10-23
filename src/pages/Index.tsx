@@ -93,6 +93,17 @@ const Index = () => {
     }
   }, [user, showAuth, showDashboard]);
 
+  // Gestione chiusura dashboard da URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('closeDashboard') === '1') {
+      console.log('Closing dashboard from URL parameter');
+      setShowDashboard(false);
+      // Pulisci l'URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   // Mostra il loading screen solo per i primi 2 secondi massimo
   if (loading && !loadingTimeout) {
     return <LoadingScreen />;

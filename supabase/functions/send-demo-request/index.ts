@@ -62,7 +62,7 @@ const handler = async (req: Request): Promise<Response> => {
     // Send notification email to Recruito team
     const notificationEmail = await resend.emails.send({
       from: "Recruito Demo Requests <onboarding@resend.dev>",
-      to: ["info@recruito.eu", "contact.recruito@gmail.com"],
+      to: ["contact.recruito@gmail.com"],
       subject: `Nuova Richiesta Demo - ${data.nome} ${data.cognome}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

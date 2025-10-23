@@ -45,6 +45,11 @@ const queryClient = new QueryClient();
 // Cambia questo valore a 'false' per disattivare la modalità manutenzione
 const MAINTENANCE_MODE = false;
 
+// 🔒 MODALITÀ MANUTENZIONE DASHBOARD 🔒
+// Cambia questo valore a 'true' per sospendere l'accesso alle dashboard
+// Mantiene visibili le landing page ma blocca login/accesso alle dashboard
+export const DASHBOARD_MAINTENANCE_MODE = true;
+
 // 🤖 FUNZIONALITÀ AI DISABILITATE 🤖
 export const AI_FEATURES_ENABLED = false;
 

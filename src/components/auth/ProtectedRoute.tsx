@@ -1,6 +1,7 @@
-
 import { useAuth } from "@/hooks/useAuth";
 import AuthPage from "./AuthPage";
+import DashboardMaintenancePage from "@/components/DashboardMaintenancePage";
+import { DASHBOARD_MAINTENANCE_MODE } from "@/App";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -16,6 +17,11 @@ export default function ProtectedRoute({ children, onBack }: ProtectedRouteProps
         <div className="text-lg">Caricamento...</div>
       </div>
     );
+  }
+
+  // Se la manutenzione dashboard è attiva, mostra la pagina di manutenzione
+  if (DASHBOARD_MAINTENANCE_MODE) {
+    return <DashboardMaintenancePage />;
   }
 
   if (!user) {

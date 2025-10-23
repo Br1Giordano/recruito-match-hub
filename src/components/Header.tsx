@@ -14,6 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { DASHBOARD_MAINTENANCE_MODE } from "@/App";
 
 interface HeaderProps {
   onShowAuth?: () => void;
@@ -120,6 +121,29 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
                 <MessageIcon onClick={handleOpenMessageCenter} hasNotification={hasNewMessages} />
                 {userProfile.user_type === 'recruiter' ? (
                   <RecruiterProfileButton />
+                ) : DASHBOARD_MAINTENANCE_MODE ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span>
+                          <Button
+                            size="sm"
+                            disabled
+                            className="gradient-recruito text-white border-0 opacity-60 cursor-not-allowed flex items-center gap-2"
+                          >
+                            <Wrench className="h-4 w-4" />
+                            Dashboard Azienda
+                          </Button>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs text-center">
+                          Dashboard temporaneamente sospese per gestire le numerose richieste. 
+                          Usa il form "Prenota una Demo" per essere ricontattato!
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 ) : (
                   <Button
                     onClick={onShowDashboard}

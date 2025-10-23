@@ -12,8 +12,14 @@ import LoadingScreen from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { LogIn } from "lucide-react";
+import { LogIn, Wrench } from "lucide-react";
 import BrandedGradient from "@/components/ui/animated/BrandedGradient";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Index = () => {
   const [showDashboard, setShowDashboard] = useState(false);
@@ -147,12 +153,30 @@ const Index = () => {
                   </Button>
                 ) : (
                   <div className="space-y-4">
-                    <Button onClick={() => setShowAuth(true)} size="lg" className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-                      <LogIn className="h-5 w-5 mr-2" />
-                      Accedi / Registrati
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="inline-block">
+                            <Button 
+                              disabled
+                              size="lg" 
+                              className="gradient-recruito text-white text-lg px-12 py-4 rounded-xl font-semibold shadow-lg opacity-60 cursor-not-allowed flex items-center gap-2"
+                            >
+                              <Wrench className="h-5 w-5" />
+                              Accedi / Registrati
+                            </Button>
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="max-w-xs text-center">
+                            Sistema temporaneamente in manutenzione per gestire le numerose richieste.<br/>
+                            Usa il form "Prenota una Demo" qui sotto!
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                     <p className="text-sm text-muted-foreground">
-                      Devi essere autenticato per accedere alla demo
+                      Sistema in manutenzione - Prenota una demo per essere ricontattato
                     </p>
                   </div>
                 )}

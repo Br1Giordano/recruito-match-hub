@@ -6,8 +6,14 @@ import RecruiterProfileButton from "./recruiter/RecruiterProfileButton";
 import { MessageIcon } from "./messaging/MessageIcon";
 import { MessageCenter } from "./messaging/MessageCenter";
 import { useRealTimeNotifications } from "@/hooks/useRealTimeNotifications";
-import { Building2 } from "lucide-react";
+import { Building2, Wrench } from "lucide-react";
 import { useState } from "react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface HeaderProps {
   onShowAuth?: () => void;
@@ -126,14 +132,28 @@ const Header = ({ onShowAuth, onShowDashboard }: HeaderProps) => {
                 )}
               </>
             ) : (
-              <Link to="/auth">
-                <Button
-                  size="sm"
-                  className="gradient-recruito text-white border-0 hover:opacity-90"
-                >
-                  Join Us
-                </Button>
-              </Link>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span>
+                      <Button
+                        size="sm"
+                        disabled
+                        className="gradient-recruito text-white border-0 opacity-60 cursor-not-allowed flex items-center gap-2"
+                      >
+                        <Wrench className="h-4 w-4" />
+                        Join Us
+                      </Button>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="max-w-xs text-center">
+                      Sistema temporaneamente in manutenzione per gestire le numerose richieste. 
+                      Usa il form "Prenota una Demo" per essere ricontattato!
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </div>
         </nav>

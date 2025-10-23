@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import DashboardNavigation from "@/components/DashboardNavigation";
 import AuthPage from "@/components/auth/AuthPage";
+import { DemoRequestForm } from "@/components/DemoRequestForm";
 import LoadingScreen from "@/components/LoadingScreen";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -178,6 +179,7 @@ const Index = () => {
         </div>
         
         <HowItWorks />
+        <DemoRequestForm />
       </main>
       <Footer />
     </div>

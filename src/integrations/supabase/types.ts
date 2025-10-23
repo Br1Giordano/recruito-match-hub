@@ -267,6 +267,42 @@ export type Database = {
           },
         ]
       }
+      demo_requests: {
+        Row: {
+          cognome: string
+          created_at: string
+          email: string
+          id: string
+          messaggio: string | null
+          nome: string
+          nome_azienda: string | null
+          status: string
+          telefono: string | null
+        }
+        Insert: {
+          cognome: string
+          created_at?: string
+          email: string
+          id?: string
+          messaggio?: string | null
+          nome: string
+          nome_azienda?: string | null
+          status?: string
+          telefono?: string | null
+        }
+        Update: {
+          cognome?: string
+          created_at?: string
+          email?: string
+          id?: string
+          messaggio?: string | null
+          nome?: string
+          nome_azienda?: string | null
+          status?: string
+          telefono?: string | null
+        }
+        Relationships: []
+      }
       digital_contracts: {
         Row: {
           content: string
@@ -313,7 +349,7 @@ export type Database = {
           data_categories: string[] | null
           description: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           legal_basis: string | null
           metadata: Json | null
           processed_by: string | null
@@ -327,7 +363,7 @@ export type Database = {
           data_categories?: string[] | null
           description: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           legal_basis?: string | null
           metadata?: Json | null
           processed_by?: string | null
@@ -341,7 +377,7 @@ export type Database = {
           data_categories?: string[] | null
           description?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           legal_basis?: string | null
           metadata?: Json | null
           processed_by?: string | null
@@ -513,21 +549,21 @@ export type Database = {
         Row: {
           attempt_time: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           success: boolean | null
           user_id: string | null
         }
         Insert: {
           attempt_time?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           success?: boolean | null
           user_id?: string | null
         }
         Update: {
           attempt_time?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           success?: boolean | null
           user_id?: string | null
         }
@@ -989,7 +1025,7 @@ export type Database = {
           created_at: string
           expiry_date: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           signature_data: Json
           signed_at: string
           status: string
@@ -1004,7 +1040,7 @@ export type Database = {
           created_at?: string
           expiry_date?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           signature_data: Json
           signed_at?: string
           status?: string
@@ -1019,7 +1055,7 @@ export type Database = {
           created_at?: string
           expiry_date?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           signature_data?: Json
           signed_at?: string
           status?: string
@@ -1084,14 +1120,8 @@ export type Database = {
         Args: { recruiter_email_param: string }
         Returns: undefined
       }
-      cleanup_old_login_attempts: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      fix_test_users_profiles: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      cleanup_old_login_attempts: { Args: never; Returns: undefined }
+      fix_test_users_profiles: { Args: never; Returns: undefined }
       get_current_user_registration_id: {
         Args: { table_name: string }
         Returns: string
@@ -1100,22 +1130,13 @@ export type Database = {
         Args: { p_job_offer_id: string }
         Returns: number
       }
-      is_admin: {
-        Args: { user_email: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { user_email: string }; Returns: boolean }
       link_user_to_registration: {
         Args: { p_registration_id: string; p_user_type: string }
         Returns: boolean
       }
-      populate_user_ids: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      test_email_system: {
-        Args: Record<PropertyKey, never>
-        Returns: Json
-      }
+      populate_user_ids: { Args: never; Returns: undefined }
+      test_email_system: { Args: never; Returns: Json }
       update_recruiter_stats: {
         Args: { recruiter_email_param: string }
         Returns: undefined

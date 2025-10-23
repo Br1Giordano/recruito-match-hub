@@ -157,6 +157,9 @@ const Index = () => {
                 Esplora in anteprima il sistema completo di gestione proposte e candidature. 
                 Testa tutte le funzionalità per recruiter e aziende in un ambiente completamente funzionale.
               </p>
+              <p className="text-sm text-muted-foreground/70 mb-6">
+                Accesso in pausa per manutenzione dovuta alle numerose richieste
+              </p>
               
               <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 shadow-xl border border-white/20 hover-lift">
                 {user ? (
